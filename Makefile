@@ -51,6 +51,9 @@ src/music/soundfx.nsf: src/music/soundfx.ftm
 src/music/soundfx.s: src/music/soundfx.nsf
 	${NSF2DATA} src/music/soundfx.nsf -ca65 -ntsc
 
+%.rle: %.nam
+	ruby tools/rle-compress.rb $< $@
+
 clean:
 	rm src/*.o src/main.s src/*/*.o src/music/soundfx.nsf src/music/soundfx.s src/music/soundtrack.txt src/music/soundtrack.s assets/*.o *.nes *.dbg map.txt -f
 
