@@ -1,0 +1,9 @@
+*.o
+*.nes
+*.dbg
+*.tiled-session
+map.txt
+data/*.inc
+tools/ld65-map.json
+src/main.s
+assets/questions/*
