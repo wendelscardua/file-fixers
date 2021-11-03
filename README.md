@@ -8,6 +8,9 @@ A computer-themed RPG for NES, made for the [Game Off 2021](https://itch.io/jam/
 - FamiTone 5.0 (set `NSF2DATA` and `TEXT2DATA` paths on Makefile)
 - FamiTracker (set `FAMITRACKER` path on Makefile).
 
+Intermediate sfx and soundtrack files are commited, so FamiTone and FamiTracker
+are only needed if their original files are changed.
+
 ## Building
 
 To compile a release version:
