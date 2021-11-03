@@ -32,7 +32,9 @@ src/crt0.o: src/crt0.s src/mmc3/mmc3_code.asm src/lib/neslib.s src/lib/nesdoug.s
 	ca65 $< ${CA65_FLAGS}
 
 assets/nametables.o: assets/nametables.s assets/nametables.h \
-                     assets/nametables/title.rle
+                     assets/nametables/title.rle \
+                     assets/nametables/main.rle \
+                     assets/nametables/drivers-window.rle
 	ca65 $< ${CA65_FLAGS}
 
 assets/palettes.o: assets/palettes.s assets/palettes.h \
@@ -53,6 +55,13 @@ src/music/soundfx.s: src/music/soundfx.nsf
 
 %.rle: %.nam
 	ruby tools/rle-compress.rb $< $@
+
+assets/nametables/drivers-window.nam: assets/nametables/drivers-window.map \
+                                      assets/nametables/main.nam
+	ruby tools/prerender-window.rb assets/nametables/main.nam \
+                                       $< \
+                                       4 8 \
+                                       $@
 
 clean:
 	rm src/*.o src/main.s src/*/*.o src/music/soundfx.nsf src/music/soundfx.s src/music/soundtrack.txt src/music/soundtrack.s assets/*.o *.nes *.dbg map.txt -f
