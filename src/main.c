@@ -10,6 +10,7 @@
 #include "mmc3/mmc3_code.c"
 #include "sprites.h"
 #include "../assets/nametables.h"
+#include "../assets/palettes.h"
 
 #define SFX_TOGGLE 0
 #define SFX_SELECT 1
@@ -61,11 +62,6 @@ unsigned int wram_start;
 #pragma rodata-name ("RODATA")
 #pragma code-name ("CODE")
 
-const char palette_bg[16]={ 0x10,0x0f,0x11,0x30,0x10,0x38,0x28,0x30,0x10,0x06,0x16,0x26,0x10,0x09,0x19,0x29 };
-
-const char palette_spr[16]={ 0x10,0x0f,0x11,0x30,0x10,0x38,0x28,0x30,0x10,0x06,0x16,0x26,0x10,0x09,0x19,0x29 };
-
-
 void draw_sprites (void);
 
 void init_wram (void) {
@@ -82,8 +78,8 @@ void start_game (void) {
 
   pal_fade_to(4, 0);
   ppu_off();
-  pal_bg(palette_bg);
-  pal_spr(palette_spr);
+  pal_bg(bg_palette);
+  pal_spr(sprites_palette);
 
   // draw some things
   vram_adr(NTADR_A(0,0));
@@ -129,8 +125,8 @@ void main (void) {
   init_wram();
 
   ppu_off(); // screen off
-  pal_bg(palette_bg); //	load the BG palette
-  pal_spr(palette_spr); // load the sprite palette
+  pal_bg(bg_palette); //	load the BG palette
+  pal_spr(sprites_palette); // load the sprite palette
   // load red alpha and drawing as bg chars
   // and unused as sprites
   set_chr_mode_2(BG_0);
