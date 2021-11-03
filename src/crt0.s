@@ -377,9 +377,5 @@ sounds_data:
 
 .segment "CHARS"
 
-.incbin "../assets/bg_0.chr"
-.incbin "../assets/bg_1.chr"
-.incbin "../assets/bg_2.chr"
-.incbin "../assets/bg_3.chr"
-.incbin "../assets/sprites_0.chr"
-.incbin "../assets/sprites_1.chr"
+.incbin "../assets/bg.chr"
+.incbin "../assets/sprites.chr"
