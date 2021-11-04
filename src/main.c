@@ -20,12 +20,16 @@
 #define SFX_PEW 5
 #define SFX_CHAOS 6
 
-#define BG_0 0
-#define BG_1 1
-#define BG_2 2
-#define BG_3 3
+#define BG_MAIN_0 0
+#define BG_MAIN_1 1
+#define BG_MAIN_2 2
+#define BG_MAIN_3 3
 #define SPRITE_0 4
 #define SPRITE_1 6
+#define BG_DUNGEON_0 8
+#define BG_DUNGEON_1 9
+#define BG_DUNGEON_2 10
+#define BG_DUNGEON_3 11
 
 #pragma bss-name(push, "ZEROPAGE")
 
@@ -127,12 +131,11 @@ void main (void) {
   ppu_off(); // screen off
   pal_bg(bg_palette); //	load the BG palette
   pal_spr(sprites_palette); // load the sprite palette
-  // load red alpha and drawing as bg chars
-  // and unused as sprites
-  set_chr_mode_2(BG_0);
-  set_chr_mode_3(BG_1);
-  set_chr_mode_4(BG_2);
-  set_chr_mode_5(BG_3);
+
+  set_chr_mode_2(BG_MAIN_0);
+  set_chr_mode_3(BG_MAIN_1);
+  set_chr_mode_4(BG_MAIN_2);
+  set_chr_mode_5(BG_MAIN_3);
   set_chr_mode_0(SPRITE_0);
   set_chr_mode_1(SPRITE_1);
 
