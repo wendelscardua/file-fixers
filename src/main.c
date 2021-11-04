@@ -116,6 +116,15 @@ void go_to_title (void) {
   set_scroll_y(0);
 
   draw_sprites();
+
+  set_chr_mode_2(BG_MAIN_0);
+  set_chr_mode_3(BG_MAIN_1);
+  set_chr_mode_4(BG_MAIN_2);
+  set_chr_mode_5(BG_MAIN_3);
+
+  pal_bg(bg_palette);
+  pal_spr(sprites_palette);
+
   ppu_on_all(); //	turn on screen
   pal_fade_to(0, 4);
 }
