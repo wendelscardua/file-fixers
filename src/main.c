@@ -244,10 +244,12 @@ void main_window_handler() {
       cursor_target_y = main_window_target_y[cursor_index] + nudge_y;
     }
 
+#define MIN_DX 8
+#define MIN_DY 4
     if (cursor_target_x != cursor_x || cursor_target_y != cursor_y) {
       cursor_dx = cursor_target_x - cursor_x;
       cursor_dy = cursor_target_y - cursor_y;
-      while (cursor_dx > 4 || cursor_dy > 4 || cursor_dx < -4 || cursor_dy < -4) {
+      while (cursor_dx > MIN_DX || cursor_dy > MIN_DY || cursor_dx < -MIN_DX || cursor_dy < -MIN_DY) {
         if (cursor_dx > 1 || cursor_dx < -1) cursor_dx >>= 1;
         if (cursor_dy > 1 || cursor_dy < -1) cursor_dy >>= 1;
       }
