@@ -12,6 +12,9 @@
 #include "../assets/nametables.h"
 #include "../assets/palettes.h"
 
+#define FP(integer,fraction) (((integer)<<8)|((fraction)>>0))
+#define INT(unsigned_fixed_point) ((unsigned_fixed_point>>8)&0xff)
+
 #define SFX_TOGGLE 0
 #define SFX_SELECT 1
 #define SFX_START 2
@@ -52,8 +55,9 @@ enum game_state {
                  Dungeon
 } current_game_state;
 
-unsigned char cursor_index, cursor_x, cursor_y, cursor_target_x, cursor_target_y;
-signed char cursor_dx, cursor_dy;
+unsigned char cursor_index;
+unsigned int cursor_x, cursor_y, cursor_target_x, cursor_target_y;
+signed int cursor_dx, cursor_dy;
 
 #pragma bss-name(pop)
 // should be in the regular 0x300 ram now
@@ -228,30 +232,32 @@ void main_window_handler() {
     signed char nudge_y = rand8() % 8 - 4;
     if (pad1_new & PAD_UP) {
       cursor_index = main_window_up[cursor_index];
-      cursor_target_x = main_window_target_x[cursor_index] + nudge_x;
-      cursor_target_y = main_window_target_y[cursor_index] + nudge_y;
+      cursor_target_x = FP(main_window_target_x[cursor_index] + nudge_x, 0);
+      cursor_target_y = FP(main_window_target_y[cursor_index] + nudge_y, 0);
     } else if (pad1_new & PAD_DOWN) {
       cursor_index = main_window_down[cursor_index];
-      cursor_target_x = main_window_target_x[cursor_index] + nudge_x;
-      cursor_target_y = main_window_target_y[cursor_index] + nudge_y;
+      cursor_target_x = FP(main_window_target_x[cursor_index] + nudge_x, 0);
+      cursor_target_y = FP(main_window_target_y[cursor_index] + nudge_y, 0);
     } else if (pad1_new & PAD_LEFT) {
       cursor_index = main_window_left[cursor_index];
-      cursor_target_x = main_window_target_x[cursor_index] + nudge_x;
-      cursor_target_y = main_window_target_y[cursor_index] + nudge_y;
+      cursor_target_x = FP(main_window_target_x[cursor_index] + nudge_x, 0);
+      cursor_target_y = FP(main_window_target_y[cursor_index] + nudge_y, 0);
     } else if (pad1_new & PAD_RIGHT) {
       cursor_index = main_window_right[cursor_index];
-      cursor_target_x = main_window_target_x[cursor_index] + nudge_x;
-      cursor_target_y = main_window_target_y[cursor_index] + nudge_y;
+      cursor_target_x = FP(main_window_target_x[cursor_index] + nudge_x, 0);
+      cursor_target_y = FP(main_window_target_y[cursor_index] + nudge_y, 0);
     }
 
-#define MIN_DX 8
-#define MIN_DY 4
+#define MAX_DX FP(8, 0)
+#define MAX_DY FP(4, 0)
+#define MIN_DX FP(0, 8)
+#define MIN_DY FP(0, 8)
     if (cursor_target_x != cursor_x || cursor_target_y != cursor_y) {
       cursor_dx = cursor_target_x - cursor_x;
       cursor_dy = cursor_target_y - cursor_y;
-      while (cursor_dx > MIN_DX || cursor_dy > MIN_DY || cursor_dx < -MIN_DX || cursor_dy < -MIN_DY) {
-        if (cursor_dx > 1 || cursor_dx < -1) cursor_dx >>= 1;
-        if (cursor_dy > 1 || cursor_dy < -1) cursor_dy >>= 1;
+      while (cursor_dx > MAX_DX || cursor_dy > MAX_DY || cursor_dx < -MAX_DX || cursor_dy < -MAX_DY) {
+        if (cursor_dx > MIN_DX || cursor_dx < -MIN_DX) cursor_dx >>= 1;
+        if (cursor_dy > MIN_DY || cursor_dy < -MIN_DY) cursor_dy >>= 1;
       }
     }
   }
@@ -260,15 +266,15 @@ void main_window_handler() {
 }
 
 void draw_main_window_sprites() {
-  oam_meta_spr(cursor_x, cursor_y, arrow_cursor_sprite);
+  oam_meta_spr(INT(cursor_x), INT(cursor_y), arrow_cursor_sprite);
 }
 
 // ::CURSOR::
 
 void reset_cursor () {
   cursor_index = 0;
-  cursor_x = cursor_target_x = 0x80;
-  cursor_y = cursor_target_y = 0x20;
+  cursor_x = cursor_target_x = FP(0x80, 0x00);
+  cursor_y = cursor_target_y = FP(0x20, 0x00);
   cursor_dx = cursor_dy = 0;
 }
 
