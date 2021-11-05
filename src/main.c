@@ -45,7 +45,10 @@ unsigned int temp_int, temp_int_x, temp_int_y;
 
 enum game_state {
                  Title,
-                 GamePlay
+                 MainWindow,
+                 DriversWindow,
+                 AboutWindow,
+                 Dungeon
 } current_game_state;
 
 #pragma bss-name(pop)
@@ -92,7 +95,7 @@ void start_game (void) {
   ppu_on_all();
 
   pal_fade_to(0, 4);
-  current_game_state = GamePlay;
+  current_game_state = MainWindow;
 }
 
 void go_to_title (void) {
@@ -130,6 +133,21 @@ void go_to_title (void) {
   pal_fade_to(0, 4);
 }
 
+void title_handler() {
+  for(i = 0; i < 16; i++) {
+    pad_poll(0);
+    rand16();
+    if (get_pad_new(0) & (PAD_START | PAD_A)) {
+      sfx_play(SFX_START, 0);
+      start_game();
+      break;
+    }
+  }
+}
+
+void main_window_handler() {
+}
+
 void main (void) {
   set_mirroring(MIRROR_HORIZONTAL);
   bank_spr(1);
@@ -159,24 +177,15 @@ void main (void) {
   while (1){ // infinite loop
     ppu_wait_nmi();
     clear_vram_buffer();
-    pad_poll(0);
 
     double_buffer_index = 0;
 
     switch (current_game_state) {
     case Title:
-      for(i = 0; i < 16; i++) {
-        rand16();
-        if (get_pad_new(0) & (PAD_START | PAD_A)) {
-          sfx_play(SFX_START, 0);
-          start_game();
-          break;
-        }
-        pad_poll(0);
-      }
+      title_handler();
       break;
-    case GamePlay:
-      // TODO: gameplay
+    case MainWindow:
+      main_window_handler();
       break;
     }
 
@@ -199,9 +208,21 @@ void main (void) {
   }
 }
 
+void draw_title_sprites() {
+}
+
+void draw_main_window_sprites() {
+}
+
 void draw_sprites (void) {
   oam_clear();
-  if (current_game_state != GamePlay) return;
 
-  // TODO: render sprites
+  switch (current_game_state) {
+  case Title:
+    draw_title_sprites();
+    break;
+  case MainWindow:
+    draw_main_window_sprites();
+    break;
+  }
 }
