@@ -69,84 +69,14 @@ unsigned int wram_start;
 #pragma rodata-name ("RODATA")
 #pragma code-name ("CODE")
 
+void draw_main_window_sprites (void);
 void draw_sprites (void);
-
-void init_wram (void) {
-  if (wram_start != 0xcafe)
-    memfill(&wram_start,0,0x2000);
-  wram_start = 0xcafe;
-}
-
-void start_game (void) {
-  if (unseeded) {
-    seed_rng();
-    unseeded = 0;
-  }
-
-  pal_fade_to(4, 0);
-  ppu_off();
-
-  pal_bg(bg_palette);
-  pal_spr(sprites_palette);
-
-  // draw some things
-  vram_adr(NTADR_A(0,0));
-  unrle(main_window_nametable);
-  ppu_on_all();
-
-  pal_fade_to(0, 4);
-  current_game_state = MainWindow;
-}
-
-void go_to_title (void) {
-  current_game_state = Title;
-
-  if (irq_array[0] != 0xff) {
-    while(!is_irq_done() ){}
-    irq_array[0] = 0xff;
-    double_buffer[0] = 0xff;
-  }
-
-  clear_vram_buffer();
-
-  pal_fade_to(4, 0);
-  ppu_off(); // screen off
-  // draw some things
-  vram_adr(NTADR_A(0,0));
-  unrle(title_nametable);
-  music_play(0);
-
-  set_scroll_x(0);
-  set_scroll_y(0);
-
-  draw_sprites();
-
-  set_chr_mode_2(BG_MAIN_0);
-  set_chr_mode_3(BG_MAIN_1);
-  set_chr_mode_4(BG_MAIN_2);
-  set_chr_mode_5(BG_MAIN_3);
-
-  pal_bg(bg_palette);
-  pal_spr(sprites_palette);
-
-  ppu_on_all(); //	turn on screen
-  pal_fade_to(0, 4);
-}
-
-void title_handler() {
-  for(i = 0; i < 16; i++) {
-    pad_poll(0);
-    rand16();
-    if (get_pad_new(0) & (PAD_START | PAD_A)) {
-      sfx_play(SFX_START, 0);
-      start_game();
-      break;
-    }
-  }
-}
-
-void main_window_handler() {
-}
+void draw_title_sprites (void);
+void go_to_title (void);
+void init_wram (void);
+void main_window_handler (void);
+void start_game (void);
+void title_handler (void);
 
 void main (void) {
   set_mirroring(MIRROR_HORIZONTAL);
@@ -208,12 +138,6 @@ void main (void) {
   }
 }
 
-void draw_title_sprites() {
-}
-
-void draw_main_window_sprites() {
-}
-
 void draw_sprites (void) {
   oam_clear();
 
@@ -225,4 +149,93 @@ void draw_sprites (void) {
     draw_main_window_sprites();
     break;
   }
+}
+
+// ::TITLE::
+
+void go_to_title (void) {
+  current_game_state = Title;
+
+  if (irq_array[0] != 0xff) {
+    while(!is_irq_done() ){}
+    irq_array[0] = 0xff;
+    double_buffer[0] = 0xff;
+  }
+
+  clear_vram_buffer();
+
+  pal_fade_to(4, 0);
+  ppu_off(); // screen off
+  // draw some things
+  vram_adr(NTADR_A(0,0));
+  unrle(title_nametable);
+  music_play(0);
+
+  set_scroll_x(0);
+  set_scroll_y(0);
+
+  draw_sprites();
+
+  set_chr_mode_2(BG_MAIN_0);
+  set_chr_mode_3(BG_MAIN_1);
+  set_chr_mode_4(BG_MAIN_2);
+  set_chr_mode_5(BG_MAIN_3);
+
+  pal_bg(bg_palette);
+  pal_spr(sprites_palette);
+
+  ppu_on_all(); //	turn on screen
+  pal_fade_to(0, 4);
+}
+
+void title_handler() {
+  for(i = 0; i < 16; i++) {
+    pad_poll(0);
+    rand16();
+    if (get_pad_new(0) & (PAD_START | PAD_A)) {
+      sfx_play(SFX_START, 0);
+      start_game();
+      break;
+    }
+  }
+}
+
+void draw_title_sprites() {
+}
+
+// ::MAIN WINDOW::
+
+void main_window_handler() {
+}
+
+void draw_main_window_sprites() {
+}
+
+// ::ETC::
+
+void start_game (void) {
+  if (unseeded) {
+    seed_rng();
+    unseeded = 0;
+  }
+
+  pal_fade_to(4, 0);
+  ppu_off();
+
+  pal_bg(bg_palette);
+  pal_spr(sprites_palette);
+
+  // draw some things
+  vram_adr(NTADR_A(0,0));
+  unrle(main_window_nametable);
+  ppu_on_all();
+
+  pal_fade_to(0, 4);
+  current_game_state = MainWindow;
+}
+
+void init_wram (void) {
+  if (wram_start != 0xcafe)
+    memfill(&wram_start,0,0x2000);
+  wram_start = 0xcafe;
 }
