@@ -43,6 +43,7 @@ unsigned char pad1_new;
 unsigned char temp, i, unseeded, temp_x, temp_y;
 unsigned int temp_int, temp_int_x, temp_int_y;
 
+// Game stuff
 enum game_state {
                  Title,
                  MainWindow,
@@ -50,6 +51,9 @@ enum game_state {
                  AboutWindow,
                  Dungeon
 } current_game_state;
+
+unsigned char cursor_index, cursor_x, cursor_y, cursor_target_x, cursor_target_y;
+signed char cursor_dx, cursor_dy;
 
 #pragma bss-name(pop)
 // should be in the regular 0x300 ram now
@@ -75,8 +79,10 @@ void draw_title_sprites (void);
 void go_to_title (void);
 void init_wram (void);
 void main_window_handler (void);
+void reset_cursor(void);
 void start_game (void);
 void title_handler (void);
+void update_cursor (void);
 
 void main (void) {
   set_mirroring(MIRROR_HORIZONTAL);
@@ -205,10 +211,81 @@ void draw_title_sprites() {
 
 // ::MAIN WINDOW::
 
+const unsigned char main_window_target_x[] = { 0x20, 0x48, 0x48, 0xa8, 0x48 };
+const unsigned char main_window_target_y[] = { 0x20, 0x58, 0x78, 0x78, 0x98 };
+const unsigned char main_window_up[]       = {    1,    1,    1,    1,    2 };
+const unsigned char main_window_down[]     = {    1,    2,    4,    4,    4 };
+const unsigned char main_window_left[]     = {    1,    1,    2,    2,    4 };
+const unsigned char main_window_right[]    = {    1,    3,    3,    3,    3 };
+
 void main_window_handler() {
+  rand16();
+  pad_poll(0);
+  pad1_new = get_pad_new(0);
+
+  if (pad1_new) {
+    signed char nudge_x = rand8() % 8 - 4;
+    signed char nudge_y = rand8() % 8 - 4;
+    if (pad1_new & PAD_UP) {
+      cursor_index = main_window_up[cursor_index];
+      cursor_target_x = main_window_target_x[cursor_index] + nudge_x;
+      cursor_target_y = main_window_target_y[cursor_index] + nudge_y;
+    } else if (pad1_new & PAD_DOWN) {
+      cursor_index = main_window_down[cursor_index];
+      cursor_target_x = main_window_target_x[cursor_index] + nudge_x;
+      cursor_target_y = main_window_target_y[cursor_index] + nudge_y;
+    } else if (pad1_new & PAD_LEFT) {
+      cursor_index = main_window_left[cursor_index];
+      cursor_target_x = main_window_target_x[cursor_index] + nudge_x;
+      cursor_target_y = main_window_target_y[cursor_index] + nudge_y;
+    } else if (pad1_new & PAD_RIGHT) {
+      cursor_index = main_window_right[cursor_index];
+      cursor_target_x = main_window_target_x[cursor_index] + nudge_x;
+      cursor_target_y = main_window_target_y[cursor_index] + nudge_y;
+    }
+
+    if (cursor_target_x != cursor_x || cursor_target_y != cursor_y) {
+      cursor_dx = cursor_target_x - cursor_x;
+      cursor_dy = cursor_target_y - cursor_y;
+      while (cursor_dx > 4 || cursor_dy > 4 || cursor_dx < -4 || cursor_dy < -4) {
+        if (cursor_dx > 1 || cursor_dx < -1) cursor_dx >>= 1;
+        if (cursor_dy > 1 || cursor_dy < -1) cursor_dy >>= 1;
+      }
+    }
+  }
+
+  update_cursor();
 }
 
 void draw_main_window_sprites() {
+  oam_meta_spr(cursor_x, cursor_y, arrow_cursor_sprite);
+}
+
+// ::CURSOR::
+
+void reset_cursor () {
+  cursor_index = 0;
+  cursor_x = cursor_target_x = 0x80;
+  cursor_y = cursor_target_y = 0x20;
+  cursor_dx = cursor_dy = 0;
+}
+
+void update_cursor () {
+  if (cursor_dx != 0) {
+    cursor_x += cursor_dx;
+    if ((cursor_dx > 0) == (cursor_x >= cursor_target_x)) {
+      cursor_x = cursor_target_x;
+      cursor_dx = 0;
+    }
+  }
+
+  if (cursor_dy != 0) {
+    cursor_y += cursor_dy;
+    if ((cursor_dy > 0) == (cursor_y >= cursor_target_y)) {
+      cursor_y = cursor_target_y;
+      cursor_dy = 0;
+    }
+  }
 }
 
 // ::ETC::
@@ -232,6 +309,8 @@ void start_game (void) {
 
   pal_fade_to(0, 4);
   current_game_state = MainWindow;
+
+  reset_cursor();
 }
 
 void init_wram (void) {
