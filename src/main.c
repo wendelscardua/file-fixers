@@ -82,12 +82,13 @@ void start_game (void) {
 
   pal_fade_to(4, 0);
   ppu_off();
+
   pal_bg(bg_palette);
   pal_spr(sprites_palette);
 
   // draw some things
   vram_adr(NTADR_A(0,0));
-  unrle(title_nametable); // TODO: first screen nametable
+  unrle(main_window_nametable);
   ppu_on_all();
 
   pal_fade_to(0, 4);
