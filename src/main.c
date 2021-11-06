@@ -9,6 +9,7 @@
 #include "mmc3/mmc3_code.h"
 #include "mmc3/mmc3_code.c"
 #include "sprites.h"
+#include "nametable_loader.h"
 #include "../assets/nametables.h"
 #include "../assets/palettes.h"
 
@@ -99,6 +100,7 @@ void draw_cursor (void);
 void draw_main_window_sprites (void);
 void draw_sprites (void);
 void draw_title_sprites (void);
+void flip_screen (void);
 void go_to_title (void);
 void init_wram (void);
 void main_window_default_cursor_handler (void);
@@ -117,8 +119,6 @@ void main (void) {
   set_irq_ptr(irq_array); // point to this array
 
   init_wram();
-
-  set_unrle_buffer(unrle_buffer);
 
   ppu_off(); // screen off
   pal_bg(bg_palette); //	load the BG palette
@@ -301,25 +301,38 @@ void main_window_default_cursor_handler() {
 }
 
 void main_window_loading_handler () {
-  if (cursor_counter == 0) {
-    // started loading
-    switch(cursor_index) {
-    case 0:
-      current_cursor_state = Default;
-      break;
-    case 1: // Castle.exe
-      current_cursor_state = Default;
-      break;
-    case 2: // Drivers
+  // started loading
+  switch(cursor_index) {
+  case 0:
+    current_cursor_state = Default;
+    break;
+  case 1: // Castle.exe
+    current_cursor_state = Default;
+    break;
+  case 2: // Drivers
+    if (cursor_counter == 0) {
+      set_unrle_buffer(unrle_buffer);
       unrle_to_buffer(drivers_window_nametable);
-      break;
-    case 3: // About.txt
-      current_cursor_state = Default;
-      break;
-    case 4: // Config.sys
-      current_cursor_state = Default;
-      break;
+
+      set_nametable_loader_buffer(unrle_buffer);
+      if (current_screen == 0) {
+        start_nametable_loader(NTADR_C(0, 0));
+      } else {
+        start_nametable_loader(NTADR_A(0, 0));
+      }
+    } else {
+      if (!yield_nametable_loader()) {
+        current_cursor_state = Default;
+        flip_screen();
+      }
     }
+    break;
+  case 3: // About.txt
+    current_cursor_state = Default;
+    break;
+  case 4: // Config.sys
+    current_cursor_state = Default;
+    break;
   }
 }
 
@@ -423,4 +436,14 @@ void init_wram (void) {
   if (wram_start != WRAM_VERSION)
     memfill(&wram_start,0,0x2000);
   wram_start = WRAM_VERSION;
+}
+
+void flip_screen (void) {
+  if (current_screen == 0) {
+    current_screen = 1;
+    set_scroll_y(0x100);
+  } else {
+    current_screen = 0;
+    set_scroll_y(0x100);
+  }
 }
