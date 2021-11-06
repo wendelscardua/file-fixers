@@ -196,7 +196,7 @@ void go_to_title (void) {
   ppu_off(); // screen off
   // draw some things
   vram_adr(NTADR_A(0,0));
-  unrle(title_nametable);
+  vram_unrle(title_nametable);
   music_play(0);
 
   set_scroll_x(0);
@@ -376,7 +376,7 @@ void start_game (void) {
 
   // draw some things
   vram_adr(NTADR_A(0,0));
-  unrle(main_window_nametable);
+  vram_unrle(main_window_nametable);
   ppu_on_all();
 
   pal_fade_to(0, 4);
