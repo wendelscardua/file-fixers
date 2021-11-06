@@ -34,6 +34,14 @@
 #define BG_DUNGEON_2 10
 #define BG_DUNGEON_3 11
 
+// Configs
+#define CLICK_DELAY 0x10
+#define MAX_CURSOR_DX FP(8, 0)
+#define MAX_CURSOR_DY FP(4, 0)
+#define MIN_CURSOR_DX FP(0, 8)
+#define MIN_CURSOR_DY FP(0, 8)
+
+
 #pragma bss-name(push, "ZEROPAGE")
 
 // GLOBAL VARIABLES
@@ -55,9 +63,15 @@ enum game_state {
                  Dungeon
 } current_game_state;
 
-unsigned char cursor_index;
+unsigned char cursor_index, cursor_counter;
 unsigned int cursor_x, cursor_y, cursor_target_x, cursor_target_y;
 signed int cursor_dx, cursor_dy;
+
+enum cursor_state {
+                   Default,
+                   Clicking,
+                   Loading
+} current_cursor_state;
 
 #pragma bss-name(pop)
 // should be in the regular 0x300 ram now
@@ -77,13 +91,16 @@ unsigned int wram_start;
 #pragma rodata-name ("RODATA")
 #pragma code-name ("CODE")
 
+void draw_cursor (void);
 void draw_main_window_sprites (void);
 void draw_sprites (void);
 void draw_title_sprites (void);
 void go_to_title (void);
 void init_wram (void);
+void main_window_default_cursor_handler (void);
 void main_window_handler (void);
-void reset_cursor(void);
+void reset_cursor (void);
+void set_cursor_speed (void);
 void start_game (void);
 void title_handler (void);
 void update_cursor (void);
@@ -215,6 +232,24 @@ void draw_title_sprites() {
 
 // ::MAIN WINDOW::
 
+void main_window_handler() {
+  rand16();
+  pad_poll(0);
+  pad1_new = get_pad_new(0);
+
+  switch(current_cursor_state) {
+  case Default:
+    main_window_default_cursor_handler();
+    break;
+  }
+
+  update_cursor();
+}
+
+void draw_main_window_sprites() {
+  draw_cursor();
+}
+
 const unsigned char main_window_target_x[] = { 0x20, 0x48, 0x48, 0xa8, 0x48 };
 const unsigned char main_window_target_y[] = { 0x20, 0x58, 0x78, 0x78, 0x98 };
 const unsigned char main_window_up[]       = {    1,    1,    1,    1,    2 };
@@ -222,11 +257,7 @@ const unsigned char main_window_down[]     = {    1,    2,    4,    4,    4 };
 const unsigned char main_window_left[]     = {    1,    1,    2,    2,    4 };
 const unsigned char main_window_right[]    = {    1,    3,    3,    3,    3 };
 
-void main_window_handler() {
-  rand16();
-  pad_poll(0);
-  pad1_new = get_pad_new(0);
-
+void main_window_default_cursor_handler() {
   if (pad1_new) {
     signed char nudge_x = rand8() % 8 - 4;
     signed char nudge_y = rand8() % 8 - 4;
@@ -248,51 +279,79 @@ void main_window_handler() {
       cursor_target_y = FP(main_window_target_y[cursor_index] + nudge_y, 0);
     }
 
-#define MAX_DX FP(8, 0)
-#define MAX_DY FP(4, 0)
-#define MIN_DX FP(0, 8)
-#define MIN_DY FP(0, 8)
-    if (cursor_target_x != cursor_x || cursor_target_y != cursor_y) {
-      cursor_dx = cursor_target_x - cursor_x;
-      cursor_dy = cursor_target_y - cursor_y;
-      while (cursor_dx > MAX_DX || cursor_dy > MAX_DY || cursor_dx < -MAX_DX || cursor_dy < -MAX_DY) {
-        if (cursor_dx > MIN_DX || cursor_dx < -MIN_DX) cursor_dx >>= 1;
-        if (cursor_dy > MIN_DY || cursor_dy < -MIN_DY) cursor_dy >>= 1;
+    if (cursor_target_x == cursor_x || cursor_target_y == cursor_y) {
+      if (pad1_new & PAD_A) {
+        current_cursor_state = Clicking;
+        cursor_counter = CLICK_DELAY;
       }
+    } else {
+      set_cursor_speed();
     }
   }
-
-  update_cursor();
-}
-
-void draw_main_window_sprites() {
-  oam_meta_spr(INT(cursor_x), INT(cursor_y), arrow_cursor_sprite);
 }
 
 // ::CURSOR::
+
+void draw_cursor() {
+  switch (current_cursor_state) {
+  case Default:
+    oam_meta_spr(INT(cursor_x), INT(cursor_y), default_cursor_sprite);
+    break;
+  case Clicking:
+    if (cursor_counter < (CLICK_DELAY >> 2)) {
+      oam_meta_spr(INT(cursor_x), INT(cursor_y), default_cursor_sprite);
+    } else {
+      oam_meta_spr(INT(cursor_x), INT(cursor_y), clicking_cursor_sprite);
+    }
+    break;
+  }
+}
 
 void reset_cursor () {
   cursor_index = 0;
   cursor_x = cursor_target_x = FP(0x80, 0x00);
   cursor_y = cursor_target_y = FP(0x20, 0x00);
   cursor_dx = cursor_dy = 0;
+  current_cursor_state = Default;
+}
+
+void set_cursor_speed () {
+  cursor_dx = cursor_target_x - cursor_x;
+  cursor_dy = cursor_target_y - cursor_y;
+  while (cursor_dx > MAX_CURSOR_DX || cursor_dy > MAX_CURSOR_DY || cursor_dx < -MAX_CURSOR_DX || cursor_dy < -MAX_CURSOR_DY) {
+    if (cursor_dx > MIN_CURSOR_DX || cursor_dx < -MIN_CURSOR_DX) cursor_dx >>= 1;
+    if (cursor_dy > MIN_CURSOR_DY || cursor_dy < -MIN_CURSOR_DY) cursor_dy >>= 1;
+  }
 }
 
 void update_cursor () {
-  if (cursor_dx != 0) {
-    cursor_x += cursor_dx;
-    if ((cursor_dx > 0) == (cursor_x >= cursor_target_x)) {
-      cursor_x = cursor_target_x;
-      cursor_dx = 0;
+  switch (current_cursor_state) {
+  case Default:
+    if (cursor_dx != 0) {
+      cursor_x += cursor_dx;
+      if ((cursor_dx > 0) == (cursor_x >= cursor_target_x)) {
+        cursor_x = cursor_target_x;
+        cursor_dx = 0;
+      }
     }
-  }
 
-  if (cursor_dy != 0) {
-    cursor_y += cursor_dy;
-    if ((cursor_dy > 0) == (cursor_y >= cursor_target_y)) {
-      cursor_y = cursor_target_y;
-      cursor_dy = 0;
+    if (cursor_dy != 0) {
+      cursor_y += cursor_dy;
+      if ((cursor_dy > 0) == (cursor_y >= cursor_target_y)) {
+        cursor_y = cursor_target_y;
+        cursor_dy = 0;
+      }
     }
+    break;
+  case Clicking:
+    --cursor_counter;
+    if (cursor_counter == 0) {
+      current_cursor_state = Loading;
+    }
+    break;
+  case Loading:
+    ++cursor_counter;
+    break;
   }
 }
 
