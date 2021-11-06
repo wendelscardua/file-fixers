@@ -82,8 +82,8 @@ run: debug
 
 usage: tools/ld65-map.json
 
-tools/ld65-map.json: map.txt tools/ld65-map.rb
-	ruby tools/ld65-map.rb map.txt 2 2 tools/ld65-map.json
+tools/ld65-map.json: map.txt MMC3.cfg tools/ld65-map.rb
+	ruby tools/ld65-map.rb map.txt MMC3.cfg tools/ld65-map.json
 
 release: ${TARGET}
 	cp ${TARGET} ${PROJECT}-${VERSION}.nes

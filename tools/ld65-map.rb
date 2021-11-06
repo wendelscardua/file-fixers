@@ -11,55 +11,90 @@ def scale(x, total)
   x.to_f / total
 end
 
+def parse_map(map_file)
+  map_text = File.readlines(map_file, chomp: true)
+
+  module_data = []
+
+  mode = nil
+
+  map_text.each do |line|
+    case line
+    when 'Modules list:'
+      mode = :modules_list
+    when ''
+      mode = nil
+    end
+
+    case mode
+    when :modules_list
+      if (m = line.match(/\A\s*(?<name>[^\s]*):/))
+        module_data << { module: m['name'], segments: [] }
+      elsif (m = line.match(/\A\s+(?<segment>\S+)\s+Offs=(?<offset>\S+)\s+Size=(?<size>\S+)\s+Align=(?<align>\S+)\s+Fill=(?<fill>\S+)/))
+        module_data.last[:segments] << {
+          segment: m['segment'],
+          offset: hex(m['offset']),
+          size: hex(m['size']),
+          align: hex(m['align']),
+          fill: hex(m['fill'])
+        }
+      end
+    end
+  end
+
+  module_data
+end
+
+def parse_size(size_string)
+  if size_string.start_with?('$')
+    size_string[1..].to_i(16)
+  else
+    size_string.to_i
+  end
+end
+
+def parse_cfg(config_file)
+  config_text = File.readlines(config_file, chomp: true)
+
+  categories = {}
+
+  mode = nil
+
+  config_text.each do |line|
+    case line.gsub(/#.*/, '')
+    when /MEMORY.*\{/
+      mode = :memory
+    when /SEGMENTS.*\{/
+      mode = :segments
+    when /}/
+      mode = nil
+    end
+
+    case mode
+    when :memory
+      if (m = line.match(/(?<name>\w+):.*size\s*=\s*(?<size>\$?\d+)/))
+        categories[m['name']] = { size: parse_size(m['size']), segments: [] }
+      end
+    when :segments
+      if (m = line.match(/(?<name>\w+):.*load\s*=\s*(?<cat>\w+)/))
+        categories[m['cat']][:segments] <<= m['name']
+      end
+    end
+  end
+  categories
+end
+
 if ARGV.empty?
-  puts 'Arguments: input-file prg-banks chr-banks json-output'
+  puts 'Arguments: map cfg json-output'
   exit 1
 end
 
-input = ARGV[0]
-prg_banks = ARGV[1].to_i
-chr_banks = ARGV[2].to_i
-output = ARGV[3]
+map_file = ARGV[0]
+config_file = ARGV[1]
+output = ARGV[2]
 
-map_text = File.readlines(input, chomp: true)
-
-module_data = []
-
-mode = nil
-
-map_text.each do |line|
-  case line
-  when 'Modules list:'
-    mode = :modules_list
-  when ''
-    mode = nil
-  end
-
-  case mode
-  when :modules_list
-    if (m = line.match(/\A\s*(?<name>[^\s]*):/))
-      module_data << { module: m['name'], segments: [] }
-    elsif (m = line.match(/\A\s+(?<segment>\S+)\s+Offs=(?<offset>\S+)\s+Size=(?<size>\S+)\s+Align=(?<align>\S+)\s+Fill=(?<fill>\S+)/))
-      module_data.last[:segments] << {
-        segment: m['segment'],
-        offset: hex(m['offset']),
-        size: hex(m['size']),
-        align: hex(m['align']),
-        fill: hex(m['fill'])
-      }
-    end
-  end
-end
-
-categories = {
-  'HEADER' => { size: 0x10, segments: ['HEADER'] },
-  'PRG' => { size: 0x4000 * prg_banks, segments: %w[LOWCODE INIT CODE RODATA DATA ONCE STARTUP VECTORS BANK0] },
-  'CHR' => { size: 0x2000 * chr_banks, segments: ['CHARS'] },
-  'ZEROPAGE' => { size: 0x100, segments: ['ZEROPAGE'] },
-  'STACK' => { size: 0x100, segments: ['STACK'] },
-  'RAM' => { size: 0x800 - 0x200, segments: %w[OAM FAMITONE BSS HEAP] },
-  'WRAM' => { size: 0x2000, segments: ['XRAM'] }
-}
+module_data = parse_map(map_file)
+categories = parse_cfg(config_file)
 
 json_map = { name: 'ld65-map', children: [] }
 
