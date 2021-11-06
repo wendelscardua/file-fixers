@@ -32,7 +32,7 @@ FT_SFX_ENABLE   = 1		;undefine to exclude all sound effects code
 .import __STARTUP_LOAD__,__STARTUP_RUN__,__STARTUP_SIZE__
 .import	__CODE_LOAD__   ,__CODE_RUN__   ,__CODE_SIZE__
 .import	__RODATA_LOAD__ ,__RODATA_RUN__ ,__RODATA_SIZE__
-.import NES_MAPPER, NES_PRG_BANKS, NES_CHR_BANKS, NES_MIRRORING
+.import NES_MAPPER, NES_PRG_BANKS, NES_CHR_BANKS, NES_MIRRORING, NES_BATTERY
 
 .include "zeropage.inc"
 
@@ -115,7 +115,7 @@ DATA_PTR:			.res 2
 .byte $4e,$45,$53,$1a
 .byte <NES_PRG_BANKS
 .byte <NES_CHR_BANKS
-.byte <NES_MIRRORING|(<NES_MAPPER<<4)
+.byte <NES_MIRRORING|(<NES_MAPPER<<4)|(<NES_BATTERY<<1)
 .byte <NES_MAPPER&$f0
 .byte 1 ;8k of PRG RAM
 .res 7,0
