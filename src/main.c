@@ -73,6 +73,8 @@ enum cursor_state {
                    Loading
 } current_cursor_state;
 
+unsigned char current_screen;
+
 #pragma bss-name(pop)
 // should be in the regular 0x300 ram now
 
@@ -84,6 +86,7 @@ unsigned char double_buffer[32];
 
 #define WRAM_VERSION 0x0001
 unsigned int wram_start;
+unsigned char unrle_buffer[1024];
 
 #pragma bss-name(pop)
 
@@ -99,6 +102,7 @@ void draw_title_sprites (void);
 void go_to_title (void);
 void init_wram (void);
 void main_window_default_cursor_handler (void);
+void main_window_loading_handler (void);
 void main_window_handler (void);
 void reset_cursor (void);
 void set_cursor_speed (void);
@@ -113,6 +117,8 @@ void main (void) {
   set_irq_ptr(irq_array); // point to this array
 
   init_wram();
+
+  set_unrle_buffer(unrle_buffer);
 
   ppu_off(); // screen off
   pal_bg(bg_palette); //	load the BG palette
@@ -242,6 +248,9 @@ void main_window_handler() {
   case Default:
     main_window_default_cursor_handler();
     break;
+  case Loading:
+    main_window_loading_handler();
+    break;
   }
 
   update_cursor();
@@ -287,6 +296,29 @@ void main_window_default_cursor_handler() {
       }
     } else {
       set_cursor_speed();
+    }
+  }
+}
+
+void main_window_loading_handler () {
+  if (cursor_counter == 0) {
+    // started loading
+    switch(cursor_index) {
+    case 0:
+      current_cursor_state = Default;
+      break;
+    case 1: // Castle.exe
+      current_cursor_state = Default;
+      break;
+    case 2: // Drivers
+      unrle_to_buffer(drivers_window_nametable);
+      break;
+    case 3: // About.txt
+      current_cursor_state = Default;
+      break;
+    case 4: // Config.sys
+      current_cursor_state = Default;
+      break;
     }
   }
 }
@@ -383,6 +415,8 @@ void start_game (void) {
   current_game_state = MainWindow;
 
   reset_cursor();
+
+  current_screen = 0;
 }
 
 void init_wram (void) {
