@@ -82,6 +82,7 @@ unsigned char double_buffer[32];
 #pragma bss-name(push, "XRAM")
 // extra RAM at $6000-$7fff
 
+#define WRAM_VERSION 0x0001
 unsigned int wram_start;
 
 #pragma bss-name(pop)
@@ -385,7 +386,7 @@ void start_game (void) {
 }
 
 void init_wram (void) {
-  if (wram_start != 0xcafe)
+  if (wram_start != WRAM_VERSION)
     memfill(&wram_start,0,0x2000);
-  wram_start = 0xcafe;
+  wram_start = WRAM_VERSION;
 }
