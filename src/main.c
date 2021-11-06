@@ -304,6 +304,10 @@ void draw_cursor() {
       oam_meta_spr(INT(cursor_x), INT(cursor_y), clicking_cursor_sprite);
     }
     break;
+  case Loading:
+    oam_meta_spr(INT(cursor_x), INT(cursor_y), default_cursor_sprite);
+    oam_meta_spr(INT(cursor_x) + 0x14, INT(cursor_y) + 0x10, loading_cursor_sprite);
+    break;
   }
 }
 

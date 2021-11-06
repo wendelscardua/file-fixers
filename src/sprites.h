@@ -19,3 +19,11 @@ const unsigned char clicking_cursor_sprite[]={
                                               8,  0,0x23,0,
                                               0x80
 };
+
+const unsigned char loading_cursor_sprite[]={
+                                             - 8,- 8,0x04,0,
+                                             0,- 8,0x05,0,
+                                             - 8,  0,0x14,0,
+                                             0,  0,0x15,0,
+                                             0x80
+};
