@@ -18,14 +18,21 @@ debug: CA65_FLAGS += -g -DDEBUG=1
 debug: ${TARGET}
 
 ${TARGET}: src/main.o src/crt0.o src/lib/unrle.o \
+           src/nametable_loader.o \
            assets/nametables.o assets/palettes.o
 	ld65 $^ -C MMC3.cfg nes.lib -m map.txt -o ${TARGET} ${LD65_FLAGS}
 
 %.o: %.s
 	ca65 $< ${CA65_FLAGS}
 
-src/main.s: src/main.c assets/nametables.h assets/palettes.h src/sprites.h
-	cc65 -Oirs src/main.c --add-source ${CA65_FLAGS}
+src/main.s: src/main.c \
+            assets/nametables.h assets/palettes.h \
+            src/sprites.h \
+            src/lib/unrle.h src/nametable_loader.h
+	cc65 -Oirs $< --add-source ${CA65_FLAGS}
+
+src/nametable_loader.s: src/nametable_loader.c
+	cc65 -Oirs $< --add-source ${CA65_FLAGS}
 
 src/crt0.o: src/crt0.s src/mmc3/mmc3_code.asm src/lib/neslib.s src/lib/nesdoug.s assets/*.chr \
             src/music/soundtrack.s src/music/soundfx.s

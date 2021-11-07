@@ -9,6 +9,7 @@
 #include "mmc3/mmc3_code.h"
 #include "mmc3/mmc3_code.c"
 #include "sprites.h"
+#include "nametable_loader.h"
 #include "../assets/nametables.h"
 #include "../assets/palettes.h"
 
@@ -73,6 +74,8 @@ enum cursor_state {
                    Loading
 } current_cursor_state;
 
+unsigned char current_screen;
+
 #pragma bss-name(pop)
 // should be in the regular 0x300 ram now
 
@@ -84,6 +87,7 @@ unsigned char double_buffer[32];
 
 #define WRAM_VERSION 0x0001
 unsigned int wram_start;
+unsigned char unrle_buffer[1024];
 
 #pragma bss-name(pop)
 
@@ -93,12 +97,18 @@ unsigned int wram_start;
 #pragma code-name ("CODE")
 
 void draw_cursor (void);
+void draw_drivers_window_sprites (void);
 void draw_main_window_sprites (void);
 void draw_sprites (void);
 void draw_title_sprites (void);
+void drivers_window_default_cursor_handler (void);
+void drivers_window_loading_handler (void);
+void drivers_window_handler (void);
+void flip_screen (void);
 void go_to_title (void);
 void init_wram (void);
 void main_window_default_cursor_handler (void);
+void main_window_loading_handler (void);
 void main_window_handler (void);
 void reset_cursor (void);
 void set_cursor_speed (void);
@@ -145,6 +155,9 @@ void main (void) {
     case MainWindow:
       main_window_handler();
       break;
+    case DriversWindow:
+      drivers_window_handler();
+      break;
     }
 
     // load the irq array with values it parse
@@ -176,6 +189,9 @@ void draw_sprites (void) {
   case MainWindow:
     draw_main_window_sprites();
     break;
+  case DriversWindow:
+    draw_drivers_window_sprites();
+    break;
   }
 }
 
@@ -196,7 +212,7 @@ void go_to_title (void) {
   ppu_off(); // screen off
   // draw some things
   vram_adr(NTADR_A(0,0));
-  unrle(title_nametable);
+  vram_unrle(title_nametable);
   music_play(0);
 
   set_scroll_x(0);
@@ -242,6 +258,9 @@ void main_window_handler() {
   case Default:
     main_window_default_cursor_handler();
     break;
+  case Loading:
+    main_window_loading_handler();
+    break;
   }
 
   update_cursor();
@@ -280,7 +299,7 @@ void main_window_default_cursor_handler() {
       cursor_target_y = FP(main_window_target_y[cursor_index] + nudge_y, 0);
     }
 
-    if (cursor_target_x == cursor_x || cursor_target_y == cursor_y) {
+    if (cursor_target_x == cursor_x && cursor_target_y == cursor_y) {
       if (pad1_new & PAD_A) {
         current_cursor_state = Clicking;
         cursor_counter = CLICK_DELAY;
@@ -288,6 +307,141 @@ void main_window_default_cursor_handler() {
     } else {
       set_cursor_speed();
     }
+  }
+}
+
+void main_window_loading_handler () {
+  // started loading
+  switch(cursor_index) {
+  case 0:
+    current_cursor_state = Default;
+    break;
+  case 1: // Castle.exe
+    current_cursor_state = Default;
+    // TODO: go to castle
+    break;
+  case 2: // Drivers
+    if (cursor_counter == 0) {
+      set_unrle_buffer(unrle_buffer);
+      unrle_to_buffer(drivers_window_nametable);
+
+      set_nametable_loader_buffer(unrle_buffer);
+      if (current_screen == 0) {
+        start_nametable_loader(NTADR_C(0, 0));
+      } else {
+        start_nametable_loader(NTADR_A(0, 0));
+      }
+    } else {
+      if (!yield_nametable_loader()) {
+        current_cursor_state = Default;
+        cursor_index = 0;
+        cursor_target_x = FP(0xbc, 0);
+        cursor_target_y = FP(0x44, 0);
+        set_cursor_speed();
+        current_game_state = DriversWindow;
+        flip_screen();
+      }
+    }
+    break;
+  case 3: // About.txt
+    // TODO
+    current_cursor_state = Default;
+    break;
+  case 4: // Config.sys
+    // TODO
+    current_cursor_state = Default;
+    break;
+  }
+}
+
+// ::DRIVERS WINDOW::
+
+void drivers_window_handler() {
+  rand16();
+  pad_poll(0);
+  pad1_new = get_pad_new(0);
+
+  switch(current_cursor_state) {
+  case Default:
+    drivers_window_default_cursor_handler();
+    break;
+  case Loading:
+    drivers_window_loading_handler();
+    break;
+  }
+
+  update_cursor();
+}
+
+void draw_drivers_window_sprites() {
+  draw_cursor();
+}
+
+const unsigned char drivers_window_target_x[] = { 0xbc, 0x38, 0x78, 0x38, 0x78 };
+const unsigned char drivers_window_target_y[] = { 0x44, 0x58, 0x58, 0x88, 0x88 };
+const unsigned char drivers_window_up[]       = {    2,    0,    0,    1,    2 };
+const unsigned char drivers_window_down[]     = {    2,    3,    4,    3,    4 };
+const unsigned char drivers_window_left[]     = {    2,    1,    1,    3,    3 };
+const unsigned char drivers_window_right[]    = {    2,    2,    2,    4,    4 };
+
+void drivers_window_default_cursor_handler() {
+  if (pad1_new) {
+    signed char nudge_x = cursor_index == 0 ? 0 : rand8() % 8 - 4;
+    signed char nudge_y = cursor_index == 0 ? 0 : rand8() % 8 - 4;
+    if (pad1_new & PAD_UP) {
+      cursor_index = drivers_window_up[cursor_index];
+      cursor_target_x = FP(drivers_window_target_x[cursor_index] + nudge_x, 0);
+      cursor_target_y = FP(drivers_window_target_y[cursor_index] + nudge_y, 0);
+    } else if (pad1_new & PAD_DOWN) {
+      cursor_index = drivers_window_down[cursor_index];
+      cursor_target_x = FP(drivers_window_target_x[cursor_index] + nudge_x, 0);
+      cursor_target_y = FP(drivers_window_target_y[cursor_index] + nudge_y, 0);
+    } else if (pad1_new & PAD_LEFT) {
+      cursor_index = drivers_window_left[cursor_index];
+      cursor_target_x = FP(drivers_window_target_x[cursor_index] + nudge_x, 0);
+      cursor_target_y = FP(drivers_window_target_y[cursor_index] + nudge_y, 0);
+    } else if (pad1_new & PAD_RIGHT) {
+      cursor_index = drivers_window_right[cursor_index];
+      cursor_target_x = FP(drivers_window_target_x[cursor_index] + nudge_x, 0);
+      cursor_target_y = FP(drivers_window_target_y[cursor_index] + nudge_y, 0);
+    }
+
+    if (cursor_target_x == cursor_x && cursor_target_y == cursor_y) {
+      if (pad1_new & PAD_A) {
+        current_cursor_state = Clicking;
+        cursor_counter = CLICK_DELAY;
+      }
+    } else {
+      set_cursor_speed();
+    }
+  }
+}
+
+void drivers_window_loading_handler () {
+  // started loading
+  switch(cursor_index) {
+  case 0: // Close button
+    if (cursor_counter == 0) {
+      set_unrle_buffer(unrle_buffer);
+      unrle_to_buffer(main_window_nametable);
+
+      set_nametable_loader_buffer(unrle_buffer);
+      if (current_screen == 0) {
+        start_nametable_loader(NTADR_C(0, 0));
+      } else {
+        start_nametable_loader(NTADR_A(0, 0));
+      }
+    } else {
+      if (!yield_nametable_loader()) {
+        current_cursor_state = Default;
+        current_game_state = MainWindow;
+        flip_screen();
+      }
+    }
+    break;
+  default: // Load driver dungeon
+    // TODO
+    break;
   }
 }
 
@@ -376,17 +530,29 @@ void start_game (void) {
 
   // draw some things
   vram_adr(NTADR_A(0,0));
-  unrle(main_window_nametable);
+  vram_unrle(main_window_nametable);
   ppu_on_all();
 
   pal_fade_to(0, 4);
   current_game_state = MainWindow;
 
   reset_cursor();
+
+  current_screen = 0;
 }
 
 void init_wram (void) {
   if (wram_start != WRAM_VERSION)
     memfill(&wram_start,0,0x2000);
   wram_start = WRAM_VERSION;
+}
+
+void flip_screen (void) {
+  if (current_screen == 0) {
+    current_screen = 1;
+    set_scroll_y(0x100);
+  } else {
+    current_screen = 0;
+    set_scroll_y(0x000);
+  }
 }
