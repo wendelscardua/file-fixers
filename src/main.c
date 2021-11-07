@@ -299,7 +299,7 @@ void main_window_default_cursor_handler() {
       cursor_target_y = FP(main_window_target_y[cursor_index] + nudge_y, 0);
     }
 
-    if (cursor_target_x == cursor_x || cursor_target_y == cursor_y) {
+    if (cursor_target_x == cursor_x && cursor_target_y == cursor_y) {
       if (pad1_new & PAD_A) {
         current_cursor_state = Clicking;
         cursor_counter = CLICK_DELAY;
@@ -406,7 +406,7 @@ void drivers_window_default_cursor_handler() {
       cursor_target_y = FP(drivers_window_target_y[cursor_index] + nudge_y, 0);
     }
 
-    if (cursor_target_x == cursor_x || cursor_target_y == cursor_y) {
+    if (cursor_target_x == cursor_x && cursor_target_y == cursor_y) {
       if (pad1_new & PAD_A) {
         current_cursor_state = Clicking;
         cursor_counter = CLICK_DELAY;
