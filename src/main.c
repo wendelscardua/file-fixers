@@ -308,6 +308,7 @@ void main_window_loading_handler () {
     break;
   case 1: // Castle.exe
     current_cursor_state = Default;
+    // TODO: go to castle
     break;
   case 2: // Drivers
     if (cursor_counter == 0) {
@@ -328,9 +329,11 @@ void main_window_loading_handler () {
     }
     break;
   case 3: // About.txt
+    // TODO
     current_cursor_state = Default;
     break;
   case 4: // Config.sys
+    // TODO
     current_cursor_state = Default;
     break;
   }
