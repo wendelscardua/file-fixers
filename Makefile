@@ -28,10 +28,13 @@ ${TARGET}: src/main.o src/crt0.o src/lib/unrle.o \
 src/main.s: src/main.c \
             assets/nametables.h assets/palettes.h \
             src/sprites.h \
-            src/lib/unrle.h src/nametable_loader.h
+            src/lib/unrle.h src/nametable_loader.h src/dungeon.h
 	cc65 -Oirs $< --add-source ${CA65_FLAGS}
 
 src/nametable_loader.s: src/nametable_loader.c
+	cc65 -Oirs $< --add-source ${CA65_FLAGS}
+
+src/dungeon.s: src/dungeon.c
 	cc65 -Oirs $< --add-source ${CA65_FLAGS}
 
 src/crt0.o: src/crt0.s src/mmc3/mmc3_code.asm src/lib/neslib.s src/lib/nesdoug.s assets/*.chr \
@@ -42,6 +45,9 @@ assets/nametables.o: assets/nametables.s assets/nametables.h \
                      assets/nametables/title.rle \
                      assets/nametables/main-window.rle \
                      assets/nametables/drivers-window.rle
+	ca65 $< ${CA65_FLAGS}
+
+assets/dungeons.o: assets/dungeons.s assets/dungeons.h
 	ca65 $< ${CA65_FLAGS}
 
 assets/palettes.o: assets/palettes.s assets/palettes.h \
