@@ -6,4 +6,5 @@ map.txt
 data/*.inc
 tools/ld65-map.json
 src/main.s
-assets/questions/*
+src/nametable_loader.s
+src/dungeon.s
