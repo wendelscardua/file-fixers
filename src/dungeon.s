@@ -10,24 +10,37 @@
 	.importzp	sp, sreg, regsave, regbank
 	.importzp	tmp1, tmp2, tmp3, tmp4, ptr1, ptr2, ptr3, ptr4
 	.macpack	longbranch
-	.dbg		file, "src/dungeon.c", 1385, 1636338489
+	.dbg		file, "src/dungeon.c", 1735, 1636339702
 	.dbg		file, "src/lib/nesdoug.h", 6692, 1635896270
 	.dbg		file, "src/lib/neslib.h", 8949, 1635896270
 	.dbg		file, "src/dungeon.h", 250, 1636336646
 	.dbg		file, "src/../assets/dungeons.h", 342, 1636336916
+	.dbg		sym, "one_vram_buffer", "00", extern, "_one_vram_buffer"
+	.dbg		sym, "flush_vram_update_nmi", "00", extern, "_flush_vram_update_nmi"
 	.dbg		sym, "rand8", "00", extern, "_rand8"
 	.dbg		sym, "sector_metatiles", "00", extern, "_sector_metatiles"
+	.dbg		sym, "metatile_UL_tiles", "00", extern, "_metatile_UL_tiles"
+	.dbg		sym, "metatile_UR_tiles", "00", extern, "_metatile_UR_tiles"
+	.dbg		sym, "metatile_DL_tiles", "00", extern, "_metatile_DL_tiles"
+	.dbg		sym, "metatile_DR_tiles", "00", extern, "_metatile_DR_tiles"
 	.dbg		sym, "temp_x", "00", extern, "_temp_x"
 	.dbg		sym, "temp_y", "00", extern, "_temp_y"
 	.dbg		sym, "temp_int", "00", extern, "_temp_int"
+	.import		_one_vram_buffer
+	.import		_flush_vram_update_nmi
 	.import		_rand8
 	.export		_generate_layout
 	.export		_start_dungeon
 	.export		_load_dungeon_sector
 	.import		_sector_metatiles
+	.import		_metatile_UL_tiles
+	.import		_metatile_UR_tiles
+	.import		_metatile_DL_tiles
+	.import		_metatile_DR_tiles
 	.importzp	_temp_x
 	.importzp	_temp_y
 	.importzp	_temp_int
+	.export		_nt_adr
 	.export		_mt
 	.export		_current_sector
 	.export		_dungeon_layout
@@ -41,6 +54,8 @@
 .segment	"BSS"
 
 .segment	"ZEROPAGE"
+_nt_adr:
+	.res	2,$00
 _mt:
 	.res	1,$00
 .segment	"BSS"
@@ -69,12 +84,12 @@ _current_sector_index:
 ;
 ; void generate_layout(unsigned char * dungeon_layout_buffer) {
 ;
-	.dbg	line, "src/dungeon.c", 23
+	.dbg	line, "src/dungeon.c", 24
 	jsr     pushax
 ;
 ; dungeon_layout = dungeon_layout_buffer;
 ;
-	.dbg	line, "src/dungeon.c", 24
+	.dbg	line, "src/dungeon.c", 25
 	ldy     #$01
 	lda     (sp),y
 	sta     _dungeon_layout+1
@@ -84,14 +99,14 @@ _current_sector_index:
 ;
 ; temp_int = 0;
 ;
-	.dbg	line, "src/dungeon.c", 25
+	.dbg	line, "src/dungeon.c", 26
 	tya
 	sta     _temp_int
 	sta     _temp_int+1
 ;
 ; for(temp_y = 0; temp_y < NUM_DUNGEONS; temp_y++) {
 ;
-	.dbg	line, "src/dungeon.c", 26
+	.dbg	line, "src/dungeon.c", 27
 	sta     _temp_y
 L000B:	lda     _temp_y
 	cmp     #$04
@@ -99,7 +114,7 @@ L000B:	lda     _temp_y
 ;
 ; for(temp_x = 0; temp_x < NUM_DUNGEON_LEVELS; temp_x++) {
 ;
-	.dbg	line, "src/dungeon.c", 27
+	.dbg	line, "src/dungeon.c", 28
 	lda     #$00
 	sta     _temp_x
 L000C:	lda     _temp_x
@@ -108,7 +123,7 @@ L000C:	lda     _temp_x
 ;
 ; dungeon_layout[temp_int++] = rand8() % NUM_SECTOR_TEMPLATES;
 ;
-	.dbg	line, "src/dungeon.c", 28
+	.dbg	line, "src/dungeon.c", 29
 	lda     _dungeon_layout
 	clc
 	adc     _temp_int
@@ -128,19 +143,19 @@ L000A:	jsr     _rand8
 ;
 ; for(temp_x = 0; temp_x < NUM_DUNGEON_LEVELS; temp_x++) {
 ;
-	.dbg	line, "src/dungeon.c", 27
+	.dbg	line, "src/dungeon.c", 28
 	inc     _temp_x
 	jmp     L000C
 ;
 ; for(temp_y = 0; temp_y < NUM_DUNGEONS; temp_y++) {
 ;
-	.dbg	line, "src/dungeon.c", 26
+	.dbg	line, "src/dungeon.c", 27
 L000D:	inc     _temp_y
 	jmp     L000B
 ;
 ; }
 ;
-	.dbg	line, "src/dungeon.c", 31
+	.dbg	line, "src/dungeon.c", 32
 L0003:	jmp     incsp2
 
 	.dbg	line
@@ -162,24 +177,24 @@ L0003:	jmp     incsp2
 ;
 ; void start_dungeon(unsigned char dungeon_index) {
 ;
-	.dbg	line, "src/dungeon.c", 33
+	.dbg	line, "src/dungeon.c", 34
 	jsr     pusha
 ;
 ; current_dungeon_index = dungeon_index;
 ;
-	.dbg	line, "src/dungeon.c", 34
+	.dbg	line, "src/dungeon.c", 35
 	ldy     #$00
 	lda     (sp),y
 	sta     _current_dungeon_index
 ;
 ; current_sector_index = 0;
 ;
-	.dbg	line, "src/dungeon.c", 35
+	.dbg	line, "src/dungeon.c", 36
 	sty     _current_sector_index
 ;
 ; }
 ;
-	.dbg	line, "src/dungeon.c", 36
+	.dbg	line, "src/dungeon.c", 37
 	jmp     incsp1
 
 	.dbg	line
@@ -201,28 +216,28 @@ L0003:	jmp     incsp2
 ;
 ; void load_dungeon_sector(unsigned char sector_index) {
 ;
-	.dbg	line, "src/dungeon.c", 38
+	.dbg	line, "src/dungeon.c", 39
 	jsr     pusha
 ;
 ; current_sector_index = sector_index;
 ;
-	.dbg	line, "src/dungeon.c", 39
+	.dbg	line, "src/dungeon.c", 40
 	ldy     #$00
 	lda     (sp),y
 	sta     _current_sector_index
 ;
 ; current_sector = (unsigned char *) sector_metatiles[dungeon_layout[current_dungeon_index * NUM_DUNGEON_LEVELS + current_sector_index]];
 ;
-	.dbg	line, "src/dungeon.c", 40
+	.dbg	line, "src/dungeon.c", 41
 	ldx     #$00
 	lda     _current_dungeon_index
 	jsr     shlax4
 	clc
 	adc     _current_sector_index
-	bcc     L000C
+	bcc     L0014
 	inx
 	clc
-L000C:	adc     _dungeon_layout
+L0014:	adc     _dungeon_layout
 	sta     ptr1
 	txa
 	adc     _dungeon_layout+1
@@ -246,31 +261,58 @@ L000C:	adc     _dungeon_layout
 ;
 ; temp_int = 0;
 ;
-	.dbg	line, "src/dungeon.c", 42
+	.dbg	line, "src/dungeon.c", 43
 	txa
 	sta     _temp_int
 	sta     _temp_int+1
 ;
 ; for(temp_y = 0; temp_y < 10; temp_y++) {
 ;
-	.dbg	line, "src/dungeon.c", 43
+	.dbg	line, "src/dungeon.c", 44
 	sta     _temp_y
-L000D:	lda     _temp_y
+L0016:	lda     _temp_y
 	cmp     #$0A
-	bcs     L0003
+	jcs     L0003
 ;
 ; for(temp_x = 0; temp_x < 12; temp_x++) {
 ;
-	.dbg	line, "src/dungeon.c", 44
+	.dbg	line, "src/dungeon.c", 45
 	lda     #$00
 	sta     _temp_x
-L000E:	lda     _temp_x
+L0017:	lda     _temp_x
 	cmp     #$0C
-	bcs     L0010
+	jcs     L0007
+;
+; nt_adr = 0x2084 + 0x20 * temp_y + 2 * temp_x;
+;
+	.dbg	line, "src/dungeon.c", 46
+	ldx     #$00
+	lda     _temp_y
+	jsr     shlax4
+	stx     tmp1
+	asl     a
+	rol     tmp1
+	clc
+	adc     #$84
+	sta     ptr1
+	lda     tmp1
+	adc     #$20
+	sta     ptr1+1
+	ldx     #$00
+	lda     _temp_x
+	asl     a
+	bcc     L0015
+	inx
+	clc
+L0015:	adc     ptr1
+	sta     _nt_adr
+	txa
+	adc     ptr1+1
+	sta     _nt_adr+1
 ;
 ; mt = current_sector[temp_int++];
 ;
-	.dbg	line, "src/dungeon.c", 45
+	.dbg	line, "src/dungeon.c", 47
 	lda     _current_sector
 	clc
 	adc     _temp_int
@@ -282,24 +324,93 @@ L000E:	lda     _temp_x
 	lda     (ptr1),y
 	sta     _mt
 	inc     _temp_int
-	bne     L000F
+	bne     L000A
 	inc     _temp_int+1
+;
+; one_vram_buffer(metatile_UL_tiles[mt], nt_adr);
+;
+	.dbg	line, "src/dungeon.c", 48
+L000A:	ldy     _mt
+	lda     _metatile_UL_tiles,y
+	jsr     pusha
+	lda     _nt_adr
+	ldx     _nt_adr+1
+	jsr     _one_vram_buffer
+;
+; ++nt_adr;
+;
+	.dbg	line, "src/dungeon.c", 49
+	inc     _nt_adr
+	bne     L000C
+	inc     _nt_adr+1
+;
+; one_vram_buffer(metatile_UR_tiles[mt], nt_adr);
+;
+	.dbg	line, "src/dungeon.c", 50
+L000C:	ldy     _mt
+	lda     _metatile_UR_tiles,y
+	jsr     pusha
+	lda     _nt_adr
+	ldx     _nt_adr+1
+	jsr     _one_vram_buffer
+;
+; nt_adr += 0x32 - 1;
+;
+	.dbg	line, "src/dungeon.c", 51
+	lda     #$31
+	clc
+	adc     _nt_adr
+	sta     _nt_adr
+	bcc     L000E
+	inc     _nt_adr+1
+;
+; one_vram_buffer(metatile_DL_tiles[mt], nt_adr);
+;
+	.dbg	line, "src/dungeon.c", 52
+L000E:	ldy     _mt
+	lda     _metatile_DL_tiles,y
+	jsr     pusha
+	lda     _nt_adr
+	ldx     _nt_adr+1
+	jsr     _one_vram_buffer
+;
+; ++nt_adr;
+;
+	.dbg	line, "src/dungeon.c", 53
+	inc     _nt_adr
+	bne     L0010
+	inc     _nt_adr+1
+;
+; one_vram_buffer(metatile_DR_tiles[mt], nt_adr);
+;
+	.dbg	line, "src/dungeon.c", 54
+L0010:	ldy     _mt
+	lda     _metatile_DR_tiles,y
+	jsr     pusha
+	lda     _nt_adr
+	ldx     _nt_adr+1
+	jsr     _one_vram_buffer
 ;
 ; for(temp_x = 0; temp_x < 12; temp_x++) {
 ;
-	.dbg	line, "src/dungeon.c", 44
-L000F:	inc     _temp_x
-	jmp     L000E
+	.dbg	line, "src/dungeon.c", 45
+	inc     _temp_x
+	jmp     L0017
+;
+; flush_vram_update_nmi();
+;
+	.dbg	line, "src/dungeon.c", 56
+L0007:	jsr     _flush_vram_update_nmi
 ;
 ; for(temp_y = 0; temp_y < 10; temp_y++) {
 ;
-	.dbg	line, "src/dungeon.c", 43
-L0010:	inc     _temp_y
-	jmp     L000D
+	.dbg	line, "src/dungeon.c", 44
+	inc     _temp_y
+	jmp     L0016
 ;
 ; }
 ;
-	.dbg	line, "src/dungeon.c", 51
+	.dbg	line, "src/dungeon.c", 60
 L0003:	jmp     incsp1
 
 	.dbg	line

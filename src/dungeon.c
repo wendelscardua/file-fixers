@@ -12,6 +12,7 @@ extern unsigned int temp_int;
 #pragma zpsym("temp_x");
 #pragma zpsym("temp_y");
 #pragma zpsym("temp_int");
+unsigned int nt_adr;
 
 unsigned char mt;
 #pragma bss-name(pop)
@@ -42,9 +43,17 @@ void load_dungeon_sector(unsigned char sector_index) {
   temp_int = 0;
   for(temp_y = 0; temp_y < 10; temp_y++) {
     for(temp_x = 0; temp_x < 12; temp_x++) {
+      nt_adr = 0x2084 + 0x20 * temp_y + 2 * temp_x;
       mt = current_sector[temp_int++];
-      // TODO: draw tiles
+      one_vram_buffer(metatile_UL_tiles[mt], nt_adr);
+      ++nt_adr;
+      one_vram_buffer(metatile_UR_tiles[mt], nt_adr);
+      nt_adr += 0x32 - 1;
+      one_vram_buffer(metatile_DL_tiles[mt], nt_adr);
+      ++nt_adr;
+      one_vram_buffer(metatile_DR_tiles[mt], nt_adr);
     }
+    flush_vram_update_nmi();
   }
 
   // TODO: draw level info
