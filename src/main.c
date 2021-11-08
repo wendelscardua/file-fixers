@@ -443,7 +443,31 @@ void drivers_window_loading_handler () {
     }
     break;
   default: // Load driver dungeon
-    // TODO
+    current_game_state = Dungeon;
+    current_cursor_state = Default;
+    oam_clear();
+    pal_fade_to(4, 0);
+    ppu_off();
+
+    set_chr_mode_2(BG_DUNGEON_0);
+    set_chr_mode_3(BG_DUNGEON_1);
+    set_chr_mode_4(BG_DUNGEON_2);
+    set_chr_mode_5(BG_DUNGEON_3);
+
+    pal_bg(dungeon_bg_palette);
+    pal_spr(sprites_palette);
+
+    // draw some things
+    vram_adr(NTADR_A(0,0));
+    vram_unrle(dungeon_hud_nametable);
+    set_scroll_x(0);
+    set_scroll_y(0);
+    current_screen = 0;
+
+    ppu_on_all();
+    pal_fade_to(0, 4);
+
+    start_dungeon(cursor_index - 1);
     break;
   }
 }

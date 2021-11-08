@@ -45,7 +45,8 @@ src/crt0.o: src/crt0.s src/mmc3/mmc3_code.asm src/lib/neslib.s src/lib/nesdoug.s
 assets/nametables.o: assets/nametables.s assets/nametables.h \
                      assets/nametables/title.rle \
                      assets/nametables/main-window.rle \
-                     assets/nametables/drivers-window.rle
+                     assets/nametables/drivers-window.rle \
+                     assets/nametables/dungeon-hud.rle
 	ca65 $< ${CA65_FLAGS}
 
 assets/dungeons.o: assets/dungeons.s assets/dungeons.h \
