@@ -19,7 +19,8 @@ debug: ${TARGET}
 
 ${TARGET}: src/main.o src/crt0.o src/lib/unrle.o \
            src/nametable_loader.o \
-           assets/nametables.o assets/palettes.o
+           src/dungeon.o \
+           assets/nametables.o assets/palettes.o assets/dungeons.o
 	ld65 $^ -C MMC3.cfg nes.lib -m map.txt -o ${TARGET} ${LD65_FLAGS}
 
 %.o: %.s
@@ -47,12 +48,23 @@ assets/nametables.o: assets/nametables.s assets/nametables.h \
                      assets/nametables/drivers-window.rle
 	ca65 $< ${CA65_FLAGS}
 
-assets/dungeons.o: assets/dungeons.s assets/dungeons.h
+assets/dungeons.o: assets/dungeons.s assets/dungeons.h \
+                   assets/dungeons/dungeon-00.bin \
+                   assets/dungeons/dungeon-01.bin \
+                   assets/dungeons/dungeon-02.bin \
+                   assets/dungeons/dungeon-03.bin \
+                   assets/dungeons/dungeon-04.bin \
+                   assets/dungeons/dungeon-05.bin \
+                   assets/dungeons/dungeon-06.bin \
+                   assets/dungeons/dungeon-07.bin
 	ca65 $< ${CA65_FLAGS}
 
 assets/palettes.o: assets/palettes.s assets/palettes.h \
                    assets/bg.pal assets/sprites.pal
 	ca65 $< ${CA65_FLAGS}
+
+assets/dungeons/%.bin: assets/dungeons/%.tmx
+	ruby tools/dungeon-to-bin.rb $< $@
 
 src/music/soundtrack.s: src/music/soundtrack.txt
 	${TEXT2DATA} $^ -ca65 -allin
