@@ -10,6 +10,7 @@
 #include "mmc3/mmc3_code.c"
 #include "sprites.h"
 #include "nametable_loader.h"
+#include "dungeon.h"
 #include "../assets/nametables.h"
 #include "../assets/palettes.h"
 
@@ -85,8 +86,10 @@ unsigned char double_buffer[32];
 #pragma bss-name(push, "XRAM")
 // extra RAM at $6000-$7fff
 
-#define WRAM_VERSION 0x0001
+#define WRAM_VERSION 0x0002
 unsigned int wram_start;
+unsigned char dungeon_layout_initialized;
+unsigned char wram_dungeon_layout[NUM_DUNGEONS * NUM_DUNGEON_LEVELS];
 unsigned char unrle_buffer[1024];
 
 #pragma bss-name(pop)
@@ -531,6 +534,12 @@ void start_game (void) {
   // draw some things
   vram_adr(NTADR_A(0,0));
   vram_unrle(main_window_nametable);
+
+  if (!dungeon_layout_initialized) {
+    dungeon_layout_initialized = 1;
+    generate_layout(wram_dungeon_layout);
+  }
+
   ppu_on_all();
 
   pal_fade_to(0, 4);
