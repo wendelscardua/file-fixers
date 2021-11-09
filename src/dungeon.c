@@ -7,10 +7,11 @@
 #pragma rodata-name ("RODATA")
 
 #pragma bss-name(push, "ZEROPAGE")
-extern unsigned char temp_x, temp_y;
+extern unsigned char temp, temp_x, temp_y;
 extern unsigned int temp_int;
 extern unsigned char current_screen;
 
+#pragma zpsym("temp");
 #pragma zpsym("temp_x");
 #pragma zpsym("temp_y");
 #pragma zpsym("temp_int");
@@ -18,6 +19,8 @@ extern unsigned char current_screen;
 unsigned int nt_adr;
 
 unsigned char mt;
+unsigned char sector_up_row, sector_up_column;
+unsigned char sector_down_row, sector_down_column;
 #pragma bss-name(pop)
 
 unsigned char * current_sector;
@@ -43,7 +46,12 @@ void start_dungeon(unsigned char dungeon_index) {
 
 void load_dungeon_sector(unsigned char sector_index) {
   current_sector_index = sector_index;
-  current_sector = (unsigned char *) sector_metatiles[dungeon_layout[current_dungeon_index * NUM_DUNGEON_LEVELS + current_sector_index]];
+  temp = dungeon_layout[current_dungeon_index * NUM_DUNGEON_LEVELS + current_sector_index];
+  /*
+    temp tells which sector template to use now...
+    but also tells (via bit 7) if the current sector was already completed
+  */
+  current_sector = (unsigned char *) sector_metatiles[temp & 0x7f];
 
   set_scroll_y(0);
   ppu_wait_nmi();
@@ -53,7 +61,19 @@ void load_dungeon_sector(unsigned char sector_index) {
   nt_adr = 0x2084;
   for(temp_y = 0; temp_y < 10; temp_y++) {
     for(temp_x = 0; temp_x < 12; temp_x++) {
-      mt = current_sector[temp_int++];
+      mt = current_sector[temp_int];
+      switch(mt) {
+      case UpMetatile:
+        sector_up_row = temp_y;
+        sector_up_column = temp_x;
+        break;
+      case DownMetatile:
+        sector_down_row = temp_y;
+        sector_down_column = temp_x;
+        if (!(temp & 0x80)) {
+          mt = LockedMetatile;
+        }
+      }
       one_vram_buffer(metatile_UL_tiles[mt], nt_adr);
       one_vram_buffer(metatile_UR_tiles[mt], nt_adr + 0x01);
       one_vram_buffer(metatile_DL_tiles[mt], nt_adr + 0x20);
@@ -64,6 +84,7 @@ void load_dungeon_sector(unsigned char sector_index) {
         set_scroll_y(0);
         clear_vram_buffer();
       }
+      temp_int++;
     }
     nt_adr += 0x28;
   }
