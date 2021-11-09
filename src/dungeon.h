@@ -12,3 +12,5 @@ typedef enum {
 void __fastcall__ generate_layout(unsigned char * dungeon_layout);
 void __fastcall__ start_dungeon(unsigned char dungeon_index);
 void __fastcall__ load_dungeon_sector(unsigned char sector_index);
+void __fastcall__ draw_dungeon_sprites(void);
+void __fastcall__ dungeon_handler(void);

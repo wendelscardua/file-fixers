@@ -161,6 +161,8 @@ void main (void) {
     case DriversWindow:
       drivers_window_handler();
       break;
+    case Dungeon:
+      dungeon_handler();
     }
 
     // load the irq array with values it parse
@@ -194,6 +196,9 @@ void draw_sprites (void) {
     break;
   case DriversWindow:
     draw_drivers_window_sprites();
+    break;
+  case Dungeon:
+    draw_dungeon_sprites();
     break;
   }
 }

@@ -97,3 +97,11 @@ void load_dungeon_sector(unsigned char sector_index) {
     nt_adr += 0x28;
   }
 }
+
+void dungeon_handler() {
+  // TODO
+}
+
+void draw_dungeon_sprites() {
+  // TODO
+}
