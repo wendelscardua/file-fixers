@@ -24,7 +24,7 @@ void start_nametable_loader(unsigned int nametable_address) {
 unsigned char yield_nametable_loader () {
   if (nametable_slice_counter >= NUM_SLICES) return 0;
 
-  multi_vram_buffer_horz(nametable_buffer, SLICE_SIZE, current_nametable_address);
+  multi_vram_buffer_horz((char *) nametable_buffer, SLICE_SIZE, current_nametable_address);
 
   nametable_buffer += SLICE_SIZE;
   current_nametable_address += SLICE_SIZE;
