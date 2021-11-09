@@ -35,7 +35,7 @@ src/main.s: src/main.c \
 src/nametable_loader.s: src/nametable_loader.c
 	cc65 -Oirs $< --add-source ${CA65_FLAGS}
 
-src/dungeon.s: src/dungeon.c
+src/dungeon.s: src/dungeon.c src/dungeon.h
 	cc65 -Oirs $< --add-source ${CA65_FLAGS}
 
 src/crt0.o: src/crt0.s src/mmc3/mmc3_code.asm src/lib/neslib.s src/lib/nesdoug.s assets/*.chr \
@@ -61,7 +61,7 @@ assets/dungeons.o: assets/dungeons.s assets/dungeons.h \
 	ca65 $< ${CA65_FLAGS}
 
 assets/palettes.o: assets/palettes.s assets/palettes.h \
-                   assets/bg.pal assets/sprites.pal
+                   assets/bg.pal assets/sprites.pal assets/bg-dungeon.pal
 	ca65 $< ${CA65_FLAGS}
 
 assets/dungeons/%.bin: assets/dungeons/%.tmx
