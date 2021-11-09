@@ -29,3 +29,17 @@ _metatile_DR_tiles:  .byte $00, $d1, $d3, $d5, $d7
 
 .export _metatile_attribute
 _metatile_attribute: .byte $00, $00, $00, $00, $00
+
+.repeat $40, i
+  .charmap $40 + i, $20 + i
+.endrepeat
+.charmap '.', $0e
+.charmap ' ', $00
+
+.export _dungeon_name
+_dungeon_name:
+gpu_dll:  .byte "GPU.DLL "
+disk_dll: .byte "Disk.DLL"
+io_dll:   .byte "IO.DLL  "
+ram_dll:  .byte "RAM.DLL "
+;_dungeon_name: .word gpu_dll, disk_dll, io_dll, ram_dll

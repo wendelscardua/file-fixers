@@ -57,6 +57,10 @@ void load_dungeon_sector(unsigned char sector_index) {
   ppu_wait_nmi();
   clear_vram_buffer();
 
+  multi_vram_buffer_horz(dungeon_name[current_dungeon_index], 8, NTADR_A(9, 2));
+  one_vram_buffer(0x10 + (sector_index>>4), NTADR_A(26, 2));
+  one_vram_buffer(0x10 + (sector_index & 0x0f), NTADR_A(27, 2));
+
   temp_int = 0;
   nt_adr = 0x2084;
   for(temp_y = 0; temp_y < 10; temp_y++) {
@@ -89,5 +93,5 @@ void load_dungeon_sector(unsigned char sector_index) {
     nt_adr += 0x28;
   }
 
-  // TODO: draw level info
+                  // TODO: draw level info
 }
