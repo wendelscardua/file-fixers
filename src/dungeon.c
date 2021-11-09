@@ -76,6 +76,10 @@ void load_dungeon_sector(unsigned char sector_index) {
         sector_down_column = temp_x;
         if (!(temp & 0x80)) {
           mt = LockedMetatile;
+        } else if (sector_index == NUM_DUNGEON_LEVELS - 1) {
+          mt = GroundMetatile;
+          sector_down_row = 0xff;
+          sector_down_column = 0xff;
         }
       }
       one_vram_buffer(metatile_UL_tiles[mt], nt_adr);
@@ -92,6 +96,4 @@ void load_dungeon_sector(unsigned char sector_index) {
     }
     nt_adr += 0x28;
   }
-
-                  // TODO: draw level info
 }
