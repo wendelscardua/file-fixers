@@ -10,6 +10,7 @@
 #include "mmc3/mmc3_code.c"
 #include "sprites.h"
 #include "nametable_loader.h"
+#include "dungeon.h"
 #include "../assets/nametables.h"
 #include "../assets/palettes.h"
 
@@ -85,8 +86,10 @@ unsigned char double_buffer[32];
 #pragma bss-name(push, "XRAM")
 // extra RAM at $6000-$7fff
 
-#define WRAM_VERSION 0x0001
+#define WRAM_VERSION 0x0002
 unsigned int wram_start;
+unsigned char dungeon_layout_initialized;
+unsigned char wram_dungeon_layout[NUM_DUNGEONS * NUM_DUNGEON_LEVELS];
 unsigned char unrle_buffer[1024];
 
 #pragma bss-name(pop)
@@ -158,6 +161,8 @@ void main (void) {
     case DriversWindow:
       drivers_window_handler();
       break;
+    case Dungeon:
+      dungeon_handler();
     }
 
     // load the irq array with values it parse
@@ -191,6 +196,9 @@ void draw_sprites (void) {
     break;
   case DriversWindow:
     draw_drivers_window_sprites();
+    break;
+  case Dungeon:
+    draw_dungeon_sprites();
     break;
   }
 }
@@ -440,7 +448,31 @@ void drivers_window_loading_handler () {
     }
     break;
   default: // Load driver dungeon
-    // TODO
+    current_game_state = Dungeon;
+    current_cursor_state = Default;
+    oam_clear();
+    pal_fade_to(4, 0);
+    ppu_off();
+
+    set_chr_mode_2(BG_DUNGEON_0);
+    set_chr_mode_3(BG_DUNGEON_1);
+    set_chr_mode_4(BG_DUNGEON_2);
+    set_chr_mode_5(BG_DUNGEON_3);
+
+    pal_bg(dungeon_bg_palette);
+    pal_spr(sprites_palette);
+
+    // draw some things
+    vram_adr(NTADR_A(0,0));
+    vram_unrle(dungeon_hud_nametable);
+    set_scroll_x(0);
+    set_scroll_y(0);
+    current_screen = 0;
+
+    ppu_on_all();
+    pal_fade_to(0, 4);
+
+    start_dungeon(cursor_index - 1);
     break;
   }
 }
@@ -531,6 +563,12 @@ void start_game (void) {
   // draw some things
   vram_adr(NTADR_A(0,0));
   vram_unrle(main_window_nametable);
+
+  if (!dungeon_layout_initialized) {
+    dungeon_layout_initialized = 1;
+    generate_layout(wram_dungeon_layout);
+  }
+
   ppu_on_all();
 
   pal_fade_to(0, 4);
