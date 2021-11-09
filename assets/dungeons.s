@@ -14,6 +14,7 @@ _sector_metatiles:
 .word dungeon_00, dungeon_01, dungeon_02, dungeon_03
 .word dungeon_04, dungeon_05, dungeon_06, dungeon_07
 
+; metatiles: null, ground, down, up, locked
 .export _metatile_UL_tiles
 _metatile_UL_tiles:  .byte $00, $c0, $c2, $c4, $c6
 
