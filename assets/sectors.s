@@ -1,18 +1,18 @@
 .segment "RODATA"
 
-dungeon_00: .incbin "dungeons/dungeon-00.bin"
-dungeon_01: .incbin "dungeons/dungeon-01.bin"
-dungeon_02: .incbin "dungeons/dungeon-02.bin"
-dungeon_03: .incbin "dungeons/dungeon-03.bin"
-dungeon_04: .incbin "dungeons/dungeon-04.bin"
-dungeon_05: .incbin "dungeons/dungeon-05.bin"
-dungeon_06: .incbin "dungeons/dungeon-06.bin"
-dungeon_07: .incbin "dungeons/dungeon-07.bin"
+sector_00: .incbin "sectors/sector-00.bin"
+sector_01: .incbin "sectors/sector-01.bin"
+sector_02: .incbin "sectors/sector-02.bin"
+sector_03: .incbin "sectors/sector-03.bin"
+sector_04: .incbin "sectors/sector-04.bin"
+sector_05: .incbin "sectors/sector-05.bin"
+sector_06: .incbin "sectors/sector-06.bin"
+sector_07: .incbin "sectors/sector-07.bin"
 
 .export _sector_metatiles
 _sector_metatiles:
-.word dungeon_00, dungeon_01, dungeon_02, dungeon_03
-.word dungeon_04, dungeon_05, dungeon_06, dungeon_07
+.word sector_00, sector_01, sector_02, sector_03
+.word sector_04, sector_05, sector_06, sector_07
 
 ; metatiles: null, ground, down, up, locked
 .export _metatile_UL_tiles
