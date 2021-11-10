@@ -35,6 +35,8 @@
 #define BG_DUNGEON_1 9
 #define BG_DUNGEON_2 10
 #define BG_DUNGEON_3 11
+#define SPRITE_PLAYERS_0 12
+#define SPRITE_PLAYERS_1 14
 
 // Configs
 #define CLICK_DELAY 0x10
@@ -458,6 +460,8 @@ void drivers_window_loading_handler () {
     set_chr_mode_3(BG_DUNGEON_1);
     set_chr_mode_4(BG_DUNGEON_2);
     set_chr_mode_5(BG_DUNGEON_3);
+    set_chr_mode_0(SPRITE_PLAYERS_0);
+    set_chr_mode_1(SPRITE_PLAYERS_1);
 
     pal_bg(dungeon_bg_palette);
     pal_spr(sprites_palette);
