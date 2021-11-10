@@ -20,7 +20,7 @@ debug: ${TARGET}
 ${TARGET}: src/main.o src/crt0.o src/lib/unrle.o \
            src/nametable_loader.o \
            src/dungeon.o \
-           assets/nametables.o assets/palettes.o assets/sectors.o
+           assets/nametables.o assets/palettes.o assets/sectors.o assets/sprites.o
 	ld65 $^ -C MMC3.cfg nes.lib -m map.txt -o ${TARGET} ${LD65_FLAGS}
 
 %.o: %.s
@@ -28,7 +28,7 @@ ${TARGET}: src/main.o src/crt0.o src/lib/unrle.o \
 
 src/main.s: src/main.c \
             assets/nametables.h assets/palettes.h \
-            src/sprites.h \
+            assets/sprites.h \
             src/lib/unrle.h src/nametable_loader.h src/dungeon.h
 	cc65 -Oirs $< --add-source ${CA65_FLAGS}
 
@@ -62,6 +62,9 @@ assets/sectors.o: assets/sectors.s assets/sectors.h \
 
 assets/palettes.o: assets/palettes.s assets/palettes.h \
                    assets/bg.pal assets/sprites.pal assets/bg-dungeon.pal
+	ca65 $< ${CA65_FLAGS}
+
+assets/sprites.o: assets/sprites.s assets/sprites.h
 	ca65 $< ${CA65_FLAGS}
 
 assets/sectors/%.bin: assets/sectors/%.tmx

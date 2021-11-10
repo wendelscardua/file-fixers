@@ -8,9 +8,9 @@
 #include "lib/unrle.h"
 #include "mmc3/mmc3_code.h"
 #include "mmc3/mmc3_code.c"
-#include "sprites.h"
 #include "nametable_loader.h"
 #include "dungeon.h"
+#include "../assets/sprites.h"
 #include "../assets/nametables.h"
 #include "../assets/palettes.h"
 
