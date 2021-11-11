@@ -1,7 +1,8 @@
 #include "lib/nesdoug.h"
 #include "lib/neslib.h"
 #include "dungeon.h"
-#include "../assets/dungeons.h"
+#include "../assets/sectors.h"
+#include "../assets/sprites.h"
 
 #pragma code-name ("CODE")
 #pragma rodata-name ("RODATA")
