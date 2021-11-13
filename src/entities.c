@@ -64,8 +64,10 @@ void entity_handler() {
     entity_input_handler();
     break;
   case EntityMovement:
+    entity_movement_handler();
     break;
   case EntityAction:
+    entity_action_handler();
     break;
   }
 }
@@ -76,16 +78,37 @@ void entity_input_handler() {
     pad_poll(0);
     pad1_new = get_pad_new(0);
     if (pad1_new & (PAD_UP|PAD_DOWN|PAD_LEFT|PAD_RIGHT)) {
-      if (pad1_new & PAD_UP) { temp = entity_direction[current_entity] = Up; }
-      if (pad1_new & PAD_DOWN) { temp = entity_direction[current_entity] = Down; }
-      if (pad1_new & PAD_LEFT) { temp = entity_direction[current_entity] = Left; }
-      if (pad1_new & PAD_RIGHT) { temp = entity_direction[current_entity] = Right; }
+      temp_x = entity_col[current_entity];
+      temp_y = entity_row[current_entity];
+      if (pad1_new & PAD_UP) { --temp_y; temp = entity_direction[current_entity] = Up; }
+      if (pad1_new & PAD_DOWN) { ++temp_y; temp = entity_direction[current_entity] = Down; }
+      if (pad1_new & PAD_LEFT) { --temp_x; temp = entity_direction[current_entity] = Left; }
+      if (pad1_new & PAD_RIGHT) { ++temp_x; temp = entity_direction[current_entity] = Right; }
+
+      entity_row[current_entity] = temp_y;
+      entity_col[current_entity] = temp_x;
 
       current_entity_state = EntityMovement;
       entity_aux = 0x10;
     }
     break;
   }
+}
+
+void entity_movement_handler() {
+  --entity_aux;
+  switch (entity_direction[current_entity]) {
+  case Up: --entity_y; break;
+  case Down: ++entity_y; break;
+  case Left: --entity_x; break;
+  case Right: ++entity_x; break;
+  }
+  if (entity_aux == 0) {
+    current_entity_state = EntityInput;
+  }
+}
+
+void entity_action_handler() {
 }
 
 void next_entity() {

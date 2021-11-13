@@ -15,3 +15,5 @@ void entity_handler (void);
 void draw_entities (void);
 void next_entity (void);
 void entity_input_handler (void);
+void entity_movement_handler (void);
+void entity_action_handler (void);
