@@ -65,10 +65,10 @@ _loading_cursor_sprite:
 
   .ident (.concat("player_facing_right_", .string(player_index))):
 
-	.byte   0,  0,$04 + $20 * player_index,0
-	.byte   8,  0,$05 + $20 * player_index,0
-	.byte   0,  8,$14 + $20 * player_index,0
-	.byte   8,  8,$15 + $20 * player_index,0
+	.byte   8,  0,$04 + $20 * player_index,0|OAM_FLIP_H
+	.byte   0,  0,$05 + $20 * player_index,0|OAM_FLIP_H
+	.byte   8,  8,$14 + $20 * player_index,0|OAM_FLIP_H
+	.byte   0,  8,$15 + $20 * player_index,0|OAM_FLIP_H
 
 	.byte $80
 
