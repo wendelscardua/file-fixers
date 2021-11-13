@@ -1,4 +1,5 @@
 #include "directions.h"
+#include "dungeon.h"
 #include "entities.h"
 #include "players.h"
 #include "lib/neslib.h"
@@ -87,6 +88,11 @@ void entity_handler() {
   }
 }
 
+extern unsigned char * current_sector;
+unsigned char entity_collides() {
+  return current_sector[temp_y * 12 + temp_x] == NullMetatile;
+}
+
 void entity_input_handler() {
   switch(entity_type[current_entity]) {
   case Player:
@@ -100,7 +106,7 @@ void entity_input_handler() {
       if (pad1_new & PAD_LEFT) { --temp_x; temp = entity_direction[current_entity] = Left; }
       if (pad1_new & PAD_RIGHT) { ++temp_x; temp = entity_direction[current_entity] = Right; }
 
-      if (current_entity_moves > 0) {
+      if (current_entity_moves > 0 && !entity_collides()) {
         entity_row[current_entity] = temp_y;
         entity_col[current_entity] = temp_x;
         --current_entity_moves;
