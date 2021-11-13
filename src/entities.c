@@ -32,9 +32,24 @@ entity_type_enum entity_type[MAX_ENTITIES];
 unsigned char entity_turn_counter[MAX_ENTITIES];
 unsigned char entity_speed[MAX_ENTITIES];
 unsigned char current_entity;
-unsigned char current_entity_steps;
+unsigned char current_entity_moves;
 entity_state_enum current_entity_state;
 unsigned char entity_x, entity_y;
+
+void refresh_moves_hud() {
+  temp = current_entity_moves;
+  temp_x = 0;
+  while (temp >= 10) {
+    temp -= 10;
+    ++temp_x;
+  }
+  if (temp_x > 0) {
+    one_vram_buffer(0x10 + temp_x, NTADR_A(22, 27));
+  } else {
+    one_vram_buffer(0x00, NTADR_A(22, 27));
+  }
+  one_vram_buffer(0x10 + temp, NTADR_A(23, 27));
+}
 
 void init_entities(unsigned char stairs_row, unsigned char stairs_col) {
   num_entities = 4;
@@ -85,11 +100,14 @@ void entity_input_handler() {
       if (pad1_new & PAD_LEFT) { --temp_x; temp = entity_direction[current_entity] = Left; }
       if (pad1_new & PAD_RIGHT) { ++temp_x; temp = entity_direction[current_entity] = Right; }
 
-      entity_row[current_entity] = temp_y;
-      entity_col[current_entity] = temp_x;
-
-      current_entity_state = EntityMovement;
-      entity_aux = 0x10;
+      if (current_entity_moves > 0) {
+        entity_row[current_entity] = temp_y;
+        entity_col[current_entity] = temp_x;
+        --current_entity_moves;
+        refresh_moves_hud();
+        current_entity_state = EntityMovement;
+        entity_aux = 0x10;
+      }
     }
     break;
   }
@@ -123,11 +141,13 @@ void next_entity() {
     entity_turn_counter[current_entity] += entity_speed[current_entity];
     if (entity_turn_counter[current_entity] >= speed_cap) {
       entity_turn_counter[current_entity] -= speed_cap;
-      current_entity_steps = 3; // TODO: base on dex maybe?
+      current_entity_moves = 3; // TODO: base on dex maybe?
       current_entity_state = EntityInput;
 
       entity_x = entity_col[current_entity] * 0x10 + 0x20;
       entity_y = entity_row[current_entity] * 0x10 + 0x20 - 1;
+
+      refresh_moves_hud();
       break;
     }
     ++current_entity;
@@ -159,9 +179,9 @@ void draw_entities() {
       temp_y = entity_row[i] * 0x10 + 0x20 - 1;
       switch(entity_type[i]) {
       case Player:
-        switch(entity_direction[i]) {
-        case Up: temp = (PLAYER_UP_SPR << 2) | i; break;
-        case Down: temp = (PLAYER_DOWN_SPR << 2) | i; break;
+                               switch(entity_direction[i]) {
+                               case Up: temp = (PLAYER_UP_SPR << 2) | i; break;
+                               case Down: temp = (PLAYER_DOWN_SPR << 2) | i; break;
         case Left: temp = (PLAYER_LEFT_SPR << 2) | i; break;
         case Right: temp = (PLAYER_RIGHT_SPR << 2) | i; break;
         }
