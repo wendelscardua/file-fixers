@@ -10,15 +10,19 @@
 	.importzp	sp, sreg, regsave, regbank
 	.importzp	tmp1, tmp2, tmp3, tmp4, ptr1, ptr2, ptr3, ptr4
 	.macpack	longbranch
-	.dbg		file, "src/entities.c", 999, 1636758179
+	.dbg		file, "src/entities.c", 1426, 1636769125
 	.dbg		file, "src/entities.h", 304, 1636758409
+	.dbg		file, "src/players.h", 566, 1636761601
 	.dbg		file, "src/../assets/sprites.h", 602, 1636691396
 	.dbg		file, "src/../assets/../src/constants.h", 48, 1635896270
-	.dbg		sym, "entity_turn", "00", extern, "_entity_turn"
+	.dbg		sym, "player_dex", "00", extern, "_player_dex"
+	.dbg		sym, "i", "00", extern, "_i"
 	.export		_init_entities
 	.export		_entity_handler
-	.import		_entity_turn
+	.import		_player_dex
+	.importzp	_i
 	.export		_num_entities
+	.export		_speed_cap
 	.export		_entity_x
 	.export		_entity_y
 	.export		_entity_type
@@ -36,6 +40,8 @@
 
 .segment	"ZEROPAGE"
 _num_entities:
+	.res	1,$00
+_speed_cap:
 	.res	1,$00
 .segment	"BSS"
 _entity_x:
@@ -66,21 +72,52 @@ _current_entity_state:
 .segment	"CODE"
 
 ;
-; num_entities = 0;
+; num_entities = 4;
 ;
-	.dbg	line, "src/entities.c", 29
-	lda     #$00
+	.dbg	line, "src/entities.c", 32
+	lda     #$04
 	sta     _num_entities
 ;
 ; current_entity = 0;
 ;
-	.dbg	line, "src/entities.c", 30
+	.dbg	line, "src/entities.c", 33
+	lda     #$00
 	sta     _current_entity
+;
+; for(i = 0; i < 4; i++) {
+;
+	.dbg	line, "src/entities.c", 34
+	sta     _i
+L0008:	lda     _i
+	cmp     #$04
+	bcs     L0003
+;
+; entity_speed[i] = player_dex[i];
+;
+	.dbg	line, "src/entities.c", 35
+	lda     #<(_entity_speed)
+	ldx     #>(_entity_speed)
+	clc
+	adc     _i
+	bcc     L0006
+	inx
+L0006:	sta     ptr1
+	stx     ptr1+1
+	ldy     _i
+	lda     _player_dex,y
+	ldy     #$00
+	sta     (ptr1),y
+;
+; for(i = 0; i < 4; i++) {
+;
+	.dbg	line, "src/entities.c", 34
+	inc     _i
+	jmp     L0008
 ;
 ; }
 ;
-	.dbg	line, "src/entities.c", 31
-	rts
+	.dbg	line, "src/entities.c", 37
+L0003:	rts
 
 	.dbg	line
 .endproc
@@ -100,7 +137,7 @@ _current_entity_state:
 ;
 ; }
 ;
-	.dbg	line, "src/entities.c", 35
+	.dbg	line, "src/entities.c", 41
 	rts
 
 	.dbg	line
@@ -121,48 +158,124 @@ _current_entity_state:
 ;
 ; if (num_entities == 0) return;
 ;
-	.dbg	line, "src/entities.c", 38
-	lda     _num_entities
-	bne     L0003
-	rts
-;
-; if (entity_turn()) {
-;
-	.dbg	line, "src/entities.c", 41
-L0003:	jsr     _entity_turn
-	tax
-;
-; break;
-;
-	.dbg	line, "src/entities.c", 42
-	bne     L0004
-;
-; ++current_entity;
-;
 	.dbg	line, "src/entities.c", 44
-	inc     _current_entity
-;
-; if (current_entity >= num_entities) {
-;
-	.dbg	line, "src/entities.c", 45
-	lda     _current_entity
-	cmp     _num_entities
-	bcc     L0003
-;
-; current_entity = 0;
-;
-	.dbg	line, "src/entities.c", 46
-	stx     _current_entity
-;
-; while(1) {
-;
-	.dbg	line, "src/entities.c", 40
-	jmp     L0003
+	lda     _num_entities
+	bne     L0017
 ;
 ; }
 ;
-	.dbg	line, "src/entities.c", 49
-L0004:	rts
+	.dbg	line, "src/entities.c", 62
+	rts
+;
+; speed_cap = 0;
+;
+	.dbg	line, "src/entities.c", 46
+L0017:	lda     #$00
+	sta     _speed_cap
+;
+; for(i = 0; i < num_entities; i++) {
+;
+	.dbg	line, "src/entities.c", 47
+	sta     _i
+L0014:	lda     _i
+	cmp     _num_entities
+	bcs     L000A
+;
+; if (entity_speed[i] > speed_cap) speed_cap = entity_speed[i];
+;
+	.dbg	line, "src/entities.c", 48
+	ldy     _i
+	lda     _entity_speed,y
+	cmp     _speed_cap
+	bcc     L0015
+	beq     L0015
+	ldy     _i
+	lda     _entity_speed,y
+	sta     _speed_cap
+;
+; for(i = 0; i < num_entities; i++) {
+;
+	.dbg	line, "src/entities.c", 47
+L0015:	inc     _i
+	jmp     L0014
+;
+; entity_turn_counter[current_entity] += entity_speed[current_entity];
+;
+	.dbg	line, "src/entities.c", 52
+L000A:	lda     #<(_entity_turn_counter)
+	ldx     #>(_entity_turn_counter)
+	clc
+	adc     _current_entity
+	bcc     L000D
+	inx
+L000D:	sta     sreg
+	stx     sreg+1
+	sta     ptr1
+	stx     ptr1+1
+	ldy     #$00
+	lda     (ptr1),y
+	sta     ptr1
+	ldy     _current_entity
+	lda     _entity_speed,y
+	clc
+	adc     ptr1
+	ldy     #$00
+	sta     (sreg),y
+;
+; if (entity_turn_counter[current_entity] >= speed_cap) {
+;
+	.dbg	line, "src/entities.c", 53
+	ldy     _current_entity
+	lda     _entity_turn_counter,y
+	cmp     _speed_cap
+	bcc     L0016
+;
+; entity_turn_counter[current_entity] -= speed_cap;
+;
+	.dbg	line, "src/entities.c", 54
+	lda     #<(_entity_turn_counter)
+	ldx     #>(_entity_turn_counter)
+	clc
+	adc     _current_entity
+	bcc     L0011
+	inx
+L0011:	sta     sreg
+	stx     sreg+1
+	sta     ptr1
+	stx     ptr1+1
+	ldy     #$00
+	lda     (ptr1),y
+	sec
+	sbc     _speed_cap
+	sta     (sreg),y
+;
+; break;
+;
+	.dbg	line, "src/entities.c", 55
+	rts
+;
+; ++current_entity;
+;
+	.dbg	line, "src/entities.c", 57
+L0016:	inc     _current_entity
+;
+; if (current_entity >= num_entities) {
+;
+	.dbg	line, "src/entities.c", 58
+	lda     _current_entity
+	cmp     _num_entities
+	bcc     L000A
+;
+; current_entity = 0;
+;
+	.dbg	line, "src/entities.c", 59
+	lda     #$00
+	sta     _current_entity
+;
+; while(1) {
+;
+	.dbg	line, "src/entities.c", 51
+	jmp     L000A
 
 	.dbg	line
 .endproc

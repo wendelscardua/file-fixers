@@ -1,15 +1,18 @@
 #include "entities.h"
+#include "players.h"
 #include "../assets/sprites.h"
 
 #pragma code-name ("CODE")
 #pragma rodata-name ("RODATA")
 
 #pragma bss-name(push, "ZEROPAGE")
-extern unsigned char temp, temp_x, temp_y;
+extern unsigned char i, temp, temp_x, temp_y;
 extern unsigned int temp_int;
 
 unsigned char num_entities;
+unsigned char speed_cap;
 
+#pragma zpsym("i");
 #pragma zpsym("temp");
 #pragma zpsym("temp_x");
 #pragma zpsym("temp_y");
@@ -26,8 +29,11 @@ unsigned char current_entity;
 entity_state_enum current_entity_state;
 
 void init_entities() {
-  num_entities = 0;
+  num_entities = 4;
   current_entity = 0;
+  for(i = 0; i < 4; i++) {
+    entity_speed[i] = player_dex[i];
+  }
 }
 
 void entity_handler() {
@@ -37,8 +43,15 @@ void entity_handler() {
 void next_entity() {
   if (num_entities == 0) return;
 
+  speed_cap = 0;
+  for(i = 0; i < num_entities; i++) {
+    if (entity_speed[i] > speed_cap) speed_cap = entity_speed[i];
+  }
+
   while(1) {
-    if (entity_turn()) {
+    entity_turn_counter[current_entity] += entity_speed[current_entity];
+    if (entity_turn_counter[current_entity] >= speed_cap) {
+      entity_turn_counter[current_entity] -= speed_cap;
       break;
     }
     ++current_entity;

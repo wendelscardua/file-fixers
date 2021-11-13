@@ -21,7 +21,7 @@ ${TARGET}: src/main.o src/crt0.o src/lib/unrle.o \
            src/nametable_loader.o \
            src/dungeon.o \
            src/players.o \
-           src/entities.o src/entities_asm.o \
+           src/entities.o  \
            assets/nametables.o assets/palettes.o assets/sectors.o assets/sprites.o
 	ld65 $^ -C MMC3.cfg nes.lib -m map.txt -o ${TARGET} ${LD65_FLAGS}
 
