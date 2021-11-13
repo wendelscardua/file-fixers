@@ -1,6 +1,7 @@
 #include "directions.h"
 #include "entities.h"
 #include "players.h"
+#include "lib/neslib.h"
 #include "../assets/sprites.h"
 
 #pragma code-name ("CODE")
@@ -31,6 +32,7 @@ unsigned char entity_speed[MAX_ENTITIES];
 unsigned char current_entity;
 unsigned char current_entity_steps;
 entity_state_enum current_entity_state;
+unsigned char entity_x, entity_y;
 
 void init_entities(unsigned char stairs_row, unsigned char stairs_col) {
   num_entities = 4;
@@ -69,11 +71,50 @@ void next_entity() {
       entity_turn_counter[current_entity] -= speed_cap;
       current_entity_steps = 3; // TODO: base on dex maybe?
       current_entity_state = EntityInput;
+
+      entity_x = entity_col[current_entity] * 0x10 + 0x20;
+      entity_y = entity_row[current_entity] * 0x10 + 0x20 - 1;
       break;
     }
     ++current_entity;
     if (current_entity >= num_entities) {
       current_entity = 0;
+    }
+  }
+}
+
+void draw_entities() {
+  for(i = 0; i < num_entities; ++i) {
+    if (i == current_entity && current_entity_state == EntityMovement) {
+      switch(entity_type[i]) {
+      case Player:
+        switch(entity_direction[i]) {
+        case Up: temp = (PLAYER_STEP_1_UP_SPR << 2) | i; break;
+        case Down: temp = (PLAYER_STEP_1_DOWN_SPR << 2) | i; break;
+        case Left: temp = (PLAYER_STEP_1_LEFT_SPR << 2) | i; break;
+        case Right: temp = (PLAYER_STEP_1_RIGHT_SPR << 2) | i; break;
+        }
+        if (entity_aux & 0x10) {
+          temp += (1 << 2);
+        }
+        oam_meta_spr(entity_x, entity_y, player_sprite[temp]);
+        break;
+      }
+    } else {
+      temp_x = entity_col[i] * 0x10 + 0x20;
+      temp_y = entity_row[i] * 0x10 + 0x20 - 1;
+      switch(entity_type[i]) {
+      case Player:
+        switch(entity_direction[i]) {
+        case Up: temp = (PLAYER_UP_SPR << 2) | i; break;
+        case Down: temp = (PLAYER_DOWN_SPR << 2) | i; break;
+        case Left: temp = (PLAYER_LEFT_SPR << 2) | i; break;
+        case Right: temp = (PLAYER_RIGHT_SPR << 2) | i; break;
+        }
+        oam_meta_spr(temp_x, temp_y, player_sprite[temp]);
+
+        break;
+      }
     }
   }
 }

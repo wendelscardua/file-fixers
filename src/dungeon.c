@@ -106,5 +106,5 @@ void dungeon_handler() {
 }
 
 void draw_dungeon_sprites() {
-  // TODO
+  draw_entities();
 }

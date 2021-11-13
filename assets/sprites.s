@@ -6,6 +6,7 @@
 .export _default_cursor_sprite
 .export _clicking_cursor_sprite
 .export _loading_cursor_sprite
+.export _player_sprite
 
 _default_cursor_sprite:
 .byte   0,  0,$00,0

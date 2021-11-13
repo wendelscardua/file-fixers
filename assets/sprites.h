@@ -3,7 +3,7 @@
 extern const unsigned char default_cursor_sprite[];
 extern const unsigned char clicking_cursor_sprite[];
 extern const unsigned char loading_cursor_sprite[];
-extern const unsigned char player_sprite[][];
+extern const unsigned char * player_sprite[12];
 
 #define PLAYER_UP_SPR 0
 #define PLAYER_DOWN_SPR 1

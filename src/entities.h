@@ -12,4 +12,4 @@ typedef enum {
 
 void init_entities (unsigned char stairs_x, unsigned char stairs_y);
 void entity_handler (void);
-unsigned char __fastcall__ entity_turn (void);
+void draw_entities (void);
