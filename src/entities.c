@@ -2,13 +2,14 @@
 #include "entities.h"
 #include "players.h"
 #include "lib/neslib.h"
+#include "lib/nesdoug.h"
 #include "../assets/sprites.h"
 
 #pragma code-name ("CODE")
 #pragma rodata-name ("RODATA")
 
 #pragma bss-name(push, "ZEROPAGE")
-extern unsigned char i, temp, temp_x, temp_y;
+extern unsigned char i, temp, temp_x, temp_y, pad1_new;
 extern unsigned int temp_int;
 
 unsigned char num_entities;
@@ -20,6 +21,7 @@ unsigned char entity_aux;
 #pragma zpsym("temp_x");
 #pragma zpsym("temp_y");
 #pragma zpsym("temp_int");
+#pragma zpsym("pad1_new");
 
 #pragma bss-name(pop)
 
@@ -51,10 +53,39 @@ void init_entities(unsigned char stairs_row, unsigned char stairs_col) {
   entity_col[3] = stairs_col + 1;
 
   // TODO get enemies based on sector
+
+  next_entity();
 }
 
 void entity_handler() {
   if (num_entities == 0) return;
+  switch(current_entity_state) {
+  case EntityInput:
+    entity_input_handler();
+    break;
+  case EntityMovement:
+    break;
+  case EntityAction:
+    break;
+  }
+}
+
+void entity_input_handler() {
+  switch(entity_type[current_entity]) {
+  case Player:
+    pad_poll(0);
+    pad1_new = get_pad_new(0);
+    if (pad1_new & (PAD_UP|PAD_DOWN|PAD_LEFT|PAD_RIGHT)) {
+      if (pad1_new & PAD_UP) { temp = entity_direction[current_entity] = Up; }
+      if (pad1_new & PAD_DOWN) { temp = entity_direction[current_entity] = Down; }
+      if (pad1_new & PAD_LEFT) { temp = entity_direction[current_entity] = Left; }
+      if (pad1_new & PAD_RIGHT) { temp = entity_direction[current_entity] = Right; }
+
+      current_entity_state = EntityMovement;
+      entity_aux = 0x10;
+    }
+    break;
+  }
 }
 
 void next_entity() {
