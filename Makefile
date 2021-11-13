@@ -20,6 +20,7 @@ debug: ${TARGET}
 ${TARGET}: src/main.o src/crt0.o src/lib/unrle.o \
            src/nametable_loader.o \
            src/dungeon.o \
+           src/players.o \
            src/entities.o src/entities_asm.o \
            assets/nametables.o assets/palettes.o assets/sectors.o assets/sprites.o
 	ld65 $^ -C MMC3.cfg nes.lib -m map.txt -o ${TARGET} ${LD65_FLAGS}
@@ -39,7 +40,10 @@ src/nametable_loader.s: src/nametable_loader.c
 src/dungeon.s: src/dungeon.c src/dungeon.h src/entities.h
 	cc65 -Oirs $< --add-source ${CA65_FLAGS}
 
-src/entities.s: src/entities.c src/entities.h assets/sprites.h
+src/entities.s: src/entities.c src/entities.h src/players.h assets/sprites.h
+	cc65 -Oirs $< --add-source ${CA65_FLAGS}
+
+src/players.s: src/players.c src/players.h
 	cc65 -Oirs $< --add-source ${CA65_FLAGS}
 
 src/crt0.o: src/crt0.s src/mmc3/mmc3_code.asm src/lib/neslib.s src/lib/nesdoug.s assets/*.chr \

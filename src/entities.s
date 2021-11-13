@@ -10,8 +10,8 @@
 	.importzp	sp, sreg, regsave, regbank
 	.importzp	tmp1, tmp2, tmp3, tmp4, ptr1, ptr2, ptr3, ptr4
 	.macpack	longbranch
-	.dbg		file, "src/entities.c", 965, 1636757485
-	.dbg		file, "src/entities.h", 374, 1636757438
+	.dbg		file, "src/entities.c", 999, 1636758179
+	.dbg		file, "src/entities.h", 304, 1636758409
 	.dbg		file, "src/../assets/sprites.h", 602, 1636691396
 	.dbg		file, "src/../assets/../src/constants.h", 48, 1635896270
 	.dbg		sym, "entity_turn", "00", extern, "_entity_turn"
@@ -119,43 +119,50 @@ _current_entity_state:
 .segment	"CODE"
 
 ;
+; if (num_entities == 0) return;
+;
+	.dbg	line, "src/entities.c", 38
+	lda     _num_entities
+	bne     L0003
+	rts
+;
 ; if (entity_turn()) {
 ;
-	.dbg	line, "src/entities.c", 39
-L0002:	jsr     _entity_turn
+	.dbg	line, "src/entities.c", 41
+L0003:	jsr     _entity_turn
 	tax
 ;
 ; break;
 ;
-	.dbg	line, "src/entities.c", 40
-	bne     L0003
+	.dbg	line, "src/entities.c", 42
+	bne     L0004
 ;
 ; ++current_entity;
 ;
-	.dbg	line, "src/entities.c", 42
+	.dbg	line, "src/entities.c", 44
 	inc     _current_entity
 ;
 ; if (current_entity >= num_entities) {
 ;
-	.dbg	line, "src/entities.c", 43
+	.dbg	line, "src/entities.c", 45
 	lda     _current_entity
 	cmp     _num_entities
-	bcc     L0002
+	bcc     L0003
 ;
 ; current_entity = 0;
 ;
-	.dbg	line, "src/entities.c", 44
+	.dbg	line, "src/entities.c", 46
 	stx     _current_entity
 ;
 ; while(1) {
 ;
-	.dbg	line, "src/entities.c", 38
-	jmp     L0002
+	.dbg	line, "src/entities.c", 40
+	jmp     L0003
 ;
 ; }
 ;
-	.dbg	line, "src/entities.c", 47
-L0003:	rts
+	.dbg	line, "src/entities.c", 49
+L0004:	rts
 
 	.dbg	line
 .endproc
