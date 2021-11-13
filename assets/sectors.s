@@ -30,11 +30,7 @@ _metatile_DR_tiles:  .byte $00, $d1, $d3, $d5, $d7
 .export _metatile_attribute
 _metatile_attribute: .byte $00, $00, $00, $00, $00
 
-.repeat $40, i
-  .charmap $40 + i, $20 + i
-.endrepeat
-.charmap '.', $0e
-.charmap ' ', $00
+.include "../src/charmap.inc"
 
 .export _dungeon_name
 _dungeon_name:

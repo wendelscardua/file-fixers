@@ -52,6 +52,12 @@ void refresh_moves_hud() {
   one_vram_buffer(0x10 + temp, NTADR_A(23, 27));
 }
 
+void refresh_player_hud() {
+  refresh_moves_hud();
+
+  multi_vram_buffer_horz((char *) player_name[current_entity], 5, NTADR_A(3, 25));
+}
+
 void init_entities(unsigned char stairs_row, unsigned char stairs_col) {
   num_entities = 4;
   for(i = 0; i < 4; i++) {
@@ -168,7 +174,7 @@ void next_entity() {
       entity_x = entity_col[current_entity] * 0x10 + 0x20;
       entity_y = entity_row[current_entity] * 0x10 + 0x20 - 1;
 
-      refresh_moves_hud();
+      refresh_player_hud();
       break;
     }
   }

@@ -1,4 +1,6 @@
 #include "players.h"
+#include "lib/neslib.h"
+#include "charmap.h"
 
 #pragma code-name ("CODE")
 #pragma rodata-name ("RODATA")
@@ -22,4 +24,8 @@ void initialize_party() {
     player_lv[i] = 1;
     player_class[i] = Fighter;
   }
+  memcpy(player_name[0], "Lorem", 5);
+  memcpy(player_name[1], "Ipsum", 5);
+  memcpy(player_name[2], "Dolor", 5);
+  memcpy(player_name[3], "Amet ", 5);
 }

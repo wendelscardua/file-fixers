@@ -43,7 +43,7 @@ src/dungeon.s: src/dungeon.c src/dungeon.h src/entities.h
 src/entities.s: src/entities.c src/entities.h src/players.h src/directions.h assets/sprites.h
 	cc65 -Oirs $< --add-source ${CA65_FLAGS}
 
-src/players.s: src/players.c src/players.h
+src/players.s: src/players.c src/players.h src/charmap.h
 	cc65 -Oirs $< --add-source ${CA65_FLAGS}
 
 src/crt0.o: src/crt0.s src/mmc3/mmc3_code.asm src/lib/neslib.s src/lib/nesdoug.s assets/*.chr \
@@ -58,7 +58,7 @@ assets/nametables.o: assets/nametables.s assets/nametables.h \
                      assets/nametables/actions-menu.rle
 	ca65 $< ${CA65_FLAGS}
 
-assets/sectors.o: assets/sectors.s assets/sectors.h \
+assets/sectors.o: assets/sectors.s assets/sectors.h src/charmap.inc \
                   assets/sectors/sector-00.bin \
                   assets/sectors/sector-01.bin \
                   assets/sectors/sector-02.bin \

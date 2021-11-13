@@ -4,6 +4,7 @@ typedef enum {
               Support
 } player_class_type;
 
+extern unsigned char player_name[4][5];
 extern unsigned char player_str[4];
 extern unsigned char player_int[4];
 extern unsigned char player_wis[4];
