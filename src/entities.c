@@ -12,6 +12,7 @@ extern unsigned int temp_int;
 
 unsigned char num_entities;
 unsigned char speed_cap;
+unsigned char entity_aux;
 
 #pragma zpsym("i");
 #pragma zpsym("temp");
@@ -55,6 +56,7 @@ void next_entity() {
     entity_turn_counter[current_entity] += entity_speed[current_entity];
     if (entity_turn_counter[current_entity] >= speed_cap) {
       entity_turn_counter[current_entity] -= speed_cap;
+      current_entity_steps = 3; // TODO: base on dex maybe?
       break;
     }
     ++current_entity;
