@@ -89,7 +89,7 @@ unsigned char double_buffer[32];
 #pragma bss-name(push, "XRAM")
 // extra RAM at $6000-$7fff
 
-#define WRAM_VERSION 0x0002
+#define WRAM_VERSION 0x0003
 unsigned int wram_start;
 unsigned char dungeon_layout_initialized;
 unsigned char wram_dungeon_layout[NUM_DUNGEONS * NUM_DUNGEON_LEVELS];
