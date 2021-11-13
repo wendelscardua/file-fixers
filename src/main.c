@@ -8,9 +8,10 @@
 #include "lib/unrle.h"
 #include "mmc3/mmc3_code.h"
 #include "mmc3/mmc3_code.c"
-#include "sprites.h"
 #include "nametable_loader.h"
 #include "dungeon.h"
+#include "players.h"
+#include "../assets/sprites.h"
 #include "../assets/nametables.h"
 #include "../assets/palettes.h"
 
@@ -35,6 +36,8 @@
 #define BG_DUNGEON_1 9
 #define BG_DUNGEON_2 10
 #define BG_DUNGEON_3 11
+#define SPRITE_PLAYERS_0 12
+#define SPRITE_PLAYERS_1 14
 
 // Configs
 #define CLICK_DELAY 0x10
@@ -86,10 +89,25 @@ unsigned char double_buffer[32];
 #pragma bss-name(push, "XRAM")
 // extra RAM at $6000-$7fff
 
-#define WRAM_VERSION 0x0002
+#define WRAM_VERSION 0x0004
 unsigned int wram_start;
 unsigned char dungeon_layout_initialized;
 unsigned char wram_dungeon_layout[NUM_DUNGEONS * NUM_DUNGEON_LEVELS];
+unsigned char party_initialized;
+unsigned char player_name[4][5];
+unsigned char player_str[4];
+unsigned char player_int[4];
+unsigned char player_wis[4];
+unsigned char player_dex[4];
+unsigned char player_con[4];
+unsigned int player_hp[4];
+unsigned int player_max_hp[4];
+unsigned int player_mp[4];
+unsigned int player_max_mp[4];
+unsigned int player_xp[4];
+unsigned int player_lv[4];
+player_class_type player_class[4];
+
 unsigned char unrle_buffer[1024];
 
 #pragma bss-name(pop)
@@ -458,6 +476,8 @@ void drivers_window_loading_handler () {
     set_chr_mode_3(BG_DUNGEON_1);
     set_chr_mode_4(BG_DUNGEON_2);
     set_chr_mode_5(BG_DUNGEON_3);
+    set_chr_mode_0(SPRITE_PLAYERS_0);
+    set_chr_mode_1(SPRITE_PLAYERS_1);
 
     pal_bg(dungeon_bg_palette);
     pal_spr(sprites_palette);
@@ -567,6 +587,12 @@ void start_game (void) {
   if (!dungeon_layout_initialized) {
     dungeon_layout_initialized = 1;
     generate_layout(wram_dungeon_layout);
+  }
+
+  // TODO initialize later, maybe on config
+  if (!party_initialized) {
+    party_initialized = 1;
+    initialize_party();
   }
 
   ppu_on_all();

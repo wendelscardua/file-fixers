@@ -11,3 +11,6 @@ _drivers_window_nametable: .incbin "nametables/drivers-window.rle"
 
 .export _dungeon_hud_nametable
 _dungeon_hud_nametable: .incbin "nametables/dungeon-hud.rle"
+
+.export _actions_menu_nametable
+_actions_menu_nametable: .incbin "nametables/actions-menu.rle"

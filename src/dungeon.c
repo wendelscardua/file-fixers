@@ -1,7 +1,9 @@
 #include "lib/nesdoug.h"
 #include "lib/neslib.h"
 #include "dungeon.h"
-#include "../assets/dungeons.h"
+#include "entities.h"
+#include "../assets/sectors.h"
+#include "../assets/sprites.h"
 
 #pragma code-name ("CODE")
 #pragma rodata-name ("RODATA")
@@ -42,6 +44,7 @@ void start_dungeon(unsigned char dungeon_index) {
   current_sector_index = 0;
 
   load_dungeon_sector(0);
+  init_entities(sector_up_row, sector_up_column);
 }
 
 void load_dungeon_sector(unsigned char sector_index) {
@@ -99,9 +102,9 @@ void load_dungeon_sector(unsigned char sector_index) {
 }
 
 void dungeon_handler() {
-  // TODO
+  entity_handler();
 }
 
 void draw_dungeon_sprites() {
-  // TODO
+  draw_entities();
 }

@@ -20,7 +20,9 @@ debug: ${TARGET}
 ${TARGET}: src/main.o src/crt0.o src/lib/unrle.o \
            src/nametable_loader.o \
            src/dungeon.o \
-           assets/nametables.o assets/palettes.o assets/dungeons.o
+           src/players.o \
+           src/entities.o  \
+           assets/nametables.o assets/palettes.o assets/sectors.o assets/sprites.o
 	ld65 $^ -C MMC3.cfg nes.lib -m map.txt -o ${TARGET} ${LD65_FLAGS}
 
 %.o: %.s
@@ -28,14 +30,20 @@ ${TARGET}: src/main.o src/crt0.o src/lib/unrle.o \
 
 src/main.s: src/main.c \
             assets/nametables.h assets/palettes.h \
-            src/sprites.h \
+            assets/sprites.h \
             src/lib/unrle.h src/nametable_loader.h src/dungeon.h
 	cc65 -Oirs $< --add-source ${CA65_FLAGS}
 
 src/nametable_loader.s: src/nametable_loader.c
 	cc65 -Oirs $< --add-source ${CA65_FLAGS}
 
-src/dungeon.s: src/dungeon.c src/dungeon.h
+src/dungeon.s: src/dungeon.c src/dungeon.h src/entities.h
+	cc65 -Oirs $< --add-source ${CA65_FLAGS}
+
+src/entities.s: src/entities.c src/entities.h src/players.h src/directions.h assets/sprites.h
+	cc65 -Oirs $< --add-source ${CA65_FLAGS}
+
+src/players.s: src/players.c src/players.h src/charmap.h
 	cc65 -Oirs $< --add-source ${CA65_FLAGS}
 
 src/crt0.o: src/crt0.s src/mmc3/mmc3_code.asm src/lib/neslib.s src/lib/nesdoug.s assets/*.chr \
@@ -46,26 +54,30 @@ assets/nametables.o: assets/nametables.s assets/nametables.h \
                      assets/nametables/title.rle \
                      assets/nametables/main-window.rle \
                      assets/nametables/drivers-window.rle \
-                     assets/nametables/dungeon-hud.rle
+                     assets/nametables/dungeon-hud.rle \
+                     assets/nametables/actions-menu.rle
 	ca65 $< ${CA65_FLAGS}
 
-assets/dungeons.o: assets/dungeons.s assets/dungeons.h \
-                   assets/dungeons/dungeon-00.bin \
-                   assets/dungeons/dungeon-01.bin \
-                   assets/dungeons/dungeon-02.bin \
-                   assets/dungeons/dungeon-03.bin \
-                   assets/dungeons/dungeon-04.bin \
-                   assets/dungeons/dungeon-05.bin \
-                   assets/dungeons/dungeon-06.bin \
-                   assets/dungeons/dungeon-07.bin
+assets/sectors.o: assets/sectors.s assets/sectors.h src/charmap.inc \
+                  assets/sectors/sector-00.bin \
+                  assets/sectors/sector-01.bin \
+                  assets/sectors/sector-02.bin \
+                  assets/sectors/sector-03.bin \
+                  assets/sectors/sector-04.bin \
+                  assets/sectors/sector-05.bin \
+                  assets/sectors/sector-06.bin \
+                  assets/sectors/sector-07.bin
 	ca65 $< ${CA65_FLAGS}
 
 assets/palettes.o: assets/palettes.s assets/palettes.h \
                    assets/bg.pal assets/sprites.pal assets/bg-dungeon.pal
 	ca65 $< ${CA65_FLAGS}
 
-assets/dungeons/%.bin: assets/dungeons/%.tmx
-	ruby tools/dungeon-to-bin.rb $< $@
+assets/sprites.o: assets/sprites.s assets/sprites.h
+	ca65 $< ${CA65_FLAGS}
+
+assets/sectors/%.bin: assets/sectors/%.tmx
+	ruby tools/sector-to-bin.rb $< $@
 
 src/music/soundtrack.s: src/music/soundtrack.txt
 	${TEXT2DATA} $^ -ca65 -allin

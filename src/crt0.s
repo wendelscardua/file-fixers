@@ -381,4 +381,4 @@ sounds_data:
 .incbin "../assets/sprites.chr"
 
 .incbin "../assets/bg-dungeon.chr"
-.res 4096
+.incbin "../assets/characters/player-anim.chr"
