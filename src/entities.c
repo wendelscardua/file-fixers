@@ -148,7 +148,7 @@ void draw_entities() {
         case Left: temp = (PLAYER_STEP_1_LEFT_SPR << 2) | i; break;
         case Right: temp = (PLAYER_STEP_1_RIGHT_SPR << 2) | i; break;
         }
-        if (entity_aux & 0x10) {
+        if (entity_aux & 0b1000) {
           temp += (1 << 2);
         }
         oam_meta_spr(entity_x, entity_y, player_sprite[temp]);
