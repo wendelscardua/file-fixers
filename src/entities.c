@@ -54,7 +54,6 @@ void refresh_moves_hud() {
 
 void init_entities(unsigned char stairs_row, unsigned char stairs_col) {
   num_entities = 4;
-  current_entity = 0;
   for(i = 0; i < 4; i++) {
     entity_speed[i] = player_dex[i];
     entity_type[i] = Player;
@@ -70,6 +69,7 @@ void init_entities(unsigned char stairs_row, unsigned char stairs_col) {
 
   // TODO get enemies based on sector
 
+  current_entity = num_entities - 1;
   next_entity();
 }
 
@@ -122,6 +122,8 @@ void entity_input_handler() {
         current_entity_state = EntityMovement;
         entity_aux = 0x10;
       }
+    } else if (pad1_new & PAD_B) { // Pass
+      next_entity();
     }
     break;
   }
@@ -151,6 +153,11 @@ void next_entity() {
     if (entity_speed[i] > speed_cap) speed_cap = entity_speed[i];
   }
 
+  ++current_entity;
+  if (current_entity >= num_entities) {
+    current_entity = 0;
+  }
+
   while(1) {
     entity_turn_counter[current_entity] += entity_speed[current_entity];
     if (entity_turn_counter[current_entity] >= speed_cap) {
@@ -163,10 +170,6 @@ void next_entity() {
 
       refresh_moves_hud();
       break;
-    }
-    ++current_entity;
-    if (current_entity >= num_entities) {
-      current_entity = 0;
     }
   }
 }
