@@ -8,3 +8,5 @@ tools/ld65-map.json
 src/main.s
 src/nametable_loader.s
 src/dungeon.s
+src/entities.s
+src/players.s
