@@ -1,3 +1,4 @@
+#include "directions.h"
 #include "entities.h"
 #include "players.h"
 #include "../assets/sprites.h"
@@ -22,10 +23,12 @@ unsigned char speed_cap;
 
 unsigned char entity_x[MAX_ENTITIES];
 unsigned char entity_y[MAX_ENTITIES];
+direction entity_direction[MAX_ENTITIES];
 entity_type_enum entity_type[MAX_ENTITIES];
 unsigned char entity_turn_counter[MAX_ENTITIES];
 unsigned char entity_speed[MAX_ENTITIES];
 unsigned char current_entity;
+unsigned char current_entity_steps;
 entity_state_enum current_entity_state;
 
 void init_entities() {

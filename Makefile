@@ -40,7 +40,7 @@ src/nametable_loader.s: src/nametable_loader.c
 src/dungeon.s: src/dungeon.c src/dungeon.h src/entities.h
 	cc65 -Oirs $< --add-source ${CA65_FLAGS}
 
-src/entities.s: src/entities.c src/entities.h src/players.h assets/sprites.h
+src/entities.s: src/entities.c src/entities.h src/players.h src/directions.h assets/sprites.h
 	cc65 -Oirs $< --add-source ${CA65_FLAGS}
 
 src/players.s: src/players.c src/players.h
