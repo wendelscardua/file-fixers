@@ -90,7 +90,13 @@ void entity_handler() {
 
 extern unsigned char * current_sector;
 unsigned char entity_collides() {
-  return current_sector[temp_y * 12 + temp_x] == NullMetatile;
+  if (current_sector[temp_y * 12 + temp_x] == NullMetatile) return 1;
+
+  for(i = 0; i < num_entities; i++) {
+    if (entity_col[i] == temp_x && entity_row[i] == temp_y) return 1;
+  }
+
+  return 0;
 }
 
 void entity_input_handler() {
