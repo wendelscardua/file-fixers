@@ -1,4 +1,5 @@
 .include "../src/constants.inc"
+.include "../src/enemies.inc"
 
 .segment "RODATA"
 .feature force_range
@@ -94,16 +95,10 @@ _loading_cursor_sprite:
 
 _enemy_sprite:
 .repeat 4, palette
-  .repeat 3, enemy_index
+  .repeat NUM_ENEMY_MODELS, enemy_index
     .word .ident (.concat("enemy_left_", .string(enemy_index), "_p", .string(palette)))
-  .endrepeat
-  .repeat 3, enemy_index
     .word .ident (.concat("enemy_left_alt_", .string(enemy_index), "_p", .string(palette)))
-  .endrepeat
-  .repeat 3, enemy_index
     .word .ident (.concat("enemy_right_", .string(enemy_index), "_p", .string(palette)))
-  .endrepeat
-  .repeat 3, enemy_index
     .word .ident (.concat("enemy_right_alt_", .string(enemy_index), "_p", .string(palette)))
   .endrepeat
 .endrepeat
