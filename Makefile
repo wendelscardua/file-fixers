@@ -70,7 +70,8 @@ assets/sectors.o: assets/sectors.s assets/sectors.h src/charmap.inc \
 	ca65 $< ${CA65_FLAGS}
 
 assets/palettes.o: assets/palettes.s assets/palettes.h \
-                   assets/bg.pal assets/sprites.pal assets/bg-dungeon.pal
+                   assets/bg.pal assets/sprites.pal \
+                   assets/bg-dungeon.pal assets/sprites-dungeon.pal
 	ca65 $< ${CA65_FLAGS}
 
 assets/sprites.o: assets/sprites.s assets/sprites.h

@@ -480,7 +480,7 @@ void drivers_window_loading_handler () {
     set_chr_mode_1(SPRITE_PLAYERS_1);
 
     pal_bg(dungeon_bg_palette);
-    pal_spr(sprites_palette);
+    pal_spr(dungeon_sprites_palette);
 
     // draw some things
     vram_adr(NTADR_A(0,0));
