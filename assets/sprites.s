@@ -7,6 +7,7 @@
 .export _clicking_cursor_sprite
 .export _loading_cursor_sprite
 .export _player_sprite
+.export _enemy_sprite
 
 _default_cursor_sprite:
 .byte   0,  0,$00,0
@@ -32,6 +33,80 @@ _loading_cursor_sprite:
 .byte - 8,  0,$14,0
 .byte   0,  0,$15,0
 .byte $80
+
+.repeat 4, palette
+  .ident (.concat("enemy_left_0_p", .string(palette))):
+  .byte   4,  7,$80,palette
+  .byte $80
+
+  .ident (.concat("enemy_left_alt_0_p", .string(palette))):
+  .byte   4,  7,$90,palette
+  .byte $80
+
+  .ident (.concat("enemy_right_0_p", .string(palette))):
+  .byte   4,  7,$80,palette
+  .byte $80
+
+  .ident (.concat("enemy_right_alt_0_p", .string(palette))):
+  .byte   4,  7,$90,palette
+  .byte $80
+
+  .ident (.concat("enemy_left_1_p", .string(palette))):
+  .byte   4,  0,$81,palette
+  .byte   4,  8,$91,palette
+  .byte $80
+
+  .ident (.concat("enemy_left_alt_1_p", .string(palette))):
+  .byte   4,  0,$81,palette
+  .byte   4,  8,$92,palette
+  .byte $80
+
+  .ident (.concat("enemy_right_1_p", .string(palette))):
+  .byte   4,  0,$81,palette
+  .byte   4,  8,$91,palette
+  .byte $80
+
+  .ident (.concat("enemy_right_alt_1_p", .string(palette))):
+  .byte   4,  0,$81,palette
+  .byte   4,  8,$92,palette
+  .byte $80
+
+  .ident (.concat("enemy_left_2_p", .string(palette))):
+  .byte   1,  0,$83,palette
+  .byte   6,  8,$93,palette
+  .byte $80
+
+  .ident (.concat("enemy_left_alt_2_p", .string(palette))):
+  .byte   1,  0,$83,palette
+  .byte   6,  8,$82,palette
+  .byte $80
+
+  .ident (.concat("enemy_right_2_p", .string(palette))):
+  .byte   7,  0,$83,palette|OAM_FLIP_H
+  .byte   2,  8,$93,palette|OAM_FLIP_H
+  .byte $80
+
+  .ident (.concat("enemy_right_alt_2_p", .string(palette))):
+  .byte   7,  0,$83,palette|OAM_FLIP_H
+  .byte   2,  8,$82,palette|OAM_FLIP_H
+  .byte $80
+.endrepeat
+
+_enemy_sprite:
+.repeat 4, palette
+  .repeat 3, enemy_index
+    .word .ident (.concat("enemy_left_", .string(enemy_index), "_p", .string(palette)))
+  .endrepeat
+  .repeat 3, enemy_index
+    .word .ident (.concat("enemy_left_alt_", .string(enemy_index), "_p", .string(palette)))
+  .endrepeat
+  .repeat 3, enemy_index
+    .word .ident (.concat("enemy_right_", .string(enemy_index), "_p", .string(palette)))
+  .endrepeat
+  .repeat 3, enemy_index
+    .word .ident (.concat("enemy_right_alt_", .string(enemy_index), "_p", .string(palette)))
+  .endrepeat
+.endrepeat
 
 .repeat 4, player_index
   .ident (.concat("player_facing_up_", .string(player_index))):
