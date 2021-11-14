@@ -1,13 +1,10 @@
 #!/usr/bin/ruby
 # frozen_string_literal: true
 
-# renders a .map sub-nametable into another nametable
+# generates sector layout from tmx file
 # inputs:
-# - base nametable (.nam)
-# - sub-nametable (.map)
-# - x
-# - y
-# - output file (.nam)
+# - tiled file (.tmx)
+# - output layout file (.bin)
 
 require 'bundler/inline'
 
