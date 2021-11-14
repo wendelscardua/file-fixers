@@ -1,0 +1,35 @@
+Eicar:
+  difficulty: 1
+  base_level: 1
+  speed: 6
+  moves: 1
+  model: 0
+  palette: 0
+Crypt:
+  difficulty: 3
+  base_level: 2
+  speed: 12
+  moves: 2
+  model: 1
+  palette: 0
+Buggy:
+  difficulty: 4
+  base_level: 4
+  moves: 2
+  speed: 12
+  model: 0
+  palette: 2
+Stega:
+  difficulty: 8
+  base_level: 8
+  moves: 2
+  speed: 12
+  model: 2
+  palette: 0
+Nefet:
+  difficulty: 16
+  base_level: 12
+  moves: 3
+  speed: 18
+  model: 1
+  palette: 2
