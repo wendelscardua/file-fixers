@@ -6,6 +6,8 @@
 #include "lib/nesdoug.h"
 #include "../assets/sprites.h"
 
+#define NORMAL_SPEED 12
+
 #pragma code-name ("CODE")
 #pragma rodata-name ("RODATA")
 
@@ -14,7 +16,6 @@ extern unsigned char i, temp, temp_x, temp_y, pad1_new;
 extern unsigned int temp_int;
 
 unsigned char num_entities;
-unsigned char speed_cap;
 unsigned char entity_aux;
 
 #pragma zpsym("i");
@@ -61,7 +62,7 @@ void refresh_player_hud() {
 void init_entities(unsigned char stairs_row, unsigned char stairs_col) {
   num_entities = 4;
   for(i = 0; i < 4; i++) {
-    entity_speed[i] = player_dex[i];
+    entity_speed[i] = NORMAL_SPEED; // TODO faster w/ more levels
     entity_type[i] = Player;
     entity_direction[i] = Down;
   }
@@ -154,11 +155,6 @@ void entity_action_handler() {
 void next_entity() {
   if (num_entities == 0) return;
 
-  speed_cap = 0;
-  for(i = 0; i < num_entities; i++) {
-    if (entity_speed[i] > speed_cap) speed_cap = entity_speed[i];
-  }
-
   ++current_entity;
   if (current_entity >= num_entities) {
     current_entity = 0;
@@ -166,8 +162,8 @@ void next_entity() {
 
   while(1) {
     entity_turn_counter[current_entity] += entity_speed[current_entity];
-    if (entity_turn_counter[current_entity] >= speed_cap) {
-      entity_turn_counter[current_entity] -= speed_cap;
+    if (entity_turn_counter[current_entity] >= NORMAL_SPEED) {
+      entity_turn_counter[current_entity] -= NORMAL_SPEED;
       current_entity_moves = 3; // TODO: base on dex maybe?
       current_entity_state = EntityInput;
 
