@@ -64,13 +64,21 @@ assets/nametables.o: assets/nametables.s assets/nametables.h \
 
 assets/sectors.o: assets/sectors.s assets/sectors.h src/charmap.inc \
                   assets/sectors/sector-00.bin \
+                  assets/sectors/sector-00-room.bin \
                   assets/sectors/sector-01.bin \
+                  assets/sectors/sector-01-room.bin \
                   assets/sectors/sector-02.bin \
+                  assets/sectors/sector-02-room.bin \
                   assets/sectors/sector-03.bin \
+                  assets/sectors/sector-03-room.bin \
                   assets/sectors/sector-04.bin \
+                  assets/sectors/sector-04-room.bin \
                   assets/sectors/sector-05.bin \
+                  assets/sectors/sector-05-room.bin \
                   assets/sectors/sector-06.bin \
-                  assets/sectors/sector-07.bin
+                  assets/sectors/sector-06-room.bin \
+                  assets/sectors/sector-07.bin \
+                  assets/sectors/sector-07-room.bin
 	ca65 $< ${CA65_FLAGS}
 
 assets/palettes.o: assets/palettes.s assets/palettes.h \
@@ -89,6 +97,9 @@ assets/enemy-stats.s: assets/enemy-stats.yaml src/enemies.inc tools/compile-enem
 
 assets/sectors/%.bin: assets/sectors/%.tmx
 	ruby tools/sector-to-bin.rb $< $@
+
+assets/sectors/%-room.bin: assets/sectors/%.tmx
+	ruby tools/sector-to-room-bin.rb $< $@
 
 src/music/soundtrack.s: src/music/soundtrack.txt
 	${TEXT2DATA} $^ -ca65 -allin
