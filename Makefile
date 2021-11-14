@@ -17,7 +17,7 @@ debug: LD65_FLAGS += --dbgfile ${PROJECT}.dbg
 debug: CA65_FLAGS += -g -DDEBUG=1
 debug: ${TARGET}
 
-${TARGET}: src/main.o src/crt0.o src/lib/unrle.o \
+${TARGET}: src/main.o src/crt0.o src/lib/unrle.o src/lib/subrand.o \
            src/nametable_loader.o \
            src/dungeon.o \
            src/players.o \
