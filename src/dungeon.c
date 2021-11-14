@@ -26,6 +26,7 @@ unsigned char sector_down_row, sector_down_column;
 #pragma bss-name(pop)
 
 unsigned char * current_sector;
+unsigned char * current_sector_room_data;
 unsigned char * dungeon_layout;
 unsigned char current_dungeon_index, current_sector_index;
 
@@ -55,6 +56,7 @@ void load_dungeon_sector(unsigned char sector_index) {
     but also tells (via bit 7) if the current sector was already completed
   */
   current_sector = (unsigned char *) sector_metatiles[temp & 0x7f];
+  current_sector_room_data = (unsigned char *) sector_rooms[temp & 0x7f];
 
   set_scroll_y(0);
   ppu_wait_nmi();
