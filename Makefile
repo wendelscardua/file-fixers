@@ -22,7 +22,11 @@ ${TARGET}: src/main.o src/crt0.o src/lib/unrle.o \
            src/dungeon.o \
            src/players.o \
            src/entities.o  \
-           assets/nametables.o assets/palettes.o assets/sectors.o assets/sprites.o
+           assets/nametables.o \
+           assets/palettes.o \
+           assets/sectors.o \
+           assets/sprites.o \
+           assets/enemy-stats.o
 	ld65 $^ -C MMC3.cfg nes.lib -m map.txt -o ${TARGET} ${LD65_FLAGS}
 
 %.o: %.s
@@ -76,6 +80,12 @@ assets/palettes.o: assets/palettes.s assets/palettes.h \
 
 assets/sprites.o: assets/sprites.s assets/sprites.h
 	ca65 $< ${CA65_FLAGS}
+
+assets/enemy-stats.o: assets/enemy-stats.s assets/enemy-stats.h
+	ca65 $< ${CA65_FLAGS}
+
+assets/enemy-stats.s: assets/enemy-stats.yaml src/enemies.inc tools/compile-enemy-stats.rb
+	ruby tools/compile-enemy-stats.rb $< $@
 
 assets/sectors/%.bin: assets/sectors/%.tmx
 	ruby tools/sector-to-bin.rb $< $@
