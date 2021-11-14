@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.5" tiledversion="1.7.2" orientation="orthogonal" renderorder="right-down" width="12" height="10" tilewidth="16" tileheight="16" infinite="0" nextlayerid="2" nextobjectid="1">
+<map version="1.5" tiledversion="1.7.2" orientation="orthogonal" renderorder="right-down" width="12" height="10" tilewidth="16" tileheight="16" infinite="0" nextlayerid="3" nextobjectid="7">
  <tileset firstgid="1" source="metatiles.tsx"/>
  <layer id="1" name="Tile Layer 1" width="12" height="10">
   <data encoding="csv">
@@ -15,4 +15,11 @@
 2,2,2,2,1,1,1,1,2,2,2,2
 </data>
  </layer>
+ <objectgroup id="2" name="Rooms">
+  <object id="1" x="2.42198" y="65.7662" width="58.6865" height="26.8281"/>
+  <object id="2" x="1.86306" y="114.206" width="58.3139" height="42.1053"/>
+  <object id="3" x="67.0703" y="50.4891" width="57.5687" height="57.9413"/>
+  <object id="4" x="130.601" y="66.1388" width="57.9413" height="27.2007"/>
+  <object id="5" x="129.856" y="1.30415" width="59.9907" height="44.8999"/>
+ </objectgroup>
 </map>
