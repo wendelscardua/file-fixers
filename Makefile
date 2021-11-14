@@ -95,10 +95,10 @@ assets/enemy-stats.o: assets/enemy-stats.s assets/enemy-stats.h
 assets/enemy-stats.s: assets/enemy-stats.yaml src/enemies.inc tools/compile-enemy-stats.rb
 	ruby tools/compile-enemy-stats.rb $< $@
 
-assets/sectors/%.bin: assets/sectors/%.tmx
+assets/sectors/%.bin: assets/sectors/%.tmx tools/sector-to-bin.rb
 	ruby tools/sector-to-bin.rb $< $@
 
-assets/sectors/%-room.bin: assets/sectors/%.tmx
+assets/sectors/%-room.bin: assets/sectors/%.tmx tools/sector-to-room-bin.rb
 	ruby tools/sector-to-room-bin.rb $< $@
 
 src/music/soundtrack.s: src/music/soundtrack.txt

@@ -1,18 +1,24 @@
 .segment "RODATA"
 
-sector_00: .incbin "sectors/sector-00.bin"
-sector_01: .incbin "sectors/sector-01.bin"
-sector_02: .incbin "sectors/sector-02.bin"
-sector_03: .incbin "sectors/sector-03.bin"
-sector_04: .incbin "sectors/sector-04.bin"
-sector_05: .incbin "sectors/sector-05.bin"
-sector_06: .incbin "sectors/sector-06.bin"
-sector_07: .incbin "sectors/sector-07.bin"
+.repeat 8, sector_index
+  .ident(.concat("sector_0", .string(sector_index))): .incbin .concat("sectors/sector-0",.string(sector_index),".bin")
+.endrepeat
+
+.repeat 8, sector_index
+  .ident(.concat("sector_room_0", .string(sector_index))): .incbin .concat("sectors/sector-0",.string(sector_index),"-room.bin")
+.endrepeat
 
 .export _sector_metatiles
 _sector_metatiles:
-.word sector_00, sector_01, sector_02, sector_03
-.word sector_04, sector_05, sector_06, sector_07
+.repeat 8, sector_index
+  .word .ident(.concat("sector_0", .string(sector_index)))
+.endrepeat
+
+.export _sector_rooms
+_sector_rooms:
+.repeat 8, sector_index
+  .word .ident(.concat("sector_room_0", .string(sector_index)))
+.endrepeat
 
 ; metatiles: null, ground, down, up, locked
 .export _metatile_UL_tiles
