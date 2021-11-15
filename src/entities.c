@@ -21,6 +21,7 @@ extern unsigned int temp_int;
 unsigned char num_entities;
 unsigned char entity_aux;
 unsigned char temp_w, temp_h;
+unsigned char *room_ptr;
 
 #pragma zpsym("i");
 #pragma zpsym("temp");
@@ -81,20 +82,23 @@ void init_entities(unsigned char stairs_row, unsigned char stairs_col) {
   entity_col[1] = stairs_col - 1;
   entity_col[3] = stairs_col + 1;
 
-  while((temp_x = *current_sector_room_data) != 0xff) {
-    ++current_sector_room_data;
-    temp_y = *current_sector_room_data;
-    ++current_sector_room_data;
-    temp_w = *current_sector_room_data;
-    ++current_sector_room_data;
-    temp_h = *current_sector_room_data;
-    ++current_sector_room_data;
+  while (num_entities == 4) {
+    room_ptr = current_sector_room_data;
+    while((temp_x = *room_ptr) != 0xff) {
+      ++room_ptr;
+      temp_y = *room_ptr;
+      ++room_ptr;
+      temp_w = *room_ptr;
+      ++room_ptr;
+      temp_h = *room_ptr;
+      ++room_ptr;
 
-    if (subrand8(2) == 0) { // 33% chance to spawn in room
-      entity_col[num_entities] = temp_x + subrand8(temp_w);
-      entity_row[num_entities] = temp_y + subrand8(temp_h);
-      entity_type[num_entities] = select_enemy_type();
-      num_entities++;
+      if (subrand8(2) == 0) { // 33% chance to spawn in room
+        entity_col[num_entities] = temp_x + subrand8(temp_w);
+        entity_row[num_entities] = temp_y + subrand8(temp_h);
+        entity_type[num_entities] = select_enemy_type();
+        num_entities++;
+      }
     }
   }
 
