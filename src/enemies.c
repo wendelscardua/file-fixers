@@ -2,6 +2,7 @@
 #include "dungeon.h"
 #include "enemies.h"
 #include "entities.h"
+#include "wram.h"
 #include "../assets/enemy-stats.h"
 
 _Static_assert(Player == NUM_ENEMY_TYPES, "entity_type_enum must be aligned with number of enemies");

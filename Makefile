@@ -75,9 +75,10 @@ src/entities.s: src/entities.c \
 
 src/enemies.s: src/enemies.c \
                src/lib/subrand.h \
+               src/dungeon.h \
                src/enemies.h \
                src/entities.h \
-               src/dungeon.h \
+               src/wram.h \
                assets/enemy-stats.h
 	cc65 -Oirs $< --add-source ${CA65_FLAGS}
 

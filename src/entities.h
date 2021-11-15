@@ -25,6 +25,4 @@ void next_entity (void);
 void entity_input_handler (void);
 void entity_movement_handler (void);
 void entity_action_handler (void);
-
-extern unsigned char party_level;
 #endif
