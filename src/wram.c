@@ -1,28 +1,22 @@
 #include "lib/neslib.h"
 #include "dungeon.h"
+#include "entities.h"
 #include "players.h"
 
 #pragma bss-name(push, "XRAM")
 // extra RAM at $6000-$7fff
 
-#define WRAM_VERSION 0x0005
+#define WRAM_VERSION 0x0006
 unsigned int wram_start;
 unsigned char dungeon_layout_initialized;
 unsigned char wram_dungeon_layout[NUM_DUNGEONS * NUM_DUNGEON_LEVELS];
 unsigned char party_initialized;
 unsigned char player_name[4][5];
-unsigned char player_str[4];
-unsigned char player_int[4];
-unsigned char player_wis[4];
-unsigned char player_dex[4];
-unsigned char player_con[4];
-unsigned int player_hp[4];
-unsigned int player_max_hp[4];
-unsigned int player_mp[4];
-unsigned int player_max_mp[4];
-unsigned int player_xp[4];
-unsigned int player_lv[4];
 player_class_type player_class[4];
+unsigned int player_xp[4];
+
+unsigned char entity_lv[MAX_ENTITIES];
+unsigned char entity_speed[MAX_ENTITIES];
 
 unsigned char unrle_buffer[1024];
 

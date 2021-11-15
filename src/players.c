@@ -1,4 +1,5 @@
 #include "players.h"
+#include "wram.h"
 #include "lib/neslib.h"
 #include "charmap.h"
 
@@ -11,18 +12,10 @@ extern unsigned char i;
 void initialize_party() {
   // TODO replace with proper initialization
   for(i = 0; i < 4; i++) {
-    player_str[i] = 1;
-    player_int[i] = 1;
-    player_wis[i] = 1;
-    player_dex[i] = 1;
-    player_con[i] = 1;
-    player_hp[i] = 10;
-    player_max_hp[i] = 10;
-    player_mp[i] = 10;
-    player_max_mp[i] = 10;
     player_xp[i] = 0;
-    player_lv[i] = 1;
     player_class[i] = Fighter;
+    entity_lv[i] = 1;
+    entity_speed[i] = 12;
   }
   memcpy(player_name[0], "Lorem", 5);
   memcpy(player_name[1], "Ipsum", 5);

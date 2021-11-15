@@ -3,6 +3,7 @@
 #include "entities.h"
 #include "players.h"
 #include "enemies.h"
+#include "wram.h"
 #include "lib/neslib.h"
 #include "lib/nesdoug.h"
 #include "lib/subrand.h"
@@ -37,7 +38,6 @@ unsigned char entity_col[MAX_ENTITIES];
 direction entity_direction[MAX_ENTITIES];
 entity_type_enum entity_type[MAX_ENTITIES];
 unsigned char entity_turn_counter[MAX_ENTITIES];
-unsigned char entity_speed[MAX_ENTITIES];
 unsigned char current_entity;
 unsigned char current_entity_moves;
 entity_state_enum current_entity_state;
@@ -72,7 +72,7 @@ void init_entities(unsigned char stairs_row, unsigned char stairs_col) {
     entity_speed[num_entities] = NORMAL_SPEED; // TODO faster w/ more levels
     entity_type[num_entities] = Player;
     entity_direction[num_entities] = Down;
-    if (player_lv[num_entities] > party_level) party_level = player_lv[num_entities];
+    if (entity_lv[num_entities] > party_level) party_level = entity_lv[num_entities];
   }
 
   entity_col[0] = entity_col[2] = stairs_col;
