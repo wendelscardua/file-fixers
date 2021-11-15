@@ -6,7 +6,7 @@
 #pragma bss-name(push, "XRAM")
 // extra RAM at $6000-$7fff
 
-#define WRAM_VERSION 0x0007
+#define WRAM_VERSION 0x0008
 unsigned int wram_start;
 
 unsigned char dungeon_layout_initialized;
@@ -21,6 +21,7 @@ unsigned char party_level;
 entity_type_enum entity_type[MAX_ENTITIES];
 unsigned char entity_lv[MAX_ENTITIES];
 unsigned char entity_speed[MAX_ENTITIES];
+unsigned char entity_moves[MAX_ENTITIES];
 
 // this one doesn't need to be saved, it's here because of space
 // TODO: optimize it away

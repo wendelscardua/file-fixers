@@ -84,7 +84,9 @@ void init_entities(unsigned char stairs_row, unsigned char stairs_col) {
       if (subrand8(2) == 0) { // 33% chance to spawn in room
         entity_col[num_entities] = temp_x + subrand8(temp_w);
         entity_row[num_entities] = temp_y + subrand8(temp_h);
-        entity_type[num_entities] = select_enemy_type();
+        entity_type[num_entities] = temp = select_enemy_type();
+        entity_moves[num_entities] = enemy_moves[temp];
+        entity_speed[num_entities] = enemy_speed[temp];
         num_entities++;
       }
     }
@@ -178,7 +180,7 @@ void next_entity() {
     entity_turn_counter[current_entity] += entity_speed[current_entity];
     if (entity_turn_counter[current_entity] >= NORMAL_SPEED) {
       entity_turn_counter[current_entity] -= NORMAL_SPEED;
-      current_entity_moves = 3; // TODO: base on dex maybe?
+      current_entity_moves = entity_moves[current_entity];
       current_entity_state = EntityInput;
 
       entity_x = entity_col[current_entity] * 0x10 + 0x20;

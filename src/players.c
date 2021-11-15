@@ -18,6 +18,7 @@ void initialize_party() {
     entity_lv[i] = 1;
     entity_type[i] = Player;
     entity_speed[i] = NORMAL_SPEED;
+    entity_moves[i] = 1;
   }
 
   memcpy(player_name[0], "Lorem", 5);
