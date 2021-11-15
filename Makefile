@@ -96,6 +96,7 @@ src/wram.s: src/wram.c \
 	cc65 -Oirs $< --add-source ${CA65_FLAGS}
 
 src/crt0.o: src/crt0.s src/mmc3/mmc3_code.asm src/lib/neslib.s src/lib/nesdoug.s assets/*.chr \
+            assets/characters/*.chr \
             src/music/soundtrack.s src/music/soundfx.s
 	ca65 $< ${CA65_FLAGS}
 
