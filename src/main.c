@@ -558,13 +558,21 @@ void start_game (void) {
   vram_unrle(main_window_nametable);
 
   if (!dungeon_layout_initialized) {
+#ifdef DEBUG
+    dungeon_layout_initialized = 0;
+#else
     dungeon_layout_initialized = 1;
+#endif
     generate_layout(wram_dungeon_layout);
   }
 
   // TODO initialize later, maybe on config
   if (!party_initialized) {
+#ifdef DEBUG
+    party_initialized = 0;
+#else
     party_initialized = 1;
+#endif
     initialize_party();
   }
 
