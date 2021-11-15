@@ -54,10 +54,14 @@ void refresh_moves_hud() {
   one_vram_buffer(0x10 + temp, NTADR_A(23, 27));
 }
 
-void refresh_player_hud() {
+void refresh_hud() {
   refresh_moves_hud();
 
-  multi_vram_buffer_horz((char *) player_name[current_entity], 5, NTADR_A(3, 25));
+  if (entity_type[current_entity] == Player) {
+    multi_vram_buffer_horz((char *) player_name[current_entity], 5, NTADR_A(3, 25));
+  } else {
+    multi_vram_buffer_horz((char *) enemy_name[entity_type[current_entity]], 5, NTADR_A(3, 25));
+  }
 }
 
 void init_entities(unsigned char stairs_row, unsigned char stairs_col) {
@@ -187,7 +191,7 @@ void next_entity() {
       entity_x = entity_col[current_entity] * 0x10 + 0x20;
       entity_y = entity_row[current_entity] * 0x10 + 0x20 - 1;
 
-      refresh_player_hud();
+      refresh_hud();
       break;
     }
   }
