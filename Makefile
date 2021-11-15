@@ -35,27 +35,63 @@ ${TARGET}: src/main.o src/crt0.o src/lib/unrle.o src/lib/subrand.o \
 	ca65 $< ${CA65_FLAGS}
 
 src/main.s: src/main.c \
-            assets/nametables.h assets/palettes.h \
-            assets/sprites.h \
-            src/lib/unrle.h src/nametable_loader.h src/dungeon.h
+            src/lib/nesdoug.h \
+            src/lib/neslib.h \
+            src/lib/unrle.h \
+            src/mmc3/mmc3_code.h \
+            src/dungeon.h \
+            src/nametable_loader.h \
+            src/players.h \
+            src/wram.h \
+            assets/nametables.h \
+            assets/palettes.h \
+            assets/sprites.h
 	cc65 -Oirs $< --add-source ${CA65_FLAGS}
 
-src/nametable_loader.s: src/nametable_loader.c
+src/nametable_loader.s: src/nametable_loader.c \
+                        src/lib/nesdoug.h
 	cc65 -Oirs $< --add-source ${CA65_FLAGS}
 
-src/dungeon.s: src/dungeon.c src/dungeon.h src/entities.h
+src/dungeon.s: src/dungeon.c \
+               src/lib/nesdoug.h \
+               src/lib/neslib.h \
+               src/dungeon.h \
+               src/entities.h \
+               assets/sectors.h
 	cc65 -Oirs $< --add-source ${CA65_FLAGS}
 
-src/entities.s: src/entities.c src/entities.h src/players.h src/directions.h assets/sprites.h
+src/entities.s: src/entities.c \
+                src/lib/nesdoug.h \
+                src/lib/neslib.h \
+                src/lib/subrand.h \
+                src/directions.h \
+                src/dungeon.h \
+                src/enemies.h \
+                src/entities.h \
+                src/wram.h \
+                assets/enemy-stats.h \
+                assets/sprites.h
 	cc65 -Oirs $< --add-source ${CA65_FLAGS}
 
-src/enemies.s: src/enemies.c src/enemies.h src/entities.h src/dungeon.h assets/enemy-stats.h
+src/enemies.s: src/enemies.c \
+               src/lib/subrand.h \
+               src/enemies.h \
+               src/entities.h \
+               src/dungeon.h \
+               assets/enemy-stats.h
 	cc65 -Oirs $< --add-source ${CA65_FLAGS}
 
-src/players.s: src/players.c src/players.h src/charmap.h
+src/players.s: src/players.c \
+               src/lib/neslib.h \
+               src/charmap.h \
+               src/wram.h
 	cc65 -Oirs $< --add-source ${CA65_FLAGS}
 
-src/wram.s: src/wram.c src/wram.h src/lib/neslib.h src/dungeon.h src/players.h
+src/wram.s: src/wram.c \
+            src/lib/neslib.h \
+            src/dungeon.h \
+            src/entities.h \
+            src/players.h
 	cc65 -Oirs $< --add-source ${CA65_FLAGS}
 
 src/crt0.o: src/crt0.s src/mmc3/mmc3_code.asm src/lib/neslib.s src/lib/nesdoug.s assets/*.chr \

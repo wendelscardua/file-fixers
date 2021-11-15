@@ -1,7 +1,7 @@
+#include "lib/nesdoug.h"
+
 #define SLICE_SIZE 64
 #define NUM_SLICES (1024/(SLICE_SIZE))
-
-#include "lib/nesdoug.h"
 
 #pragma code-name ("CODE")
 #pragma rodata-name ("RODATA")

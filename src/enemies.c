@@ -1,8 +1,7 @@
 #include "lib/subrand.h"
-#include "entities.h"
-#include "enemies.h"
 #include "dungeon.h"
-#include "wram.h"
+#include "enemies.h"
+#include "entities.h"
 #include "../assets/enemy-stats.h"
 
 _Static_assert(Player == NUM_ENEMY_TYPES, "entity_type_enum must be aligned with number of enemies");

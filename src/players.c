@@ -1,8 +1,7 @@
-#include "entities.h"
-#include "players.h"
-#include "wram.h"
 #include "lib/neslib.h"
 #include "charmap.h"
+#include "players.h""
+#include "wram.h"
 
 #pragma code-name ("CODE")
 #pragma rodata-name ("RODATA")

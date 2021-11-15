@@ -1,15 +1,13 @@
+#include "lib/nesdoug.h"
+#include "lib/neslib.h"
+#include "lib/subrand.h"
 #include "directions.h"
 #include "dungeon.h"
-#include "entities.h"
-#include "players.h"
 #include "enemies.h"
 #include "entities.h"
 #include "wram.h"
-#include "lib/neslib.h"
-#include "lib/nesdoug.h"
-#include "lib/subrand.h"
-#include "../assets/sprites.h"
 #include "../assets/enemy-stats.h"
+#include "../assets/sprites.h"
 
 #pragma code-name ("CODE")
 #pragma rodata-name ("RODATA")

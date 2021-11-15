@@ -2,19 +2,17 @@
  *  example of MMC3 for cc65
  *	Doug Fraker 2019
  */
-
-#include "lib/neslib.h"
 #include "lib/nesdoug.h"
+#include "lib/neslib.h"
 #include "lib/unrle.h"
 #include "mmc3/mmc3_code.h"
-#include "mmc3/mmc3_code.c"
-#include "wram.h"
-#include "nametable_loader.h"
 #include "dungeon.h"
+#include "nametable_loader.h"
 #include "players.h"
-#include "../assets/sprites.h"
+#include "wram.h"
 #include "../assets/nametables.h"
 #include "../assets/palettes.h"
+#include "../assets/sprites.h"
 
 #define FP(integer,fraction) (((integer)<<8)|((fraction)>>0))
 #define INT(unsigned_fixed_point) ((unsigned_fixed_point>>8)&0xff)

@@ -3,7 +3,6 @@
 #include "dungeon.h"
 #include "entities.h"
 #include "../assets/sectors.h"
-#include "../assets/sprites.h"
 
 #pragma code-name ("CODE")
 #pragma rodata-name ("RODATA")
