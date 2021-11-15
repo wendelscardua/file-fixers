@@ -154,6 +154,34 @@ void entity_input_handler() {
       next_entity();
     }
     break;
+  default:
+    // Random walk
+    if (current_entity_moves > 0 && entity_aux < 0x10) {
+      temp_x = entity_col[current_entity];
+      temp_y = entity_row[current_entity];
+      temp = entity_direction[current_entity] = subrand8(3);
+      switch(temp) {
+      case Up: --temp_y; break;
+      case Down: ++temp_y; break;
+      case Left: --temp_x; break;
+      case Right: ++temp_x; break;
+      }
+
+      if (!entity_collides()) {
+        entity_row[current_entity] = temp_y;
+        entity_col[current_entity] = temp_x;
+        --current_entity_moves;
+        refresh_moves_hud();
+        current_entity_state = EntityMovement;
+        entity_aux = 0x10;
+      } else {
+        ++entity_aux;
+      }
+    } else {
+      // TODO add actions
+      next_entity();
+    }
+    break;
   }
 }
 
@@ -187,12 +215,17 @@ void next_entity() {
       entity_turn_counter[current_entity] -= NORMAL_SPEED;
       current_entity_moves = entity_moves[current_entity];
       current_entity_state = EntityInput;
+      entity_aux = 0;
 
       entity_x = entity_col[current_entity] * 0x10 + 0x20;
       entity_y = entity_row[current_entity] * 0x10 + 0x20 - 1;
 
       refresh_hud();
       break;
+    }
+    ++current_entity;
+    if (current_entity >= num_entities) {
+      current_entity = 0;
     }
   }
 }
