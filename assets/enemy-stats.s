@@ -1,3 +1,4 @@
+.include "../src/charmap.inc"
 .segment "RODATA"
 Eicar: .byte "Eicar"
 Crypt: .byte "Crypt"

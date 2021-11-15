@@ -33,6 +33,7 @@ end
 end
 
 File.open(output_file, 'wb') do |f|
+  f.puts '.include "../src/charmap.inc"'
   f.puts '.segment "RODATA"'
   name_list.each do |name|
     f.puts %(#{name}: .byte "#{name}")
