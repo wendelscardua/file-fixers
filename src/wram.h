@@ -11,6 +11,7 @@ extern unsigned char wram_dungeon_layout[];
 extern entity_type_enum entity_type[];
 extern unsigned char entity_lv[];
 extern unsigned char entity_speed[];
+extern unsigned char party_level;
 
 void init_wram (void);
 

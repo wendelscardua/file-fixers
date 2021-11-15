@@ -41,8 +41,6 @@ unsigned char current_entity_moves;
 entity_state_enum current_entity_state;
 unsigned char entity_x, entity_y;
 
-unsigned char party_level;
-
 void refresh_moves_hud() {
   temp = current_entity_moves;
   temp_x = 0;
@@ -65,12 +63,6 @@ void refresh_player_hud() {
 }
 
 void init_entities(unsigned char stairs_row, unsigned char stairs_col) {
-  party_level = 0;
-  for(num_entities = 0; num_entities < 4; num_entities++) {
-    entity_direction[num_entities] = Down;
-    if (entity_lv[num_entities] > party_level) party_level = entity_lv[num_entities];
-  }
-
   entity_col[0] = entity_col[2] = stairs_col;
   entity_row[1] = entity_row[3] = stairs_row;
   entity_row[0] = stairs_row - 1;
