@@ -67,6 +67,7 @@ void refresh_hud() {
 void init_entities(unsigned char stairs_row, unsigned char stairs_col) {
   for(num_entities = 0; num_entities < 4; num_entities++) {
     entity_direction[num_entities] = Down;
+    entity_turn_counter[num_entities] = subrand8(12);
   }
   entity_col[0] = entity_col[2] = stairs_col;
   entity_row[1] = entity_row[3] = stairs_row;
@@ -92,6 +93,7 @@ void init_entities(unsigned char stairs_row, unsigned char stairs_col) {
         entity_type[num_entities] = temp = select_enemy_type();
         entity_moves[num_entities] = enemy_moves[temp];
         entity_speed[num_entities] = enemy_speed[temp];
+        entity_turn_counter[num_entities] = subrand8(12);
         num_entities++;
       }
     }
