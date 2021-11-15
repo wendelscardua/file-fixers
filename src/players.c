@@ -1,3 +1,4 @@
+#include "entities.h"
 #include "players.h"
 #include "wram.h"
 #include "lib/neslib.h"
@@ -15,7 +16,8 @@ void initialize_party() {
     player_xp[i] = 0;
     player_class[i] = Fighter;
     entity_lv[i] = 1;
-    entity_speed[i] = 12;
+    entity_type[i] = Player;
+    entity_speed[i] = NORMAL_SPEED;
   }
   memcpy(player_name[0], "Lorem", 5);
   memcpy(player_name[1], "Ipsum", 5);

@@ -3,14 +3,13 @@
 #include "entities.h"
 #include "players.h"
 #include "enemies.h"
+#include "entities.h"
 #include "wram.h"
 #include "lib/neslib.h"
 #include "lib/nesdoug.h"
 #include "lib/subrand.h"
 #include "../assets/sprites.h"
 #include "../assets/enemy-stats.h"
-
-#define NORMAL_SPEED 12
 
 #pragma code-name ("CODE")
 #pragma rodata-name ("RODATA")
@@ -36,7 +35,6 @@ unsigned char *room_ptr;
 unsigned char entity_row[MAX_ENTITIES];
 unsigned char entity_col[MAX_ENTITIES];
 direction entity_direction[MAX_ENTITIES];
-entity_type_enum entity_type[MAX_ENTITIES];
 unsigned char entity_turn_counter[MAX_ENTITIES];
 unsigned char current_entity;
 unsigned char current_entity_moves;
@@ -69,8 +67,6 @@ void refresh_player_hud() {
 void init_entities(unsigned char stairs_row, unsigned char stairs_col) {
   party_level = 0;
   for(num_entities = 0; num_entities < 4; num_entities++) {
-    entity_speed[num_entities] = NORMAL_SPEED; // TODO faster w/ more levels
-    entity_type[num_entities] = Player;
     entity_direction[num_entities] = Down;
     if (entity_lv[num_entities] > party_level) party_level = entity_lv[num_entities];
   }

@@ -1,4 +1,7 @@
+#ifndef _ENTITIES_H_
+#define _ENTITIES_H_
 #define MAX_ENTITIES 16
+#define NORMAL_SPEED 12
 
 typedef enum {
               Eicar,
@@ -24,3 +27,4 @@ void entity_movement_handler (void);
 void entity_action_handler (void);
 
 extern unsigned char party_level;
+#endif

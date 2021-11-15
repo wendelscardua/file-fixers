@@ -15,6 +15,7 @@ unsigned char player_name[4][5];
 player_class_type player_class[4];
 unsigned int player_xp[4];
 
+entity_type_enum entity_type[MAX_ENTITIES];
 unsigned char entity_lv[MAX_ENTITIES];
 unsigned char entity_speed[MAX_ENTITIES];
 
