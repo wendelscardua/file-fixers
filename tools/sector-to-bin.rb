@@ -1,13 +1,10 @@
 #!/usr/bin/ruby
 # frozen_string_literal: true
 
-# renders a .map sub-nametable into another nametable
+# generates sector layout from tmx file
 # inputs:
-# - base nametable (.nam)
-# - sub-nametable (.map)
-# - x
-# - y
-# - output file (.nam)
+# - tiled file (.tmx)
+# - output layout file (.bin)
 
 require 'bundler/inline'
 
@@ -17,7 +14,7 @@ gemfile do
   gem 'nokogiri'
 end
 
-tmx_file, bin_file = ARGV
+tmx_file, layout_file = ARGV
 
 document = Nokogiri::XML(File.read(tmx_file))
 
@@ -26,6 +23,6 @@ metatiles = document.xpath('//layer/data')
                     .scan(/\d+/)
                     .map { |t| t.to_i - 1 }
 
-File.open(bin_file, 'wb') do |f|
+File.open(layout_file, 'wb') do |f|
   f.write metatiles.pack('C*')
 end

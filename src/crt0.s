@@ -377,8 +377,9 @@ sounds_data:
 
 .segment "CHARS"
 
-.incbin "../assets/bg.chr"
-.incbin "../assets/sprites.chr"
+.incbin "../assets/bg.chr" ; 4k
+.incbin "../assets/sprites.chr" ; 4k
 
-.incbin "../assets/bg-dungeon.chr"
-.incbin "../assets/characters/player-anim.chr"
+.incbin "../assets/bg-dungeon.chr" ; 4k
+.incbin "../assets/characters/player-anim.chr" ; 2k
+.incbin "../assets/characters/enemies.chr" ; 2k

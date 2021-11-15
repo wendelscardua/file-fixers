@@ -1,4 +1,5 @@
 .include "../src/constants.inc"
+.include "../src/enemies.inc"
 
 .segment "RODATA"
 .feature force_range
@@ -7,6 +8,7 @@
 .export _clicking_cursor_sprite
 .export _loading_cursor_sprite
 .export _player_sprite
+.export _enemy_sprite
 
 _default_cursor_sprite:
 .byte   0,  0,$00,0
@@ -33,114 +35,182 @@ _loading_cursor_sprite:
 .byte   0,  0,$15,0
 .byte $80
 
+.repeat 4, palette
+  .ident (.concat("enemy_left_0_p", .string(palette))):
+  .byte   4,  7,$80,palette
+  .byte $80
+
+  .ident (.concat("enemy_left_alt_0_p", .string(palette))):
+  .byte   4,  7,$90,palette
+  .byte $80
+
+  .ident (.concat("enemy_right_0_p", .string(palette))):
+  .byte   4,  7,$80,palette
+  .byte $80
+
+  .ident (.concat("enemy_right_alt_0_p", .string(palette))):
+  .byte   4,  7,$90,palette
+  .byte $80
+
+  .ident (.concat("enemy_left_1_p", .string(palette))):
+  .byte   4,  0,$81,palette
+  .byte   4,  8,$91,palette
+  .byte $80
+
+  .ident (.concat("enemy_left_alt_1_p", .string(palette))):
+  .byte   4,  0,$81,palette
+  .byte   4,  8,$92,palette
+  .byte $80
+
+  .ident (.concat("enemy_right_1_p", .string(palette))):
+  .byte   4,  0,$81,palette
+  .byte   4,  8,$91,palette
+  .byte $80
+
+  .ident (.concat("enemy_right_alt_1_p", .string(palette))):
+  .byte   4,  0,$81,palette
+  .byte   4,  8,$92,palette
+  .byte $80
+
+  .ident (.concat("enemy_left_2_p", .string(palette))):
+  .byte   1,  0,$83,palette
+  .byte   6,  8,$93,palette
+  .byte $80
+
+  .ident (.concat("enemy_left_alt_2_p", .string(palette))):
+  .byte   1,  0,$83,palette
+  .byte   6,  8,$82,palette
+  .byte $80
+
+  .ident (.concat("enemy_right_2_p", .string(palette))):
+  .byte   7,  0,$83,palette|OAM_FLIP_H
+  .byte   2,  8,$93,palette|OAM_FLIP_H
+  .byte $80
+
+  .ident (.concat("enemy_right_alt_2_p", .string(palette))):
+  .byte   7,  0,$83,palette|OAM_FLIP_H
+  .byte   2,  8,$82,palette|OAM_FLIP_H
+  .byte $80
+.endrepeat
+
+_enemy_sprite:
+.repeat 4, palette
+  .repeat NUM_ENEMY_MODELS, enemy_index
+    .word .ident (.concat("enemy_left_", .string(enemy_index), "_p", .string(palette)))
+    .word .ident (.concat("enemy_left_alt_", .string(enemy_index), "_p", .string(palette)))
+    .word .ident (.concat("enemy_right_", .string(enemy_index), "_p", .string(palette)))
+    .word .ident (.concat("enemy_right_alt_", .string(enemy_index), "_p", .string(palette)))
+  .endrepeat
+.endrepeat
+
 .repeat 4, player_index
   .ident (.concat("player_facing_up_", .string(player_index))):
 
-	.byte   0,  0,$02 + $20 * player_index,0
-	.byte   8,  0,$03 + $20 * player_index,0
-	.byte   0,  8,$12 + $20 * player_index,0
-	.byte   8,  8,$13 + $20 * player_index,0
+	.byte   0,  0,$02 + $20 * player_index,1
+	.byte   8,  0,$03 + $20 * player_index,1
+	.byte   0,  8,$12 + $20 * player_index,1
+	.byte   8,  8,$13 + $20 * player_index,1
 
 	.byte $80
 
 
   .ident (.concat("player_facing_down_", .string(player_index))):
 
-	.byte   0,  0,$00 + $20 * player_index,0
-	.byte   8,  0,$01 + $20 * player_index,0
-	.byte   0,  8,$10 + $20 * player_index,0
-	.byte   8,  8,$11 + $20 * player_index,0
+	.byte   0,  0,$00 + $20 * player_index,1
+	.byte   8,  0,$01 + $20 * player_index,1
+	.byte   0,  8,$10 + $20 * player_index,1
+	.byte   8,  8,$11 + $20 * player_index,1
 
 	.byte $80
 
   .ident (.concat("player_facing_left_", .string(player_index))):
 
-	.byte   0,  0,$04 + $20 * player_index,0
-	.byte   8,  0,$05 + $20 * player_index,0
-	.byte   0,  8,$14 + $20 * player_index,0
-	.byte   8,  8,$15 + $20 * player_index,0
+	.byte   0,  0,$04 + $20 * player_index,1
+	.byte   8,  0,$05 + $20 * player_index,1
+	.byte   0,  8,$14 + $20 * player_index,1
+	.byte   8,  8,$15 + $20 * player_index,1
 
 	.byte $80
 
 
   .ident (.concat("player_facing_right_", .string(player_index))):
 
-	.byte   8,  0,$04 + $20 * player_index,0|OAM_FLIP_H
-	.byte   0,  0,$05 + $20 * player_index,0|OAM_FLIP_H
-	.byte   8,  8,$14 + $20 * player_index,0|OAM_FLIP_H
-	.byte   0,  8,$15 + $20 * player_index,0|OAM_FLIP_H
+	.byte   8,  0,$04 + $20 * player_index,1|OAM_FLIP_H
+	.byte   0,  0,$05 + $20 * player_index,1|OAM_FLIP_H
+	.byte   8,  8,$14 + $20 * player_index,1|OAM_FLIP_H
+	.byte   0,  8,$15 + $20 * player_index,1|OAM_FLIP_H
 
 	.byte $80
 
   .ident (.concat("player_step_1_up_", .string(player_index))):
 
-	.byte   0,  0,$08 + $20 * player_index,0
-	.byte   8,  0,$09 + $20 * player_index,0
-	.byte   0,  8,$18 + $20 * player_index,0
-	.byte   8,  8,$19 + $20 * player_index,0
+	.byte   0,  0,$08 + $20 * player_index,1
+	.byte   8,  0,$09 + $20 * player_index,1
+	.byte   0,  8,$18 + $20 * player_index,1
+	.byte   8,  8,$19 + $20 * player_index,1
 
 	.byte $80
 
   .ident (.concat("player_step_2_up_", .string(player_index))):
 
-	.byte   8,  0,$08 + $20 * player_index,0|OAM_FLIP_H
-	.byte   0,  0,$09 + $20 * player_index,0|OAM_FLIP_H
-	.byte   8,  8,$18 + $20 * player_index,0|OAM_FLIP_H
-	.byte   0,  8,$19 + $20 * player_index,0|OAM_FLIP_H
+	.byte   8,  0,$08 + $20 * player_index,1|OAM_FLIP_H
+	.byte   0,  0,$09 + $20 * player_index,1|OAM_FLIP_H
+	.byte   8,  8,$18 + $20 * player_index,1|OAM_FLIP_H
+	.byte   0,  8,$19 + $20 * player_index,1|OAM_FLIP_H
 
 	.byte $80
 
   .ident (.concat("player_step_1_down_", .string(player_index))):
 
-  .byte   0,  0,$06 + $20 * player_index,0
-	.byte   8,  0,$07 + $20 * player_index,0
-	.byte   0,  8,$16 + $20 * player_index,0
-	.byte   8,  8,$17 + $20 * player_index,0
+  .byte   0,  0,$06 + $20 * player_index,1
+	.byte   8,  0,$07 + $20 * player_index,1
+	.byte   0,  8,$16 + $20 * player_index,1
+	.byte   8,  8,$17 + $20 * player_index,1
 
 	.byte $80
 
   .ident (.concat("player_step_2_down_", .string(player_index))):
 
-	.byte   8,  0,$06 + $20 * player_index,0|OAM_FLIP_H
-	.byte   0,  0,$07 + $20 * player_index,0|OAM_FLIP_H
-	.byte   8,  8,$16 + $20 * player_index,0|OAM_FLIP_H
-	.byte   0,  8,$17 + $20 * player_index,0|OAM_FLIP_H
+	.byte   8,  0,$06 + $20 * player_index,1|OAM_FLIP_H
+	.byte   0,  0,$07 + $20 * player_index,1|OAM_FLIP_H
+	.byte   8,  8,$16 + $20 * player_index,1|OAM_FLIP_H
+	.byte   0,  8,$17 + $20 * player_index,1|OAM_FLIP_H
 
 	.byte $80
 
   .ident (.concat("player_step_1_left_", .string(player_index))):
 
-	.byte   0,  0,$04 + $20 * player_index,0
-	.byte   8,  0,$05 + $20 * player_index,0
-	.byte   0,  8,$14 + $20 * player_index,0
-	.byte   8,  8,$15 + $20 * player_index,0
+	.byte   0,  0,$04 + $20 * player_index,1
+	.byte   8,  0,$05 + $20 * player_index,1
+	.byte   0,  8,$14 + $20 * player_index,1
+	.byte   8,  8,$15 + $20 * player_index,1
 
 	.byte $80
 
   .ident (.concat("player_step_2_left_", .string(player_index))):
 
-	.byte   0,  0,$0a + $20 * player_index,0
-	.byte   8,  0,$0b + $20 * player_index,0
-	.byte   0,  8,$1a + $20 * player_index,0
-	.byte   8,  8,$1b + $20 * player_index,0
+	.byte   0,  0,$0a + $20 * player_index,1
+	.byte   8,  0,$0b + $20 * player_index,1
+	.byte   0,  8,$1a + $20 * player_index,1
+	.byte   8,  8,$1b + $20 * player_index,1
 
 	.byte $80
 
   .ident (.concat("player_step_1_right_", .string(player_index))):
 
-	.byte   8,  0,$04 + $20 * player_index,0|OAM_FLIP_H
-	.byte   0,  0,$05 + $20 * player_index,0|OAM_FLIP_H
-	.byte   8,  8,$14 + $20 * player_index,0|OAM_FLIP_H
-	.byte   0,  8,$15 + $20 * player_index,0|OAM_FLIP_H
+	.byte   8,  0,$04 + $20 * player_index,1|OAM_FLIP_H
+	.byte   0,  0,$05 + $20 * player_index,1|OAM_FLIP_H
+	.byte   8,  8,$14 + $20 * player_index,1|OAM_FLIP_H
+	.byte   0,  8,$15 + $20 * player_index,1|OAM_FLIP_H
 
 	.byte $80
 
   .ident (.concat("player_step_2_right_", .string(player_index))):
 
-	.byte   8,  0,$0a + $20 * player_index,0|OAM_FLIP_H
-	.byte   0,  0,$0b + $20 * player_index,0|OAM_FLIP_H
-	.byte   8,  8,$1a + $20 * player_index,0|OAM_FLIP_H
-	.byte   0,  8,$1b + $20 * player_index,0|OAM_FLIP_H
+	.byte   8,  0,$0a + $20 * player_index,1|OAM_FLIP_H
+	.byte   0,  0,$0b + $20 * player_index,1|OAM_FLIP_H
+	.byte   8,  8,$1a + $20 * player_index,1|OAM_FLIP_H
+	.byte   0,  8,$1b + $20 * player_index,1|OAM_FLIP_H
 
 	.byte $80
 .endrepeat

@@ -1,9 +1,12 @@
+#include "lib/nesdoug.h"
+#include "lib/neslib.h"
+#include "lib/subrand.h"
 #include "directions.h"
 #include "dungeon.h"
+#include "enemies.h"
 #include "entities.h"
-#include "players.h"
-#include "lib/neslib.h"
-#include "lib/nesdoug.h"
+#include "wram.h"
+#include "../assets/enemy-stats.h"
 #include "../assets/sprites.h"
 
 #pragma code-name ("CODE")
@@ -14,8 +17,9 @@ extern unsigned char i, temp, temp_x, temp_y, pad1_new;
 extern unsigned int temp_int;
 
 unsigned char num_entities;
-unsigned char speed_cap;
 unsigned char entity_aux;
+unsigned char temp_w, temp_h;
+unsigned char *room_ptr;
 
 #pragma zpsym("i");
 #pragma zpsym("temp");
@@ -29,9 +33,7 @@ unsigned char entity_aux;
 unsigned char entity_row[MAX_ENTITIES];
 unsigned char entity_col[MAX_ENTITIES];
 direction entity_direction[MAX_ENTITIES];
-entity_type_enum entity_type[MAX_ENTITIES];
 unsigned char entity_turn_counter[MAX_ENTITIES];
-unsigned char entity_speed[MAX_ENTITIES];
 unsigned char current_entity;
 unsigned char current_entity_moves;
 entity_state_enum current_entity_state;
@@ -52,20 +54,21 @@ void refresh_moves_hud() {
   one_vram_buffer(0x10 + temp, NTADR_A(23, 27));
 }
 
-void refresh_player_hud() {
+void refresh_hud() {
   refresh_moves_hud();
 
-  multi_vram_buffer_horz((char *) player_name[current_entity], 5, NTADR_A(3, 25));
+  if (entity_type[current_entity] == Player) {
+    multi_vram_buffer_horz((char *) player_name[current_entity], 5, NTADR_A(3, 25));
+  } else {
+    multi_vram_buffer_horz((char *) enemy_name[entity_type[current_entity]], 5, NTADR_A(3, 25));
+  }
 }
 
 void init_entities(unsigned char stairs_row, unsigned char stairs_col) {
-  num_entities = 4;
-  for(i = 0; i < 4; i++) {
-    entity_speed[i] = player_dex[i];
-    entity_type[i] = Player;
-    entity_direction[i] = Down;
+  for(num_entities = 0; num_entities < 4; num_entities++) {
+    entity_direction[num_entities] = Down;
+    entity_turn_counter[num_entities] = subrand8(12);
   }
-
   entity_col[0] = entity_col[2] = stairs_col;
   entity_row[1] = entity_row[3] = stairs_row;
   entity_row[0] = stairs_row - 1;
@@ -73,7 +76,42 @@ void init_entities(unsigned char stairs_row, unsigned char stairs_col) {
   entity_col[1] = stairs_col - 1;
   entity_col[3] = stairs_col + 1;
 
-  // TODO get enemies based on sector
+  while (num_entities == 4) {
+    room_ptr = current_sector_room_data;
+    while((temp_x = *room_ptr) != 0xff) {
+      ++room_ptr;
+      temp_y = *room_ptr;
+      ++room_ptr;
+      temp_w = *room_ptr;
+      ++room_ptr;
+      temp_h = *room_ptr;
+      ++room_ptr;
+
+      if (subrand8(2) == 0) { // 33% chance to spawn in room
+        entity_col[num_entities] = temp_x + subrand8(temp_w);
+        entity_row[num_entities] = temp_y + subrand8(temp_h);
+        entity_type[num_entities] = i = select_enemy_type();
+        entity_moves[num_entities] = enemy_moves[i];
+        entity_speed[num_entities] = enemy_speed[i];
+        entity_turn_counter[num_entities] = subrand8(12);
+        temp = enemy_base_level[i];
+        if (current_sector_index + 1 < temp) {
+          --temp;
+        } else if (current_sector_index + 1 > temp) {
+          temp += (current_sector_index + 1 - temp) / 5;
+        }
+        if (party_level > enemy_base_level[i]) {
+          temp += (party_level - enemy_base_level[i]) / 4;
+        }
+        if (temp * 2 > enemy_base_level[i] * 3) {
+          temp = enemy_base_level[i] * 3 / 2;
+        }
+        if (temp > 49) temp = 49;
+        entity_lv[num_entities] = temp;
+        num_entities++;
+      }
+    }
+  }
 
   current_entity = num_entities - 1;
   next_entity();
@@ -132,6 +170,34 @@ void entity_input_handler() {
       next_entity();
     }
     break;
+  default:
+    // Random walk
+    if (current_entity_moves > 0 && entity_aux < 0x10) {
+      temp_x = entity_col[current_entity];
+      temp_y = entity_row[current_entity];
+      temp = entity_direction[current_entity] = subrand8(3);
+      switch(temp) {
+      case Up: --temp_y; break;
+      case Down: ++temp_y; break;
+      case Left: --temp_x; break;
+      case Right: ++temp_x; break;
+      }
+
+      if (!entity_collides()) {
+        entity_row[current_entity] = temp_y;
+        entity_col[current_entity] = temp_x;
+        --current_entity_moves;
+        refresh_moves_hud();
+        current_entity_state = EntityMovement;
+        entity_aux = 0x10;
+      } else {
+        ++entity_aux;
+      }
+    } else {
+      // TODO add actions
+      next_entity();
+    }
+    break;
   }
 }
 
@@ -154,11 +220,6 @@ void entity_action_handler() {
 void next_entity() {
   if (num_entities == 0) return;
 
-  speed_cap = 0;
-  for(i = 0; i < num_entities; i++) {
-    if (entity_speed[i] > speed_cap) speed_cap = entity_speed[i];
-  }
-
   ++current_entity;
   if (current_entity >= num_entities) {
     current_entity = 0;
@@ -166,16 +227,21 @@ void next_entity() {
 
   while(1) {
     entity_turn_counter[current_entity] += entity_speed[current_entity];
-    if (entity_turn_counter[current_entity] >= speed_cap) {
-      entity_turn_counter[current_entity] -= speed_cap;
-      current_entity_moves = 3; // TODO: base on dex maybe?
+    if (entity_turn_counter[current_entity] >= NORMAL_SPEED) {
+      entity_turn_counter[current_entity] -= NORMAL_SPEED;
+      current_entity_moves = entity_moves[current_entity];
       current_entity_state = EntityInput;
+      entity_aux = 0;
 
       entity_x = entity_col[current_entity] * 0x10 + 0x20;
       entity_y = entity_row[current_entity] * 0x10 + 0x20 - 1;
 
-      refresh_player_hud();
+      refresh_hud();
       break;
+    }
+    ++current_entity;
+    if (current_entity >= num_entities) {
+      current_entity = 0;
     }
   }
 }
@@ -196,21 +262,48 @@ void draw_entities() {
         }
         oam_meta_spr(entity_x, entity_y, player_sprite[temp]);
         break;
+      default: // enemies
+        switch(entity_direction[i]) {
+        case Up: temp = ENEMY_LEFT_1_SPR; break;
+        case Down: temp = ENEMY_RIGHT_1_SPR; break;
+        case Left: temp = ENEMY_LEFT_1_SPR; break;
+        case Right: temp = ENEMY_RIGHT_1_SPR; break;
+        }
+        if (entity_aux & 0b1000) {
+          temp++;
+        }
+        oam_meta_spr(entity_x,
+                     entity_y,
+                     enemy_sprite[
+                                  enemy_sprite_index[entity_type[i]] | temp
+                                  ]);
       }
     } else {
       temp_x = entity_col[i] * 0x10 + 0x20;
       temp_y = entity_row[i] * 0x10 + 0x20 - 1;
       switch(entity_type[i]) {
       case Player:
-                               switch(entity_direction[i]) {
-                               case Up: temp = (PLAYER_UP_SPR << 2) | i; break;
-                               case Down: temp = (PLAYER_DOWN_SPR << 2) | i; break;
+        switch(entity_direction[i]) {
+        case Up: temp = (PLAYER_UP_SPR << 2) | i; break;
+        case Down: temp = (PLAYER_DOWN_SPR << 2) | i; break;
         case Left: temp = (PLAYER_LEFT_SPR << 2) | i; break;
         case Right: temp = (PLAYER_RIGHT_SPR << 2) | i; break;
         }
         oam_meta_spr(temp_x, temp_y, player_sprite[temp]);
 
         break;
+      default: // enemies
+        switch(entity_direction[i]) {
+        case Up: temp = ENEMY_LEFT_2_SPR; break;
+        case Down: temp = ENEMY_RIGHT_2_SPR; break;
+        case Left: temp = ENEMY_LEFT_1_SPR; break;
+        case Right: temp = ENEMY_RIGHT_1_SPR; break;
+        }
+        oam_meta_spr(temp_x,
+                     temp_y,
+                     enemy_sprite[
+                                  enemy_sprite_index[entity_type[i]] | temp
+                                  ]);
       }
     }
   }

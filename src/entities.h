@@ -1,6 +1,14 @@
-#define MAX_ENTITIES 8
+#ifndef _ENTITIES_H_
+#define _ENTITIES_H_
+#define MAX_ENTITIES 16
+#define NORMAL_SPEED 12
 
 typedef enum {
+              Eicar,
+              Crypt,
+              Buggy,
+              Stega,
+              Nefet,
               Player
 } entity_type_enum;
 
@@ -17,3 +25,4 @@ void next_entity (void);
 void entity_input_handler (void);
 void entity_movement_handler (void);
 void entity_action_handler (void);
+#endif

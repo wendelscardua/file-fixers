@@ -17,33 +17,82 @@ debug: LD65_FLAGS += --dbgfile ${PROJECT}.dbg
 debug: CA65_FLAGS += -g -DDEBUG=1
 debug: ${TARGET}
 
-${TARGET}: src/main.o src/crt0.o src/lib/unrle.o \
+${TARGET}: src/main.o src/crt0.o src/lib/unrle.o src/lib/subrand.o \
            src/nametable_loader.o \
            src/dungeon.o \
            src/players.o \
            src/entities.o  \
-           assets/nametables.o assets/palettes.o assets/sectors.o assets/sprites.o
+           src/enemies.o \
+           src/wram.o \
+           assets/nametables.o \
+           assets/palettes.o \
+           assets/sectors.o \
+           assets/sprites.o \
+           assets/enemy-stats.o
 	ld65 $^ -C MMC3.cfg nes.lib -m map.txt -o ${TARGET} ${LD65_FLAGS}
 
 %.o: %.s
 	ca65 $< ${CA65_FLAGS}
 
 src/main.s: src/main.c \
-            assets/nametables.h assets/palettes.h \
-            assets/sprites.h \
-            src/lib/unrle.h src/nametable_loader.h src/dungeon.h
+            src/lib/nesdoug.h \
+            src/lib/neslib.h \
+            src/lib/unrle.h \
+            src/mmc3/mmc3_code.h \
+            src/dungeon.h \
+            src/nametable_loader.h \
+            src/players.h \
+            src/wram.h \
+            assets/nametables.h \
+            assets/palettes.h \
+            assets/sprites.h
 	cc65 -Oirs $< --add-source ${CA65_FLAGS}
 
-src/nametable_loader.s: src/nametable_loader.c
+src/nametable_loader.s: src/nametable_loader.c \
+                        src/lib/nesdoug.h
 	cc65 -Oirs $< --add-source ${CA65_FLAGS}
 
-src/dungeon.s: src/dungeon.c src/dungeon.h src/entities.h
+src/dungeon.s: src/dungeon.c \
+               src/lib/nesdoug.h \
+               src/lib/neslib.h \
+               src/dungeon.h \
+               src/entities.h \
+               assets/sectors.h
 	cc65 -Oirs $< --add-source ${CA65_FLAGS}
 
-src/entities.s: src/entities.c src/entities.h src/players.h src/directions.h assets/sprites.h
+src/entities.s: src/entities.c \
+                src/lib/nesdoug.h \
+                src/lib/neslib.h \
+                src/lib/subrand.h \
+                src/directions.h \
+                src/dungeon.h \
+                src/enemies.h \
+                src/entities.h \
+                src/wram.h \
+                assets/enemy-stats.h \
+                assets/sprites.h
 	cc65 -Oirs $< --add-source ${CA65_FLAGS}
 
-src/players.s: src/players.c src/players.h src/charmap.h
+src/enemies.s: src/enemies.c \
+               src/lib/subrand.h \
+               src/dungeon.h \
+               src/enemies.h \
+               src/entities.h \
+               src/wram.h \
+               assets/enemy-stats.h
+	cc65 -Oirs $< --add-source ${CA65_FLAGS}
+
+src/players.s: src/players.c \
+               src/lib/neslib.h \
+               src/charmap.h \
+               src/wram.h
+	cc65 -Oirs $< --add-source ${CA65_FLAGS}
+
+src/wram.s: src/wram.c \
+            src/lib/neslib.h \
+            src/dungeon.h \
+            src/entities.h \
+            src/players.h
 	cc65 -Oirs $< --add-source ${CA65_FLAGS}
 
 src/crt0.o: src/crt0.s src/mmc3/mmc3_code.asm src/lib/neslib.s src/lib/nesdoug.s assets/*.chr \
@@ -60,24 +109,42 @@ assets/nametables.o: assets/nametables.s assets/nametables.h \
 
 assets/sectors.o: assets/sectors.s assets/sectors.h src/charmap.inc \
                   assets/sectors/sector-00.bin \
+                  assets/sectors/sector-00-room.bin \
                   assets/sectors/sector-01.bin \
+                  assets/sectors/sector-01-room.bin \
                   assets/sectors/sector-02.bin \
+                  assets/sectors/sector-02-room.bin \
                   assets/sectors/sector-03.bin \
+                  assets/sectors/sector-03-room.bin \
                   assets/sectors/sector-04.bin \
+                  assets/sectors/sector-04-room.bin \
                   assets/sectors/sector-05.bin \
+                  assets/sectors/sector-05-room.bin \
                   assets/sectors/sector-06.bin \
-                  assets/sectors/sector-07.bin
+                  assets/sectors/sector-06-room.bin \
+                  assets/sectors/sector-07.bin \
+                  assets/sectors/sector-07-room.bin
 	ca65 $< ${CA65_FLAGS}
 
 assets/palettes.o: assets/palettes.s assets/palettes.h \
-                   assets/bg.pal assets/sprites.pal assets/bg-dungeon.pal
+                   assets/bg.pal assets/sprites.pal \
+                   assets/bg-dungeon.pal assets/sprites-dungeon.pal
 	ca65 $< ${CA65_FLAGS}
 
 assets/sprites.o: assets/sprites.s assets/sprites.h
 	ca65 $< ${CA65_FLAGS}
 
-assets/sectors/%.bin: assets/sectors/%.tmx
+assets/enemy-stats.o: assets/enemy-stats.s assets/enemy-stats.h
+	ca65 $< ${CA65_FLAGS}
+
+assets/enemy-stats.s: assets/enemy-stats.yaml src/enemies.inc tools/compile-enemy-stats.rb
+	ruby tools/compile-enemy-stats.rb $< $@
+
+assets/sectors/%.bin: assets/sectors/%.tmx tools/sector-to-bin.rb
 	ruby tools/sector-to-bin.rb $< $@
+
+assets/sectors/%-room.bin: assets/sectors/%.tmx tools/sector-to-room-bin.rb
+	ruby tools/sector-to-room-bin.rb $< $@
 
 src/music/soundtrack.s: src/music/soundtrack.txt
 	${TEXT2DATA} $^ -ca65 -allin

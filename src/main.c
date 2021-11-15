@@ -2,18 +2,17 @@
  *  example of MMC3 for cc65
  *	Doug Fraker 2019
  */
-
-#include "lib/neslib.h"
 #include "lib/nesdoug.h"
+#include "lib/neslib.h"
 #include "lib/unrle.h"
 #include "mmc3/mmc3_code.h"
-#include "mmc3/mmc3_code.c"
-#include "nametable_loader.h"
 #include "dungeon.h"
+#include "nametable_loader.h"
 #include "players.h"
-#include "../assets/sprites.h"
+#include "wram.h"
 #include "../assets/nametables.h"
 #include "../assets/palettes.h"
+#include "../assets/sprites.h"
 
 #define FP(integer,fraction) (((integer)<<8)|((fraction)>>0))
 #define INT(unsigned_fixed_point) ((unsigned_fixed_point>>8)&0xff)
@@ -85,32 +84,6 @@ unsigned char current_screen;
 
 char irq_array[32];
 unsigned char double_buffer[32];
-
-#pragma bss-name(push, "XRAM")
-// extra RAM at $6000-$7fff
-
-#define WRAM_VERSION 0x0004
-unsigned int wram_start;
-unsigned char dungeon_layout_initialized;
-unsigned char wram_dungeon_layout[NUM_DUNGEONS * NUM_DUNGEON_LEVELS];
-unsigned char party_initialized;
-unsigned char player_name[4][5];
-unsigned char player_str[4];
-unsigned char player_int[4];
-unsigned char player_wis[4];
-unsigned char player_dex[4];
-unsigned char player_con[4];
-unsigned int player_hp[4];
-unsigned int player_max_hp[4];
-unsigned int player_mp[4];
-unsigned int player_max_mp[4];
-unsigned int player_xp[4];
-unsigned int player_lv[4];
-player_class_type player_class[4];
-
-unsigned char unrle_buffer[1024];
-
-#pragma bss-name(pop)
 
 // the fixed bank
 
@@ -480,7 +453,7 @@ void drivers_window_loading_handler () {
     set_chr_mode_1(SPRITE_PLAYERS_1);
 
     pal_bg(dungeon_bg_palette);
-    pal_spr(sprites_palette);
+    pal_spr(dungeon_sprites_palette);
 
     // draw some things
     vram_adr(NTADR_A(0,0));
@@ -585,13 +558,21 @@ void start_game (void) {
   vram_unrle(main_window_nametable);
 
   if (!dungeon_layout_initialized) {
+#ifdef DEBUG
+    dungeon_layout_initialized = 0;
+#else
     dungeon_layout_initialized = 1;
+#endif
     generate_layout(wram_dungeon_layout);
   }
 
   // TODO initialize later, maybe on config
   if (!party_initialized) {
+#ifdef DEBUG
+    party_initialized = 0;
+#else
     party_initialized = 1;
+#endif
     initialize_party();
   }
 
@@ -603,12 +584,6 @@ void start_game (void) {
   reset_cursor();
 
   current_screen = 0;
-}
-
-void init_wram (void) {
-  if (wram_start != WRAM_VERSION)
-    memfill(&wram_start,0,0x2000);
-  wram_start = WRAM_VERSION;
 }
 
 void flip_screen (void) {
