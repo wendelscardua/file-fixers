@@ -16,3 +16,4 @@ void __fastcall__ draw_dungeon_sprites(void);
 void __fastcall__ dungeon_handler(void);
 
 extern unsigned char * current_sector_room_data;
+extern unsigned char current_sector_index;

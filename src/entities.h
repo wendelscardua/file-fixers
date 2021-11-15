@@ -1,6 +1,11 @@
-#define MAX_ENTITIES 8
+#define MAX_ENTITIES 16
 
 typedef enum {
+              Eicar,
+              Crypt,
+              Buggy,
+              Stega,
+              Nefet,
               Player
 } entity_type_enum;
 
@@ -17,3 +22,5 @@ void next_entity (void);
 void entity_input_handler (void);
 void entity_movement_handler (void);
 void entity_action_handler (void);
+
+extern unsigned char party_level;

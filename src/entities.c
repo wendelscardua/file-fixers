@@ -2,9 +2,12 @@
 #include "dungeon.h"
 #include "entities.h"
 #include "players.h"
+#include "enemies.h"
 #include "lib/neslib.h"
 #include "lib/nesdoug.h"
+#include "lib/subrand.h"
 #include "../assets/sprites.h"
+#include "../assets/enemy-stats.h"
 
 #define NORMAL_SPEED 12
 
@@ -17,6 +20,7 @@ extern unsigned int temp_int;
 
 unsigned char num_entities;
 unsigned char entity_aux;
+unsigned char temp_w, temp_h;
 
 #pragma zpsym("i");
 #pragma zpsym("temp");
@@ -37,6 +41,8 @@ unsigned char current_entity;
 unsigned char current_entity_moves;
 entity_state_enum current_entity_state;
 unsigned char entity_x, entity_y;
+
+unsigned char party_level;
 
 void refresh_moves_hud() {
   temp = current_entity_moves;
@@ -60,11 +66,12 @@ void refresh_player_hud() {
 }
 
 void init_entities(unsigned char stairs_row, unsigned char stairs_col) {
-  num_entities = 4;
-  for(i = 0; i < 4; i++) {
-    entity_speed[i] = NORMAL_SPEED; // TODO faster w/ more levels
-    entity_type[i] = Player;
-    entity_direction[i] = Down;
+  party_level = 0;
+  for(num_entities = 0; num_entities < 4; num_entities++) {
+    entity_speed[num_entities] = NORMAL_SPEED; // TODO faster w/ more levels
+    entity_type[num_entities] = Player;
+    entity_direction[num_entities] = Down;
+    if (player_lv[num_entities] > party_level) party_level = player_lv[num_entities];
   }
 
   entity_col[0] = entity_col[2] = stairs_col;
@@ -74,7 +81,22 @@ void init_entities(unsigned char stairs_row, unsigned char stairs_col) {
   entity_col[1] = stairs_col - 1;
   entity_col[3] = stairs_col + 1;
 
-  // TODO get enemies based on sector
+  while((temp_x = *current_sector_room_data) != 0xff) {
+    ++current_sector_room_data;
+    temp_y = *current_sector_room_data;
+    ++current_sector_room_data;
+    temp_w = *current_sector_room_data;
+    ++current_sector_room_data;
+    temp_h = *current_sector_room_data;
+    ++current_sector_room_data;
+
+    if (subrand8(2) == 0) { // 33% chance to spawn in room
+      entity_col[num_entities] = temp_x + subrand8(temp_w);
+      entity_row[num_entities] = temp_y + subrand8(temp_h);
+      entity_type[num_entities] = select_enemy_type();
+      num_entities++;
+    }
+  }
 
   current_entity = num_entities - 1;
   next_entity();
