@@ -256,8 +256,8 @@ void draw_entities() {
         if (entity_aux & 0b1000) {
           temp++;
         }
-        oam_meta_spr(temp_x,
-                     temp_y,
+        oam_meta_spr(entity_x,
+                     entity_y,
                      enemy_sprite[
                                   enemy_sprite_index[entity_type[i]] | temp
                                   ]);
