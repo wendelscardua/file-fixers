@@ -61,6 +61,9 @@ void refresh_player_hud() {
 }
 
 void init_entities(unsigned char stairs_row, unsigned char stairs_col) {
+  for(num_entities = 0; num_entities < 4; num_entities++) {
+    entity_direction[num_entities] = Down;
+  }
   entity_col[0] = entity_col[2] = stairs_col;
   entity_row[1] = entity_row[3] = stairs_row;
   entity_row[0] = stairs_row - 1;
