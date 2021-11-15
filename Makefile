@@ -23,6 +23,7 @@ ${TARGET}: src/main.o src/crt0.o src/lib/unrle.o src/lib/subrand.o \
            src/players.o \
            src/entities.o  \
            src/enemies.o \
+           src/wram.o \
            assets/nametables.o \
            assets/palettes.o \
            assets/sectors.o \
@@ -52,6 +53,9 @@ src/enemies.s: src/enemies.c src/enemies.h src/entities.h src/dungeon.h assets/e
 	cc65 -Oirs $< --add-source ${CA65_FLAGS}
 
 src/players.s: src/players.c src/players.h src/charmap.h
+	cc65 -Oirs $< --add-source ${CA65_FLAGS}
+
+src/wram.s: src/wram.c src/wram.h src/lib/neslib.h src/dungeon.h src/players.h
 	cc65 -Oirs $< --add-source ${CA65_FLAGS}
 
 src/crt0.o: src/crt0.s src/mmc3/mmc3_code.asm src/lib/neslib.s src/lib/nesdoug.s assets/*.chr \

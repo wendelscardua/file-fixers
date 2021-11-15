@@ -10,4 +10,5 @@ src/entities.s
 src/main.s
 src/nametable_loader.s
 src/players.s
+src/wram.s
 tools/ld65-map.json
