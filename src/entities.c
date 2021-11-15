@@ -224,15 +224,27 @@ void draw_entities() {
       temp_y = entity_row[i] * 0x10 + 0x20 - 1;
       switch(entity_type[i]) {
       case Player:
-                               switch(entity_direction[i]) {
-                               case Up: temp = (PLAYER_UP_SPR << 2) | i; break;
-                               case Down: temp = (PLAYER_DOWN_SPR << 2) | i; break;
+        switch(entity_direction[i]) {
+        case Up: temp = (PLAYER_UP_SPR << 2) | i; break;
+        case Down: temp = (PLAYER_DOWN_SPR << 2) | i; break;
         case Left: temp = (PLAYER_LEFT_SPR << 2) | i; break;
         case Right: temp = (PLAYER_RIGHT_SPR << 2) | i; break;
         }
         oam_meta_spr(temp_x, temp_y, player_sprite[temp]);
 
         break;
+      default: // enemies
+        switch(entity_direction[i]) {
+        case Up: temp = ENEMY_LEFT_2_SPR; break;
+        case Down: temp = ENEMY_RIGHT_2_SPR; break;
+        case Left: temp = ENEMY_LEFT_1_SPR; break;
+        case Right: temp = ENEMY_RIGHT_1_SPR; break;
+        }
+        oam_meta_spr(temp_x,
+                     temp_y,
+                     enemy_sprite[
+                                  enemy_sprite_index[entity_type[i]] | temp
+                                  ]);
       }
     }
   }
