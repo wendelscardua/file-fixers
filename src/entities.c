@@ -19,6 +19,7 @@ extern unsigned int temp_int;
 unsigned char num_entities;
 unsigned char entity_aux;
 unsigned char temp_w, temp_h;
+unsigned char menu_cursor_row, menu_cursor_col;
 unsigned char *room_ptr;
 
 #pragma zpsym("i");
@@ -126,7 +127,9 @@ void entity_handler() {
   case EntityMovement:
     entity_movement_handler();
     break;
-  case EntityAction:
+  case EntityMenu:
+    entity_menu_handler();
+  case EntityPlayAction:
     entity_action_handler();
     break;
   }
@@ -166,6 +169,10 @@ void entity_input_handler() {
         current_entity_state = EntityMovement;
         entity_aux = 0x10;
       }
+    } else if (pad1_new & PAD_A) {
+      current_entity_state = EntityMenu;
+      menu_cursor_row = 0;
+      menu_cursor_col = 0;
     } else if (pad1_new & PAD_B) { // Pass
       next_entity();
     }
@@ -211,6 +218,22 @@ void entity_movement_handler() {
   }
   if (entity_aux == 0) {
     current_entity_state = EntityInput;
+  }
+}
+
+void entity_menu_handler() {
+  pad_poll(0);
+  pad1_new = get_pad_new(0);
+  if (pad1_new & PAD_UP) {
+    if (menu_cursor_row > 0) --menu_cursor_row;
+  } else if (pad1_new & PAD_DOWN) {
+    if (menu_cursor_row < 2) ++menu_cursor_row;
+  } else if (pad1_new & PAD_LEFT) {
+    if (menu_cursor_col > 0) --menu_cursor_col;
+  } else if (pad1_new & PAD_RIGHT) {
+    if (menu_cursor_col < 2) ++menu_cursor_col;
+  } else if (pad1_new & PAD_A) {
+    // TODO select option
   }
 }
 
@@ -306,5 +329,14 @@ void draw_entities() {
                                   ]);
       }
     }
+  }
+
+  if (current_entity_state == EntityMenu) {
+    temp_x = 0x40 * menu_cursor_col + 0x08;
+    temp_y = 0x08 * menu_cursor_row + 0xc4;
+    if ((get_frame_count() & 0b11000) == 0b11000) {
+      temp_x -= 0x04;
+    }
+    oam_meta_spr(temp_x, temp_y, menu_cursor_sprite);
   }
 }
