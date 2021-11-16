@@ -7,6 +7,7 @@ map.txt
 src/dungeon.s
 src/enemies.s
 src/entities.s
+src/irq_buffer.s
 src/main.s
 src/nametable_loader.s
 src/players.s

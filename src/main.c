@@ -7,6 +7,7 @@
 #include "lib/unrle.h"
 #include "mmc3/mmc3_code.h"
 #include "dungeon.h"
+#include "irq_buffer.h"
 #include "nametable_loader.h"
 #include "players.h"
 #include "wram.h"
@@ -49,7 +50,6 @@
 #pragma bss-name(push, "ZEROPAGE")
 
 // GLOBAL VARIABLES
-unsigned char double_buffer_index;
 unsigned char arg1;
 unsigned char arg2;
 unsigned char pad1;
@@ -81,9 +81,6 @@ unsigned char current_screen;
 
 #pragma bss-name(pop)
 // should be in the regular 0x300 ram now
-
-char irq_array[32];
-unsigned char double_buffer[32];
 
 // the fixed bank
 

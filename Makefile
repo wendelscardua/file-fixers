@@ -20,6 +20,7 @@ debug: ${TARGET}
 ${TARGET}: src/main.o src/crt0.o src/lib/unrle.o src/lib/subrand.o \
            src/nametable_loader.o \
            src/dungeon.o \
+           src/irq_buffer.o \
            src/players.o \
            src/entities.o  \
            src/enemies.o \
@@ -40,6 +41,7 @@ src/main.s: src/main.c \
             src/lib/unrle.h \
             src/mmc3/mmc3_code.h \
             src/dungeon.h \
+            src/irq_buffer.h \
             src/nametable_loader.h \
             src/players.h \
             src/wram.h \
@@ -80,6 +82,9 @@ src/enemies.s: src/enemies.c \
                src/entities.h \
                src/wram.h \
                assets/enemy-stats.h
+	cc65 -Oirs $< --add-source ${CA65_FLAGS}
+
+src/irq_buffer.s: src/irq_buffer.c
 	cc65 -Oirs $< --add-source ${CA65_FLAGS}
 
 src/players.s: src/players.c \
