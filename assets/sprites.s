@@ -7,6 +7,7 @@
 .export _default_cursor_sprite
 .export _clicking_cursor_sprite
 .export _loading_cursor_sprite
+.export _menu_cursor_sprite
 .export _player_sprite
 .export _enemy_sprite
 
@@ -33,6 +34,13 @@ _loading_cursor_sprite:
 .byte   0,- 8,$05,0
 .byte - 8,  0,$14,0
 .byte   0,  0,$15,0
+.byte $80
+
+_menu_cursor_sprite:
+.byte   0,  0,$0c,0
+.byte   8,  0,$0d,0
+.byte   0,  8,$1c,0
+.byte   8,  8,$1d,0
 .byte $80
 
 .repeat 4, palette
