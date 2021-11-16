@@ -70,6 +70,7 @@ src/entities.s: src/entities.c \
                 src/dungeon.h \
                 src/enemies.h \
                 src/entities.h \
+                src/irq_buffer.h \
                 src/wram.h \
                 assets/enemy-stats.h \
                 assets/sprites.h

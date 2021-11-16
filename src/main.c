@@ -455,6 +455,8 @@ void drivers_window_loading_handler () {
     // draw some things
     vram_adr(NTADR_A(0,0));
     vram_unrle(dungeon_hud_nametable);
+    vram_adr(NTADR_C(0,0));
+    vram_unrle(actions_menu_nametable);
     set_scroll_x(0);
     set_scroll_y(0);
     current_screen = 0;

@@ -5,6 +5,7 @@
 #include "dungeon.h"
 #include "enemies.h"
 #include "entities.h"
+#include "irq_buffer.h"
 #include "wram.h"
 #include "../assets/enemy-stats.h"
 #include "../assets/sprites.h"
@@ -221,7 +222,16 @@ void entity_movement_handler() {
   }
 }
 
+#define MENU_SCANLINE 0xc8
+#define HUD_HEIGHT 0x30
 void entity_menu_handler() {
+  double_buffer[double_buffer_index++] = MENU_SCANLINE - 1;
+  double_buffer[double_buffer_index++] = 0xfd;
+  double_buffer[double_buffer_index++] = 0xf6;
+  temp_int = 0x2800 + current_entity * HUD_HEIGHT;
+  double_buffer[double_buffer_index++] = (temp_int>>8);
+  double_buffer[double_buffer_index++] = temp_int;
+
   pad_poll(0);
   pad1_new = get_pad_new(0);
   if (pad1_new & PAD_UP) {
