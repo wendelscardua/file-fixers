@@ -91,6 +91,7 @@ src/irq_buffer.s: src/irq_buffer.c
 src/players.s: src/players.c \
                src/lib/neslib.h \
                src/charmap.h \
+               src/skills.h \
                src/wram.h
 	cc65 -Oirs $< --add-source ${CA65_FLAGS}
 
@@ -98,7 +99,8 @@ src/wram.s: src/wram.c \
             src/lib/neslib.h \
             src/dungeon.h \
             src/entities.h \
-            src/players.h
+            src/players.h \
+            src/skills.h
 	cc65 -Oirs $< --add-source ${CA65_FLAGS}
 
 src/crt0.o: src/crt0.s src/mmc3/mmc3_code.asm src/lib/neslib.s src/lib/nesdoug.s assets/*.chr \

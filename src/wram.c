@@ -2,11 +2,12 @@
 #include "dungeon.h"
 #include "entities.h"
 #include "players.h"
+#include "skills.h"
 
 #pragma bss-name(push, "XRAM")
 // extra RAM at $6000-$7fff
 
-#define WRAM_VERSION 0x000d
+#define WRAM_VERSION 0x000e
 unsigned int wram_start;
 
 unsigned char dungeon_layout_initialized;
@@ -16,6 +17,7 @@ unsigned char party_initialized;
 unsigned char player_name[4][5];
 player_class_type player_class[4];
 unsigned int player_xp[4];
+skill_type player_skills[4][9];
 unsigned char party_level;
 
 entity_type_enum entity_type[MAX_ENTITIES];
