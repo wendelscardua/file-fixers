@@ -210,11 +210,11 @@ bne @1
 ; MMC3 reset
 
 ; set which bank at $8000
-; also $c000 fixed to 14 of 15
+; also $c000 fixed to penultimate bank
 lda #0 ; PRG bank zero
 jsr _set_prg_8000
 ; set which bank at $a000
-lda #61 ; PRG bank 61
+lda #1 ; PRG bank 1
 jsr _set_prg_a000
 
 ; with CHR invert, set $0000-$03FF
