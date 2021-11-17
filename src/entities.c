@@ -223,14 +223,14 @@ void entity_movement_handler() {
 }
 
 #define MENU_SCANLINE 0xc8
-#define HUD_HEIGHT 0x30
 void entity_menu_handler() {
   double_buffer[double_buffer_index++] = MENU_SCANLINE - 1;
-  double_buffer[double_buffer_index++] = 0xfd;
   double_buffer[double_buffer_index++] = 0xf6;
-  temp_int = 0x2800 + current_entity * HUD_HEIGHT;
-  double_buffer[double_buffer_index++] = (temp_int>>8);
+  double_buffer[double_buffer_index++] = 8;
+  temp_int = 0x28 * current_entity;
   double_buffer[double_buffer_index++] = temp_int;
+  double_buffer[double_buffer_index++] = 0;
+  double_buffer[double_buffer_index++] = ((temp_int & 0xF8) << 2);
 
   pad_poll(0);
   pad1_new = get_pad_new(0);
