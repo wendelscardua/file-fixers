@@ -22,6 +22,9 @@ unsigned char entity_aux;
 unsigned char temp_w, temp_h;
 unsigned char menu_cursor_row, menu_cursor_col;
 unsigned char *room_ptr;
+unsigned char current_entity_skill;
+signed char skill_target_row, skill_target_col;
+unsigned char skill_target_entity;
 
 #pragma zpsym("i");
 #pragma zpsym("temp");
@@ -130,6 +133,7 @@ void entity_handler() {
     break;
   case EntityMenu:
     entity_menu_handler();
+    break;
   case EntityPlayAction:
     entity_action_handler();
     break;
@@ -222,6 +226,25 @@ void entity_movement_handler() {
   }
 }
 
+unsigned char set_melee_skill_target() {
+  skill_target_row = entity_row[current_entity];
+  skill_target_col = entity_col[current_entity];
+  switch (entity_direction[current_entity]) {
+  case Up: --skill_target_row; break;
+  case Down: ++skill_target_row; break;
+  case Left: --skill_target_col; break;
+  case Right: ++skill_target_col; break;
+  }
+
+  if (skill_target_row < 0 || skill_target_col < 0 || skill_target_row > 9 || skill_target_col > 11) return 0;
+
+  for(skill_target_entity = 0; skill_target_entity < num_entities; skill_target_entity++) {
+    if (entity_row[skill_target_entity] == skill_target_row && entity_col[skill_target_entity] == skill_target_col) return 1;
+  }
+
+  return 0;
+}
+
 #define MENU_SCANLINE 0xc8
 void entity_menu_handler() {
   double_buffer[double_buffer_index++] = MENU_SCANLINE - 1;
@@ -246,25 +269,42 @@ void entity_menu_handler() {
     entity_aux = 0;
     current_entity_state = EntityInput;
   } else if (pad1_new & PAD_A) {
-    // TODO select option
-    switch (player_skills[current_entity][menu_cursor_col * 3 + menu_cursor_row]) {
+    switch (current_entity_skill = player_skills[current_entity][menu_cursor_col * 3 + menu_cursor_row]) {
     case SkNone:
       entity_aux = 0;
       current_entity_state = EntityInput;
       break;
     case SkAttack:
-      // TODO: attack
+      entity_aux = 0;
+      if (set_melee_skill_target()) {
+        current_entity_state = EntityPlayAction;
+      } else {
+        next_entity();
+      }
       break;
     case SkItem:
       // TODO: item
       break;
     case SkPass:
       next_entity();
+      break;
     }
   }
 }
 
+#define BASIC_SKILL_ANIM_LEN 0x20
+
 void entity_action_handler() {
+  switch(current_entity_skill) {
+  case SkAttack:
+    entity_aux++;
+    if (entity_aux >= BASIC_SKILL_ANIM_LEN) {
+      // TODO: solve damage
+      entity_aux = 0;
+      next_entity();
+    }
+    break;
+  }
 }
 
 void next_entity() {
@@ -297,6 +337,17 @@ void next_entity() {
 }
 
 void draw_entities() {
+  if (current_entity_state == EntityPlayAction) {
+    switch(current_entity_skill) {
+    case SkAttack:
+      temp = entity_direction[current_entity];
+      temp_x = skill_target_col * 0x10 + 0x20;
+      temp_y = skill_target_row * 0x10 + 0x20 - 1;
+      oam_meta_spr(temp_x, temp_y, melee_sprite[temp]);
+      break;
+    }
+  }
+
   for(i = 0; i < num_entities; ++i) {
     if (i == current_entity && current_entity_state == EntityMovement) {
       switch(entity_type[i]) {
