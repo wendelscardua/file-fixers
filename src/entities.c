@@ -242,8 +242,25 @@ void entity_menu_handler() {
     if (menu_cursor_col > 0) --menu_cursor_col;
   } else if (pad1_new & PAD_RIGHT) {
     if (menu_cursor_col < 2) ++menu_cursor_col;
+  } else if (pad1_new & PAD_B) {
+    entity_aux = 0;
+    current_entity_state = EntityInput;
   } else if (pad1_new & PAD_A) {
     // TODO select option
+    switch (player_skills[current_entity][menu_cursor_col * 3 + menu_cursor_row]) {
+    case SkNone:
+      entity_aux = 0;
+      current_entity_state = EntityInput;
+      break;
+    case SkAttack:
+      // TODO: attack
+      break;
+    case SkItem:
+      // TODO: item
+      break;
+    case SkPass:
+      next_entity();
+    }
   }
 }
 
