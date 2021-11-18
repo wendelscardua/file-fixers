@@ -8,6 +8,7 @@
 .export _clicking_cursor_sprite
 .export _loading_cursor_sprite
 .export _menu_cursor_sprite
+.export _melee_sprite
 .export _player_sprite
 .export _enemy_sprite
 
@@ -42,6 +43,28 @@ _menu_cursor_sprite:
 .byte   0,  8,$1c,0
 .byte   8,  8,$1d,0
 .byte $80
+
+melee_right_sprite:
+.byte   4,  0,$0e,1
+.byte   4,  8,$1e,1
+.byte $80
+
+melee_left_sprite:
+.byte   4,  0,$0e,1|OAM_FLIP_H
+.byte   4,  8,$1e,1|OAM_FLIP_H
+.byte $80
+
+melee_down_sprite:
+.byte   0,  4,$1f,1
+.byte   8,  4,$0f,1
+.byte $80
+
+melee_up_sprite:
+.byte   0,  4,$1f,1|OAM_FLIP_V
+.byte   8,  4,$0f,1|OAM_FLIP_V
+.byte $80
+
+_melee_sprite: .word melee_up_sprite, melee_down_sprite, melee_left_sprite, melee_right_sprite
 
 .repeat 4, palette
   .ident (.concat("enemy_left_0_p", .string(palette))):
