@@ -330,6 +330,8 @@ const unsigned int xp_per_level[] =
 
 void gain_exp() {
   unsigned int exp, temp_exp, temp_goal;
+  if (current_entity >= 4) return;
+
   exp = entity_lv[skill_target_entity];
   // ML * ML + 1
   exp = exp * exp + 1;
