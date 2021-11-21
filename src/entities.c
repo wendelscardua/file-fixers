@@ -171,6 +171,29 @@ unsigned char enemy_lock_on_melee_target() {
   return 0;
 }
 
+void enemy_random_walk() {
+  temp_x = entity_col[current_entity];
+  temp_y = entity_row[current_entity];
+  temp = entity_direction[current_entity] = subrand8(3);
+  switch(temp) {
+  case Up: --temp_y; break;
+  case Down: ++temp_y; break;
+  case Left: --temp_x; break;
+  case Right: ++temp_x; break;
+  }
+
+  if (!entity_collides()) {
+    entity_row[current_entity] = temp_y;
+    entity_col[current_entity] = temp_x;
+    --current_entity_moves;
+    refresh_moves_hud();
+    current_entity_state = EntityMovement;
+    entity_aux = 0x10;
+  } else {
+    ++entity_aux;
+  }
+}
+
 void entity_input_handler() {
   switch(entity_type[current_entity]) {
   case Player:
@@ -200,62 +223,15 @@ void entity_input_handler() {
       next_entity();
     }
     break;
-  case Eicar:
+  default:
     // Random walk
     if (enemy_lock_on_melee_target()) {
       entity_aux = 0;
       current_entity_skill = SkAttack;
       current_entity_state = EntityPlayAction;
     } else if (current_entity_moves > 0 && entity_aux < 0x10) {
-      temp_x = entity_col[current_entity];
-      temp_y = entity_row[current_entity];
-      temp = entity_direction[current_entity] = subrand8(3);
-      switch(temp) {
-      case Up: --temp_y; break;
-      case Down: ++temp_y; break;
-      case Left: --temp_x; break;
-      case Right: ++temp_x; break;
-      }
-
-      if (!entity_collides()) {
-        entity_row[current_entity] = temp_y;
-        entity_col[current_entity] = temp_x;
-        --current_entity_moves;
-        refresh_moves_hud();
-        current_entity_state = EntityMovement;
-        entity_aux = 0x10;
-      } else {
-        ++entity_aux;
-      }
+      enemy_random_walk();
     } else {
-      next_entity();
-    }
-    break;
-  default:
-    // Random walk
-    if (current_entity_moves > 0 && entity_aux < 0x10) {
-      temp_x = entity_col[current_entity];
-      temp_y = entity_row[current_entity];
-      temp = entity_direction[current_entity] = subrand8(3);
-      switch(temp) {
-      case Up: --temp_y; break;
-      case Down: ++temp_y; break;
-      case Left: --temp_x; break;
-      case Right: ++temp_x; break;
-      }
-
-      if (!entity_collides()) {
-        entity_row[current_entity] = temp_y;
-        entity_col[current_entity] = temp_x;
-        --current_entity_moves;
-        refresh_moves_hud();
-        current_entity_state = EntityMovement;
-        entity_aux = 0x10;
-      } else {
-        ++entity_aux;
-      }
-    } else {
-      // TODO add actions
       next_entity();
     }
     break;
