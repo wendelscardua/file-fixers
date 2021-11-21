@@ -447,6 +447,10 @@ void entity_action_handler() {
       next_entity();
     }
     break;
+  default:
+    // TODO: error handling?
+    multi_vram_buffer_horz("ERROR", 5, NTADR_A(12, 12));
+    break;
   }
 }
 
