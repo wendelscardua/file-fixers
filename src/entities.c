@@ -26,6 +26,8 @@ unsigned char current_entity_skill;
 signed char skill_target_row, skill_target_col;
 unsigned char skill_target_entity;
 
+unsigned char turn_counter;
+
 #pragma zpsym("i");
 #pragma zpsym("temp");
 #pragma zpsym("temp_x");
@@ -70,6 +72,8 @@ void refresh_hud() {
 }
 
 void init_entities(unsigned char stairs_row, unsigned char stairs_col) {
+  turn_counter = 0;
+
   for(num_entities = 0; num_entities < 4; num_entities++) {
     entity_direction[num_entities] = Down;
     entity_turn_counter[num_entities] = subrand8(12);
@@ -286,7 +290,7 @@ unsigned char melee_to_hit() {
   // +1 if level <= 2
   if (entity_lv[current_entity] <= 2) ++to_hit_bonus;
 
-  // TODO: monster AC
+  // TODO: AC
   to_hit_bonus += 7; // default AC = 7
 
 
@@ -393,12 +397,32 @@ void entity_action_handler() {
   }
 }
 
+void regen() {
+  if ((turn_counter & 0x111) == 0 &&
+      entity_hp[current_entity] < player_max_hp[current_entity]) {
+    if (entity_lv[current_entity] >= 10) {
+      // TODO: base on constitution?
+      temp = subrand8(16) + 1;
+      if (temp > entity_lv[current_entity] - 9) {
+        temp = entity_lv[current_entity] - 9;
+      }
+      entity_hp[current_entity] += temp;
+      if (entity_hp[current_entity] > player_max_hp[current_entity]) {
+        entity_hp[current_entity] = player_max_hp[current_entity];
+      }
+    } else {
+      entity_hp[current_entity]++;
+    }
+  }
+}
+
 void next_entity() {
   if (num_entities == 0) return;
 
   ++current_entity;
   if (current_entity >= num_entities) {
     current_entity = 0;
+    ++turn_counter;
   }
 
   while(1) {
@@ -411,6 +435,8 @@ void next_entity() {
 
       entity_x = entity_col[current_entity] * 0x10 + 0x20;
       entity_y = entity_row[current_entity] * 0x10 + 0x20 - 1;
+
+      if (current_entity < 4) regen();
 
       refresh_hud();
       break;
