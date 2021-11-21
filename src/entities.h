@@ -27,4 +27,6 @@ void entity_input_handler (void);
 void entity_movement_handler (void);
 void entity_action_handler (void);
 void entity_menu_handler (void);
+
+extern unsigned char entity_turn_counter[];
 #endif

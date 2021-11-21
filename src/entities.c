@@ -93,26 +93,9 @@ void init_entities(unsigned char stairs_row, unsigned char stairs_col) {
       ++room_ptr;
 
       if (subrand8(2) == 0) { // 33% chance to spawn in room
+        spawn_enemy(num_entities);
         entity_col[num_entities] = temp_x + subrand8(temp_w);
         entity_row[num_entities] = temp_y + subrand8(temp_h);
-        entity_type[num_entities] = i = select_enemy_type();
-        entity_moves[num_entities] = enemy_moves[i];
-        entity_speed[num_entities] = enemy_speed[i];
-        entity_turn_counter[num_entities] = subrand8(12);
-        temp = enemy_base_level[i];
-        if (current_sector_index + 1 < temp) {
-          --temp;
-        } else if (current_sector_index + 1 > temp) {
-          temp += (current_sector_index + 1 - temp) / 5;
-        }
-        if (party_level > enemy_base_level[i]) {
-          temp += (party_level - enemy_base_level[i]) / 4;
-        }
-        if (temp * 2 > enemy_base_level[i] * 3) {
-          temp = enemy_base_level[i] * 3 / 2;
-        }
-        if (temp > 49) temp = 49;
-        entity_lv[num_entities] = temp;
         num_entities++;
       }
     }
