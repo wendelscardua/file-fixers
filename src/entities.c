@@ -140,6 +140,37 @@ unsigned char entity_collides() {
   return 0;
 }
 
+unsigned char set_melee_skill_target() {
+  skill_target_row = entity_row[current_entity];
+  skill_target_col = entity_col[current_entity];
+  switch (entity_direction[current_entity]) {
+  case Up: --skill_target_row; break;
+  case Down: ++skill_target_row; break;
+  case Left: --skill_target_col; break;
+  case Right: ++skill_target_col; break;
+  }
+
+  if (skill_target_row < 0 || skill_target_col < 0 || skill_target_row > 9 || skill_target_col > 11) return 0;
+
+  for(skill_target_entity = 0; skill_target_entity < num_entities; skill_target_entity++) {
+    if (entity_hp[skill_target_entity] > 0 && entity_row[skill_target_entity] == skill_target_row && entity_col[skill_target_entity] == skill_target_col) return 1;
+  }
+
+  return 0;
+}
+
+unsigned char enemy_lock_on_melee_target() {
+  temp = entity_direction[current_entity];
+  for(i = 0; i < 4; i++) {
+    if (set_melee_skill_target() && skill_target_entity < 4) return 1;
+
+    temp++;
+    if (temp >= 4) temp = 0;
+    entity_direction[current_entity] = temp;
+  }
+  return 0;
+}
+
 void entity_input_handler() {
   switch(entity_type[current_entity]) {
   case Player:
@@ -166,6 +197,36 @@ void entity_input_handler() {
       menu_cursor_row = 0;
       menu_cursor_col = 0;
     } else if (pad1_new & PAD_B) { // Pass
+      next_entity();
+    }
+    break;
+  case Eicar:
+    // Random walk
+    if (enemy_lock_on_melee_target()) {
+      entity_aux = 0;
+      current_entity_state = EntityPlayAction;
+    } else if (current_entity_moves > 0 && entity_aux < 0x10) {
+      temp_x = entity_col[current_entity];
+      temp_y = entity_row[current_entity];
+      temp = entity_direction[current_entity] = subrand8(3);
+      switch(temp) {
+      case Up: --temp_y; break;
+      case Down: ++temp_y; break;
+      case Left: --temp_x; break;
+      case Right: ++temp_x; break;
+      }
+
+      if (!entity_collides()) {
+        entity_row[current_entity] = temp_y;
+        entity_col[current_entity] = temp_x;
+        --current_entity_moves;
+        refresh_moves_hud();
+        current_entity_state = EntityMovement;
+        entity_aux = 0x10;
+      } else {
+        ++entity_aux;
+      }
+    } else {
       next_entity();
     }
     break;
@@ -211,25 +272,6 @@ void entity_movement_handler() {
   if (entity_aux == 0) {
     current_entity_state = EntityInput;
   }
-}
-
-unsigned char set_melee_skill_target() {
-  skill_target_row = entity_row[current_entity];
-  skill_target_col = entity_col[current_entity];
-  switch (entity_direction[current_entity]) {
-  case Up: --skill_target_row; break;
-  case Down: ++skill_target_row; break;
-  case Left: --skill_target_col; break;
-  case Right: ++skill_target_col; break;
-  }
-
-  if (skill_target_row < 0 || skill_target_col < 0 || skill_target_row > 9 || skill_target_col > 11) return 0;
-
-  for(skill_target_entity = 0; skill_target_entity < num_entities; skill_target_entity++) {
-    if (entity_row[skill_target_entity] == skill_target_row && entity_col[skill_target_entity] == skill_target_col) return 1;
-  }
-
-  return 0;
 }
 
 #define MENU_SCANLINE 0xc8
