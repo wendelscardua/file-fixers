@@ -96,7 +96,7 @@ void init_entities(unsigned char stairs_row, unsigned char stairs_col) {
       temp_h = *room_ptr;
       ++room_ptr;
 
-      if (subrand8(2) == 0) { // 33% chance to spawn in room
+      if (subrand8(1)) { // 50% chance to spawn in room
         spawn_enemy(num_entities);
         entity_col[num_entities] = temp_x + subrand8(temp_w);
         entity_row[num_entities] = temp_y + subrand8(temp_h);
