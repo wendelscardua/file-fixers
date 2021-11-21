@@ -23,7 +23,7 @@ unsigned char temp_w, temp_h;
 unsigned char menu_cursor_row, menu_cursor_col;
 unsigned char *room_ptr;
 unsigned char current_entity_skill;
-signed char skill_target_row, skill_target_col;
+unsigned char skill_target_row, skill_target_col;
 unsigned char skill_target_entity;
 
 unsigned char turn_counter;
@@ -154,11 +154,10 @@ unsigned char set_melee_skill_target() {
   case Left: --skill_target_col; break;
   case Right: ++skill_target_col; break;
   default:
-    error();
     return 0;
   }
 
-  if (skill_target_row < 0 || skill_target_col < 0 || skill_target_row > 9 || skill_target_col > 11) return 0;
+  if (skill_target_row > 9 || skill_target_col > 11) return 0;
 
   for(skill_target_entity = 0; skill_target_entity < num_entities; skill_target_entity++) {
     if ((entity_hp[skill_target_entity] > 0) &&
