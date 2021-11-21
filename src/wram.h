@@ -11,7 +11,8 @@ extern unsigned char wram_dungeon_layout[];
 extern unsigned char party_initialized;
 extern unsigned char player_name[4][5];
 extern player_class_type player_class[];
-extern unsigned char player_xp[];
+extern unsigned int player_xp[];
+extern unsigned char player_max_hp[];
 extern skill_type player_skills[4][9];
 extern unsigned char party_level;
 

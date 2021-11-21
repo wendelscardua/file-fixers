@@ -293,6 +293,80 @@ unsigned char melee_to_hit() {
   return (to_hit_bonus > subrand8(19) + 1);
 }
 
+const unsigned int xp_per_level[] =
+  {
+   0, // 0
+   0, // 1
+   20, // 2
+   30, // 3
+   50, // 4
+   100, // 5
+   200, // 6
+   400, // 7
+   800, // 8
+   1600, // 9
+   3200, // 10
+   3600, // 11
+   4000, // 12
+   5000, // 13
+   6000, // 14
+   7000, // 15
+   9000, // 16
+   11000, // 17
+   13000, // 18
+   15000, // 19
+   17000, // 20
+   20000, // 21
+   23000, // 22
+   26000, // 23
+   29000, // 24
+   32000, // 25
+   32000, // 26
+   32000, // 27
+   32000, // 28
+   32000, // 29
+   32000 // 30
+  };
+
+void gain_exp() {
+  unsigned int exp, temp_exp, temp_goal;
+  exp = entity_lv[skill_target_entity];
+  // ML * ML + 1
+  exp = exp * exp + 1;
+  if (entity_speed[skill_target_entity] >= 13) exp += 3;
+  if (entity_speed[skill_target_entity] >= 19) exp += 2;
+  if (entity_lv[skill_target_entity] >= 9) exp += 50;
+  // TODO: bonus per monster attack:
+  exp += 5;
+
+  for(i = 0; i < 4; i++) {
+    if (entity_hp[i] == 0) continue;
+    temp = entity_lv[i];
+    if (temp >= 30) continue;
+    // current player gets 100% xp, others get 50%
+    if (i == current_entity) {
+      temp_exp = exp;
+    } else {
+      temp_exp = exp / 2;
+    }
+
+    temp_goal = xp_per_level[temp];
+    if (temp_exp + player_xp[i] >= temp_goal) {
+      player_xp[i] = player_xp[i] + temp_exp - temp_goal;
+      // TODO: maybe check if they can gain multiple levels
+      ++entity_lv[i];
+
+      // TODO: maybe per class?
+      temp = subrand8(7) + 1;
+      player_max_hp[i] += temp;
+      entity_hp[i] += temp;
+      if (entity_hp[i] > player_max_hp[i]) entity_hp[i] = player_max_hp[i];
+    } else {
+      player_xp[i] += temp_exp;
+    }
+  }
+}
+
 #define BASIC_SKILL_ANIM_LEN 0x18
 
 void entity_action_handler() {
@@ -305,7 +379,7 @@ void entity_action_handler() {
         temp = subrand8(5) + 1;
         if (entity_hp[skill_target_entity] <= temp) {
           entity_hp[skill_target_entity] = 0;
-          // TODO: reward from kill
+          gain_exp();
         } else {
           entity_hp[skill_target_entity] -= temp;
         }

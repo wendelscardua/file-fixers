@@ -7,7 +7,7 @@
 #pragma bss-name(push, "XRAM")
 // extra RAM at $6000-$7fff
 
-#define WRAM_VERSION 0x000e
+#define WRAM_VERSION 0x000f
 unsigned int wram_start;
 
 unsigned char dungeon_layout_initialized;
@@ -17,6 +17,7 @@ unsigned char party_initialized;
 unsigned char player_name[4][5];
 player_class_type player_class[4];
 unsigned int player_xp[4];
+unsigned char player_max_hp[4];
 skill_type player_skills[4][9];
 unsigned char party_level;
 
