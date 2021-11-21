@@ -24,6 +24,7 @@ entity_type_enum entity_type[MAX_ENTITIES];
 unsigned char entity_lv[MAX_ENTITIES];
 unsigned char entity_speed[MAX_ENTITIES];
 unsigned char entity_moves[MAX_ENTITIES];
+unsigned char entity_hp[MAX_ENTITIES];
 
 // this one doesn't need to be saved, it's here because of space
 // TODO: optimize it away

@@ -19,6 +19,7 @@ extern entity_type_enum entity_type[];
 extern unsigned char entity_lv[];
 extern unsigned char entity_speed[];
 extern unsigned char entity_moves[];
+extern unsigned char entity_hp[];
 
 void init_wram (void);
 
