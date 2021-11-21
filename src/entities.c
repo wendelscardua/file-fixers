@@ -332,6 +332,7 @@ void draw_entities() {
   }
 
   for(i = 0; i < num_entities; ++i) {
+    if (entity_hp[i] == 0) continue;
     if (i == current_entity && current_entity_state == EntityMovement) {
       switch(entity_type[i]) {
       case Player:
