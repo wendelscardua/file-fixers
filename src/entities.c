@@ -204,6 +204,7 @@ void entity_input_handler() {
     // Random walk
     if (enemy_lock_on_melee_target()) {
       entity_aux = 0;
+      current_entity_skill = SkAttack;
       current_entity_state = EntityPlayAction;
     } else if (current_entity_moves > 0 && entity_aux < 0x10) {
       temp_x = entity_col[current_entity];
