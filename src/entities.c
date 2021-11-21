@@ -46,6 +46,11 @@ unsigned char current_entity_moves;
 entity_state_enum current_entity_state;
 unsigned char entity_x, entity_y;
 
+void error() {
+  // TODO: error handling?
+  multi_vram_buffer_horz("ERROR", 5, NTADR_A(12, 12));
+}
+
 void refresh_moves_hud() {
   temp = current_entity_moves;
   temp_x = 0;
@@ -148,12 +153,17 @@ unsigned char set_melee_skill_target() {
   case Down: ++skill_target_row; break;
   case Left: --skill_target_col; break;
   case Right: ++skill_target_col; break;
+  default:
+    error();
+    return 0;
   }
 
   if (skill_target_row < 0 || skill_target_col < 0 || skill_target_row > 9 || skill_target_col > 11) return 0;
 
   for(skill_target_entity = 0; skill_target_entity < num_entities; skill_target_entity++) {
-    if (entity_hp[skill_target_entity] > 0 && entity_row[skill_target_entity] == skill_target_row && entity_col[skill_target_entity] == skill_target_col) return 1;
+    if ((entity_hp[skill_target_entity] > 0) &&
+        (entity_row[skill_target_entity] == skill_target_row) &&
+        (entity_col[skill_target_entity] == skill_target_col)) return 1;
   }
 
   return 0;
@@ -425,8 +435,7 @@ void entity_action_handler() {
     }
     break;
   default:
-    // TODO: error handling?
-    multi_vram_buffer_horz("ERROR", 5, NTADR_A(12, 12));
+    error();
     break;
   }
 }
