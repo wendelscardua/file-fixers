@@ -275,14 +275,41 @@ void entity_menu_handler() {
   }
 }
 
-#define BASIC_SKILL_ANIM_LEN 0x20
+unsigned char melee_to_hit() {
+  signed char to_hit_bonus = 1;
+
+  // TODO: str / dex bonus
+
+  // + level
+  to_hit_bonus += entity_lv[current_entity];
+
+  // +1 if level <= 2
+  if (entity_lv[current_entity] <= 2) ++to_hit_bonus;
+
+  // TODO: monster AC
+  to_hit_bonus += 7; // default AC = 7
+
+
+  return (to_hit_bonus > subrand8(19) + 1);
+}
+
+#define BASIC_SKILL_ANIM_LEN 0x18
 
 void entity_action_handler() {
   switch(current_entity_skill) {
   case SkAttack:
     entity_aux++;
     if (entity_aux >= BASIC_SKILL_ANIM_LEN) {
-      // TODO: solve damage
+      if (melee_to_hit()) {
+        // TODO: weapons? default: 1d6
+        temp = subrand8(5) + 1;
+        if (entity_hp[skill_target_entity] <= temp) {
+          entity_hp[skill_target_entity] = 0;
+          // TODO: reward from kill
+        } else {
+          entity_hp[skill_target_entity] -= temp;
+        }
+      }
       entity_aux = 0;
       next_entity();
     }
