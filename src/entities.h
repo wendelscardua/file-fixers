@@ -15,7 +15,8 @@ typedef enum {
 typedef enum {
               EntityInput,
               EntityMovement,
-              EntityAction
+              EntityMenu,
+              EntityPlayAction
 } entity_state_enum;
 
 void init_entities (unsigned char stairs_x, unsigned char stairs_y);
@@ -25,4 +26,7 @@ void next_entity (void);
 void entity_input_handler (void);
 void entity_movement_handler (void);
 void entity_action_handler (void);
+void entity_menu_handler (void);
+
+extern unsigned char entity_turn_counter[];
 #endif
