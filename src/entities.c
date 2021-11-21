@@ -415,6 +415,18 @@ void gain_exp() {
   }
 }
 
+unsigned char roll_dice(unsigned char dice_spec) {
+  unsigned char amount, sides, total;
+  amount = dice_spec & 0b111;
+  sides = (dice_spec >> 3) - 1;
+  total = amount;
+  while(amount > 0) {
+    --amount;
+    total += subrand8(sides);
+  }
+  return total;
+}
+
 #define BASIC_SKILL_ANIM_LEN 0x18
 
 void entity_action_handler() {
@@ -423,8 +435,7 @@ void entity_action_handler() {
     entity_aux++;
     if (entity_aux >= BASIC_SKILL_ANIM_LEN) {
       if (melee_to_hit()) {
-        // TODO: weapons? default: 1d6
-        temp = subrand8(5) + 1;
+        temp = roll_dice(entity_attack[current_entity]);
         if (entity_hp[skill_target_entity] <= temp) {
           entity_hp[skill_target_entity] = 0;
           gain_exp();

@@ -21,6 +21,7 @@ extern unsigned char entity_lv[];
 extern unsigned char entity_speed[];
 extern unsigned char entity_moves[];
 extern unsigned char entity_hp[];
+extern unsigned char entity_attack[];
 
 void init_wram (void);
 

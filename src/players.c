@@ -1,5 +1,6 @@
 #include "lib/neslib.h"
 #include "charmap.h"
+#include "dice.h"
 #include "players.h"
 #include "skills.h"
 #include "wram.h"
@@ -28,6 +29,7 @@ void initialize_party() {
     entity_type[i] = Player;
     entity_speed[i] = NORMAL_SPEED;
     entity_moves[i] = 1;
+    entity_attack[i] = DICE(1,6);
     // TODO: maybe per class?
     player_max_hp[i] = entity_hp[i] = 16;
   }

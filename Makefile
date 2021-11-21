@@ -91,6 +91,7 @@ src/irq_buffer.s: src/irq_buffer.c
 src/players.s: src/players.c \
                src/lib/neslib.h \
                src/charmap.h \
+               src/dice.h \
                src/skills.h \
                src/wram.h
 	cc65 -Oirs $< --add-source ${CA65_FLAGS}
