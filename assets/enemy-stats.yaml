@@ -3,6 +3,7 @@ Eicar:
   base_level: 1
   speed: 6
   moves: 1
+  attack: 1d4
   model: 0
   palette: 0
 Crypt:
@@ -10,6 +11,7 @@ Crypt:
   base_level: 2
   speed: 12
   moves: 2
+  attack: 1d6
   model: 1
   palette: 0
 Buggy:
@@ -17,6 +19,7 @@ Buggy:
   base_level: 4
   moves: 2
   speed: 12
+  attack: 1d6
   model: 0
   palette: 2
 Stega:
@@ -24,6 +27,7 @@ Stega:
   base_level: 8
   moves: 2
   speed: 12
+  attack: 2d4
   model: 2
   palette: 0
 Nefet:
@@ -31,5 +35,6 @@ Nefet:
   base_level: 12
   moves: 3
   speed: 18
+  attack: 2d6
   model: 1
   palette: 2

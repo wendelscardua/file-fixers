@@ -15,5 +15,7 @@ _enemy_base_level: .byte 1, 2, 4, 8, 12
 _enemy_speed: .byte 6, 12, 12, 12, 18
 .export _enemy_moves
 _enemy_moves: .byte 1, 2, 2, 2, 3
+.export _enemy_attack
+_enemy_attack: .byte 33, 49, 49, 34, 50
 .export _enemy_sprite_index
 _enemy_sprite_index: .byte 0, 4, 24, 8, 28
