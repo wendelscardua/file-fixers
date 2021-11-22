@@ -17,3 +17,11 @@ void __fastcall__ dungeon_handler(void);
 
 extern unsigned char * current_sector_room_data;
 extern unsigned char current_sector_index;
+extern unsigned char sector_up_row, sector_up_column, sector_down_row, sector_down_column;
+extern unsigned char sector_locked;
+
+#pragma zpsym("sector_up_row")
+#pragma zpsym("sector_up_column")
+#pragma zpsym("sector_down_row")
+#pragma zpsym("sector_down_column")
+#pragma zpsym("sector_locked")

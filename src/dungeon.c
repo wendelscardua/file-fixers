@@ -10,13 +10,14 @@
 
 #pragma bss-name(push, "ZEROPAGE")
 extern unsigned char current_screen;
-
 #pragma zpsym("current_screen");
+
 unsigned int nt_adr;
 
 unsigned char mt;
 unsigned char sector_up_row, sector_up_column;
 unsigned char sector_down_row, sector_down_column;
+unsigned char sector_locked;
 #pragma bss-name(pop)
 
 unsigned char * current_sector;
@@ -49,8 +50,10 @@ void load_dungeon_sector(unsigned char sector_index) {
     temp tells which sector template to use now...
     but also tells (via bit 7) if the current sector was already completed
   */
-  current_sector = (unsigned char *) sector_metatiles[temp & 0x7f];
-  current_sector_room_data = (unsigned char *) sector_rooms[temp & 0x7f];
+  sector_locked = ((temp & 0x80) == 0);
+  temp &= 0x7f;
+  current_sector = (unsigned char *) sector_metatiles[temp];
+  current_sector_room_data = (unsigned char *) sector_rooms[temp];
 
   set_scroll_y(0);
   ppu_wait_nmi();
