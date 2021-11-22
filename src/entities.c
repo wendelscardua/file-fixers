@@ -16,7 +16,7 @@
 
 #pragma bss-name(push, "ZEROPAGE")
 
-unsigned char num_entities;
+unsigned char num_entities, num_enemies;
 unsigned char entity_aux;
 unsigned char temp_w, temp_h;
 unsigned char menu_cursor_row, menu_cursor_col;
@@ -82,7 +82,9 @@ void init_entities(unsigned char stairs_row, unsigned char stairs_col) {
   entity_col[1] = stairs_col - 1;
   entity_col[3] = stairs_col + 1;
 
-  while (num_entities == 4) {
+  num_enemies = 0;
+
+  while (num_enemies == 0) {
     room_ptr = current_sector_room_data;
     while((temp_x = *room_ptr) != 0xff) {
       ++room_ptr;
@@ -98,6 +100,7 @@ void init_entities(unsigned char stairs_row, unsigned char stairs_col) {
         entity_col[num_entities] = temp_x + subrand8(temp_w);
         entity_row[num_entities] = temp_y + subrand8(temp_h);
         num_entities++;
+        num_enemies++;
       }
     }
   }
@@ -354,7 +357,7 @@ const unsigned int xp_per_level[] =
 
 void gain_exp() {
   unsigned int exp, temp_exp, temp_goal;
-  if (current_entity >= 4) return;
+  if (current_entity >= 4 || skill_target_entity < 4) return;
 
   exp = entity_lv[skill_target_entity];
   // ML * ML + 1
@@ -390,6 +393,12 @@ void gain_exp() {
     } else {
       player_xp[i] += temp_exp;
     }
+  }
+
+  num_enemies--;
+
+  if (num_enemies == 0 && sector_locked) {
+    unlock_sector();
   }
 }
 
@@ -453,13 +462,14 @@ void regen() {
 void next_entity() {
   if (num_entities == 0) return;
 
-  ++current_entity;
-  if (current_entity >= num_entities) {
-    current_entity = 0;
-    ++turn_counter;
-  }
-
   while(1) {
+    ++current_entity;
+    if (current_entity >= num_entities) {
+      current_entity = 0;
+      ++turn_counter;
+    }
+    if (entity_hp[current_entity] == 0) continue;
+
     entity_turn_counter[current_entity] += entity_speed[current_entity];
     if (entity_turn_counter[current_entity] >= NORMAL_SPEED) {
       entity_turn_counter[current_entity] -= NORMAL_SPEED;
@@ -474,10 +484,6 @@ void next_entity() {
 
       refresh_hud();
       break;
-    }
-    ++current_entity;
-    if (current_entity >= num_entities) {
-      current_entity = 0;
     }
   }
 }

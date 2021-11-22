@@ -107,3 +107,17 @@ void dungeon_handler() {
 void draw_dungeon_sprites() {
   draw_entities();
 }
+
+void unlock_sector() {
+  if (!sector_locked) return;
+
+  sector_locked = 0;
+  dungeon_layout[current_dungeon_index * NUM_DUNGEON_LEVELS + current_sector_index] |= 0x80;
+
+  nt_adr = 0x2084 + sector_down_row * 0x40 + sector_down_column * 0x02;
+
+  one_vram_buffer(metatile_UL_tiles[DownMetatile], nt_adr);
+  one_vram_buffer(metatile_UR_tiles[DownMetatile], nt_adr + 0x01);
+  one_vram_buffer(metatile_DL_tiles[DownMetatile], nt_adr + 0x20);
+  one_vram_buffer(metatile_DR_tiles[DownMetatile], nt_adr + 0x21);
+}

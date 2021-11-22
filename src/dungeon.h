@@ -14,6 +14,7 @@ void __fastcall__ start_dungeon(unsigned char dungeon_index);
 void __fastcall__ load_dungeon_sector(unsigned char sector_index);
 void __fastcall__ draw_dungeon_sprites(void);
 void __fastcall__ dungeon_handler(void);
+void __fastcall__ unlock_sector(void);
 
 extern unsigned char * current_sector_room_data;
 extern unsigned char current_sector_index;
