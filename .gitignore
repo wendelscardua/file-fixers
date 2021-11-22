@@ -11,5 +11,6 @@ src/irq_buffer.s
 src/main.s
 src/nametable_loader.s
 src/players.s
+src/temp.s
 src/wram.s
 tools/ld65-map.json

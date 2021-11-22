@@ -6,6 +6,7 @@
 #include "enemies.h"
 #include "entities.h"
 #include "irq_buffer.h"
+#include "temp.h"
 #include "wram.h"
 #include "../assets/enemy-stats.h"
 #include "../assets/sprites.h"
@@ -14,8 +15,6 @@
 #pragma rodata-name ("RODATA")
 
 #pragma bss-name(push, "ZEROPAGE")
-extern unsigned char i, temp, temp_x, temp_y, pad1_new;
-extern unsigned int temp_int;
 
 unsigned char num_entities;
 unsigned char entity_aux;
@@ -27,13 +26,6 @@ unsigned char skill_target_row, skill_target_col;
 unsigned char skill_target_entity;
 
 unsigned char turn_counter;
-
-#pragma zpsym("i");
-#pragma zpsym("temp");
-#pragma zpsym("temp_x");
-#pragma zpsym("temp_y");
-#pragma zpsym("temp_int");
-#pragma zpsym("pad1_new");
 
 #pragma bss-name(pop)
 

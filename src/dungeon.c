@@ -2,20 +2,15 @@
 #include "lib/neslib.h"
 #include "dungeon.h"
 #include "entities.h"
+#include "temp.h"
 #include "../assets/sectors.h"
 
 #pragma code-name ("CODE")
 #pragma rodata-name ("RODATA")
 
 #pragma bss-name(push, "ZEROPAGE")
-extern unsigned char temp, temp_x, temp_y;
-extern unsigned int temp_int;
 extern unsigned char current_screen;
 
-#pragma zpsym("temp");
-#pragma zpsym("temp_x");
-#pragma zpsym("temp_y");
-#pragma zpsym("temp_int");
 #pragma zpsym("current_screen");
 unsigned int nt_adr;
 

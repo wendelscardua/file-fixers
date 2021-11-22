@@ -3,13 +3,11 @@
 #include "dice.h"
 #include "players.h"
 #include "skills.h"
+#include "temp.h"
 #include "wram.h"
 
 #pragma code-name ("CODE")
 #pragma rodata-name ("RODATA")
-
-extern unsigned char i;
-#pragma zpsym("i")
 
 void initialize_party() {
   // TODO replace with proper initialization
