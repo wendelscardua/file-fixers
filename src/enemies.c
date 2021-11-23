@@ -55,9 +55,9 @@ void spawn_enemy(unsigned char entity_slot) {
   entity_lv[entity_slot] = temp;
 
   // hp = lv d8
-  i = 0;
+  i = temp;
   while(temp > 0) {
-    i += subrand8(8);
+    i += subrand8(7);
     temp--;
   }
   entity_hp[entity_slot] = i;
