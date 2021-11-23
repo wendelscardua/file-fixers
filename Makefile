@@ -61,6 +61,7 @@ src/dungeon.s: src/dungeon.c \
                src/dungeon.h \
                src/entities.h \
                src/temp.h \
+               src/wram.h \
                assets/sectors.h
 	cc65 -Oirs $< --add-source ${CA65_FLAGS}
 

@@ -11,7 +11,7 @@
 unsigned int wram_start;
 
 unsigned char dungeon_layout_initialized;
-unsigned char wram_dungeon_layout[NUM_DUNGEONS * NUM_SECTORS];
+unsigned char wram_dungeon_layout[NUM_DUNGEONS][NUM_SECTORS];
 
 unsigned char party_initialized;
 unsigned char player_name[4][5];

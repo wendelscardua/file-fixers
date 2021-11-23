@@ -1,3 +1,6 @@
+#ifndef _DUNGEON_H_
+#define _DUNGEON_H_
+
 #define NUM_SECTORS 16
 #define NUM_DUNGEONS 4
 
@@ -9,7 +12,7 @@ typedef enum {
               LockedMetatile
 } sector_metatile;
 
-void __fastcall__ generate_layout(unsigned char * dungeon_layout);
+void __fastcall__ generate_layout();
 void __fastcall__ start_dungeon(unsigned char dungeon_index);
 void __fastcall__ load_dungeon_sector(unsigned char sector_index);
 void __fastcall__ draw_dungeon_sprites(void);
@@ -26,3 +29,5 @@ extern unsigned char sector_locked;
 #pragma zpsym("sector_down_row")
 #pragma zpsym("sector_down_column")
 #pragma zpsym("sector_locked")
+
+#endif

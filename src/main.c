@@ -557,7 +557,7 @@ void start_game (void) {
 #else
     dungeon_layout_initialized = 1;
 #endif
-    generate_layout(wram_dungeon_layout);
+    generate_layout();
   }
 
   // TODO initialize later, maybe on config

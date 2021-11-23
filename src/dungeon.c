@@ -3,6 +3,7 @@
 #include "dungeon.h"
 #include "entities.h"
 #include "temp.h"
+#include "wram.h"
 #include "../assets/sectors.h"
 
 #pragma code-name ("CODE")
@@ -22,15 +23,12 @@ unsigned char sector_locked;
 
 unsigned char * current_sector;
 unsigned char * current_sector_room_data;
-unsigned char * dungeon_layout;
 unsigned char current_dungeon_index, current_sector_index;
 
-void generate_layout(unsigned char * dungeon_layout_buffer) {
-  dungeon_layout = dungeon_layout_buffer;
-  temp_int = 0;
+void generate_layout() {
   for(temp_y = 0; temp_y < NUM_DUNGEONS; temp_y++) {
     for(temp_x = 0; temp_x < NUM_SECTORS; temp_x++) {
-      dungeon_layout[temp_int++] = rand8() % NUM_SECTOR_TEMPLATES;
+      wram_dungeon_layout[temp_y][temp_x] = rand8() % NUM_SECTOR_TEMPLATES;
     }
   }
 }
@@ -45,7 +43,7 @@ void start_dungeon(unsigned char dungeon_index) {
 
 void load_dungeon_sector(unsigned char sector_index) {
   current_sector_index = sector_index;
-  temp = dungeon_layout[current_dungeon_index * NUM_SECTORS + current_sector_index];
+  temp = wram_dungeon_layout[current_dungeon_index][current_sector_index];
   /*
     temp tells which sector template to use now...
     but also tells (via bit 7) if the current sector was already completed
@@ -115,7 +113,7 @@ void unlock_sector() {
 
   if (current_sector_index == NUM_SECTORS - 1) return; // TODO: dungeon completion
 
-  dungeon_layout[current_dungeon_index * NUM_SECTORS + current_sector_index] |= 0x80;
+  wram_dungeon_layout[current_dungeon_index][current_sector_index] |= 0x80;
 
   nt_adr = 0x2084 + sector_down_row * 0x40 + sector_down_column * 0x02;
 
