@@ -252,6 +252,20 @@ void entity_movement_handler() {
   }
   if (entity_aux == 0) {
     current_entity_state = EntityInput;
+
+    if (!sector_locked && entity_row[current_entity] == sector_down_row && entity_col[current_entity] == sector_down_column) {
+      oam_clear();
+      load_dungeon_sector(current_sector_index + 1);
+      init_entities(sector_up_row, sector_up_column);
+    } else if (entity_row[current_entity] == sector_up_row && entity_col[current_entity] == sector_up_column) {
+      oam_clear();
+      if (current_sector_index == 0) {
+        // TODO: return to OS
+      } else {
+        load_dungeon_sector(current_sector_index - 1);
+        init_entities(sector_down_row, sector_down_column);
+      }
+    }
   }
 }
 
