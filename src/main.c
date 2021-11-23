@@ -10,6 +10,7 @@
 #include "irq_buffer.h"
 #include "nametable_loader.h"
 #include "players.h"
+#include "temp.h"
 #include "wram.h"
 #include "../assets/nametables.h"
 #include "../assets/palettes.h"
@@ -50,13 +51,7 @@
 #pragma bss-name(push, "ZEROPAGE")
 
 // GLOBAL VARIABLES
-unsigned char arg1;
-unsigned char arg2;
-unsigned char pad1;
-unsigned char pad1_new;
-
-unsigned char temp, i, unseeded, temp_x, temp_y;
-unsigned int temp_int, temp_int_x, temp_int_y;
+unsigned char unseeded;
 
 // Game stuff
 enum game_state {
@@ -562,7 +557,7 @@ void start_game (void) {
 #else
     dungeon_layout_initialized = 1;
 #endif
-    generate_layout(wram_dungeon_layout);
+    generate_layout();
   }
 
   // TODO initialize later, maybe on config

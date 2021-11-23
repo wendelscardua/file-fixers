@@ -6,6 +6,7 @@
 #include "enemies.h"
 #include "entities.h"
 #include "irq_buffer.h"
+#include "temp.h"
 #include "wram.h"
 #include "../assets/enemy-stats.h"
 #include "../assets/sprites.h"
@@ -14,10 +15,8 @@
 #pragma rodata-name ("RODATA")
 
 #pragma bss-name(push, "ZEROPAGE")
-extern unsigned char i, temp, temp_x, temp_y, pad1_new;
-extern unsigned int temp_int;
 
-unsigned char num_entities;
+unsigned char num_entities, num_enemies;
 unsigned char entity_aux;
 unsigned char temp_w, temp_h;
 unsigned char menu_cursor_row, menu_cursor_col;
@@ -27,13 +26,6 @@ unsigned char skill_target_row, skill_target_col;
 unsigned char skill_target_entity;
 
 unsigned char turn_counter;
-
-#pragma zpsym("i");
-#pragma zpsym("temp");
-#pragma zpsym("temp_x");
-#pragma zpsym("temp_y");
-#pragma zpsym("temp_int");
-#pragma zpsym("pad1_new");
 
 #pragma bss-name(pop)
 
@@ -90,7 +82,9 @@ void init_entities(unsigned char stairs_row, unsigned char stairs_col) {
   entity_col[1] = stairs_col - 1;
   entity_col[3] = stairs_col + 1;
 
-  while (num_entities == 4) {
+  num_enemies = 0;
+
+  while (num_enemies == 0) {
     room_ptr = current_sector_room_data;
     while((temp_x = *room_ptr) != 0xff) {
       ++room_ptr;
@@ -106,6 +100,7 @@ void init_entities(unsigned char stairs_row, unsigned char stairs_col) {
         entity_col[num_entities] = temp_x + subrand8(temp_w);
         entity_row[num_entities] = temp_y + subrand8(temp_h);
         num_entities++;
+        num_enemies++;
       }
     }
   }
@@ -257,6 +252,20 @@ void entity_movement_handler() {
   }
   if (entity_aux == 0) {
     current_entity_state = EntityInput;
+
+    if (!sector_locked && entity_row[current_entity] == sector_down_row && entity_col[current_entity] == sector_down_column) {
+      oam_clear();
+      load_dungeon_sector(current_sector_index + 1);
+      init_entities(sector_up_row, sector_up_column);
+    } else if (entity_row[current_entity] == sector_up_row && entity_col[current_entity] == sector_up_column) {
+      oam_clear();
+      if (current_sector_index == 0) {
+        // TODO: return to OS
+      } else {
+        load_dungeon_sector(current_sector_index - 1);
+        init_entities(sector_down_row, sector_down_column);
+      }
+    }
   }
 }
 
@@ -362,7 +371,7 @@ const unsigned int xp_per_level[] =
 
 void gain_exp() {
   unsigned int exp, temp_exp, temp_goal;
-  if (current_entity >= 4) return;
+  if (current_entity >= 4 || skill_target_entity < 4) return;
 
   exp = entity_lv[skill_target_entity];
   // ML * ML + 1
@@ -389,15 +398,21 @@ void gain_exp() {
       player_xp[i] = player_xp[i] + temp_exp - temp_goal;
       // TODO: maybe check if they can gain multiple levels
       ++entity_lv[i];
+      if (entity_lv[i] > party_level) party_level = entity_lv[i];
 
       // TODO: maybe per class?
       temp = subrand8(7) + 1;
       player_max_hp[i] += temp;
       entity_hp[i] += temp;
-      if (entity_hp[i] > player_max_hp[i]) entity_hp[i] = player_max_hp[i];
     } else {
       player_xp[i] += temp_exp;
     }
+  }
+
+  num_enemies--;
+
+  if (num_enemies == 0 && sector_locked) {
+    unlock_sector();
   }
 }
 
@@ -461,13 +476,14 @@ void regen() {
 void next_entity() {
   if (num_entities == 0) return;
 
-  ++current_entity;
-  if (current_entity >= num_entities) {
-    current_entity = 0;
-    ++turn_counter;
-  }
-
   while(1) {
+    ++current_entity;
+    if (current_entity >= num_entities) {
+      current_entity = 0;
+      ++turn_counter;
+    }
+    if (entity_hp[current_entity] == 0) continue;
+
     entity_turn_counter[current_entity] += entity_speed[current_entity];
     if (entity_turn_counter[current_entity] >= NORMAL_SPEED) {
       entity_turn_counter[current_entity] -= NORMAL_SPEED;
@@ -482,10 +498,6 @@ void next_entity() {
 
       refresh_hud();
       break;
-    }
-    ++current_entity;
-    if (current_entity >= num_entities) {
-      current_entity = 0;
     }
   }
 }

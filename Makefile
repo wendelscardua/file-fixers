@@ -21,9 +21,10 @@ ${TARGET}: src/main.o src/crt0.o src/lib/unrle.o src/lib/subrand.o \
            src/nametable_loader.o \
            src/dungeon.o \
            src/irq_buffer.o \
-           src/players.o \
            src/entities.o  \
            src/enemies.o \
+           src/players.o \
+           src/temp.o \
            src/wram.o \
            assets/nametables.o \
            assets/palettes.o \
@@ -59,6 +60,8 @@ src/dungeon.s: src/dungeon.c \
                src/lib/neslib.h \
                src/dungeon.h \
                src/entities.h \
+               src/temp.h \
+               src/wram.h \
                assets/sectors.h
 	cc65 -Oirs $< --add-source ${CA65_FLAGS}
 
@@ -71,6 +74,7 @@ src/entities.s: src/entities.c \
                 src/enemies.h \
                 src/entities.h \
                 src/irq_buffer.h \
+                src/temp.h \
                 src/wram.h \
                 assets/enemy-stats.h \
                 assets/sprites.h
@@ -81,6 +85,7 @@ src/enemies.s: src/enemies.c \
                src/dungeon.h \
                src/enemies.h \
                src/entities.h \
+               src/temp.h \
                src/wram.h \
                assets/enemy-stats.h
 	cc65 -Oirs $< --add-source ${CA65_FLAGS}
@@ -93,7 +98,11 @@ src/players.s: src/players.c \
                src/charmap.h \
                src/dice.h \
                src/skills.h \
+               src/temp.h \
                src/wram.h
+	cc65 -Oirs $< --add-source ${CA65_FLAGS}
+
+src/temp.s: src/temp.c
 	cc65 -Oirs $< --add-source ${CA65_FLAGS}
 
 src/wram.s: src/wram.c \

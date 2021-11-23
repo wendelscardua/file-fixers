@@ -2,16 +2,13 @@
 #include "dungeon.h"
 #include "enemies.h"
 #include "entities.h"
+#include "temp.h"
 #include "wram.h"
 #include "../assets/enemy-stats.h"
 
 _Static_assert(Player == NUM_ENEMY_TYPES, "entity_type_enum must be aligned with number of enemies");
 
 #pragma bss-name(push, "ZEROPAGE")
-extern unsigned char i, temp;
-
-#pragma zpsym("i");
-#pragma zpsym("temp");
 
 unsigned char average_difficulty, min_difficulty;
 
@@ -58,9 +55,9 @@ void spawn_enemy(unsigned char entity_slot) {
   entity_lv[entity_slot] = temp;
 
   // hp = lv d8
-  i = 0;
+  i = temp;
   while(temp > 0) {
-    i += subrand8(8);
+    i += subrand8(7);
     temp--;
   }
   entity_hp[entity_slot] = i;
