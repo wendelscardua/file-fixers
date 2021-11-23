@@ -7,7 +7,7 @@
 
 extern unsigned char unrle_buffer[];
 extern unsigned char dungeon_layout_initialized;
-extern unsigned char wram_dungeon_layout[NUM_DUNGEONS][NUM_SECTORS];
+extern unsigned char dungeon_layout[NUM_DUNGEONS][NUM_SECTORS];
 
 extern unsigned char party_initialized;
 extern unsigned char player_name[4][5];
