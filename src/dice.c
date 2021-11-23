@@ -5,13 +5,12 @@
 #pragma rodata-name ("RODATA")
 
 #pragma bss-name(push, "ZEROPAGE")
-unsigned char amount, sides, total;
+unsigned char total;
 #pragma bss-name(pop)
 
-unsigned char roll_dice(unsigned char dice_spec) {
-  amount = dice_spec & 0b111;
-  sides = (dice_spec >> 3) - 1;
+unsigned char roll_dice(unsigned char amount, unsigned char sides) {
   total = amount;
+  --sides;
   while(amount > 0) {
     --amount;
     total += subrand8(sides);

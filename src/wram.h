@@ -1,5 +1,6 @@
 #ifndef _WRAM_H_
 #define _WRAM_H_
+#include "dice.h"
 #include "dungeon.h"
 #include "entities.h"
 #include "players.h"
@@ -22,7 +23,7 @@ extern unsigned char entity_lv[];
 extern unsigned char entity_speed[];
 extern unsigned char entity_moves[];
 extern unsigned char entity_hp[];
-extern unsigned char entity_attack[];
+extern dice_spec_t entity_attack[];
 
 void init_wram (void);
 

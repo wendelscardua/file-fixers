@@ -10,6 +10,8 @@
 #pragma rodata-name ("RODATA")
 
 void initialize_party() {
+  const dice_spec_t default_attack = { 6, 1 };
+
   // TODO replace with proper initialization
   for(i = 0; i < 4; i++) {
     player_xp[i] = 0;
@@ -27,7 +29,7 @@ void initialize_party() {
     entity_type[i] = Player;
     entity_speed[i] = NORMAL_SPEED;
     entity_moves[i] = 1;
-    entity_attack[i] = DICE(1,6);
+    entity_attack[i] = default_attack;
     // TODO: maybe per class?
     player_max_hp[i] = entity_hp[i] = 16;
   }

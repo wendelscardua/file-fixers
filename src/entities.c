@@ -425,7 +425,7 @@ void entity_action_handler() {
     entity_aux++;
     if (entity_aux >= BASIC_SKILL_ANIM_LEN) {
       if (melee_to_hit()) {
-        temp = roll_dice(entity_attack[current_entity]);
+        temp = roll_dice(entity_attack[current_entity].amount, entity_attack[current_entity].sides);
         if (entity_hp[skill_target_entity] <= temp) {
           entity_hp[skill_target_entity] = 0;
           gain_exp();

@@ -1,4 +1,5 @@
 #include "lib/neslib.h"
+#include "dice.h"
 #include "dungeon.h"
 #include "entities.h"
 #include "players.h"
@@ -26,7 +27,7 @@ unsigned char entity_lv[MAX_ENTITIES];
 unsigned char entity_speed[MAX_ENTITIES];
 unsigned char entity_moves[MAX_ENTITIES];
 unsigned char entity_hp[MAX_ENTITIES];
-unsigned char entity_attack[MAX_ENTITIES];
+dice_spec_t entity_attack[MAX_ENTITIES];
 
 // this one doesn't need to be saved, it's here because of space
 // TODO: optimize it away
