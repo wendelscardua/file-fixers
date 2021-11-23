@@ -74,7 +74,7 @@ void load_dungeon_sector(unsigned char sector_index) {
       case DownMetatile:
         sector_down_row = temp_y;
         sector_down_column = temp_x;
-        if (!(temp & 0x80)) {
+        if (sector_locked) {
           mt = LockedMetatile;
         } else if (sector_index == NUM_SECTORS - 1) {
           mt = GroundMetatile;
