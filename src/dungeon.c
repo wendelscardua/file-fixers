@@ -109,9 +109,12 @@ void draw_dungeon_sprites() {
 }
 
 void unlock_sector() {
-  if (!sector_locked) return;
+  if (!sector_locked || current_sector_index == NUM_SECTORS - 1) return;
 
   sector_locked = 0;
+
+  if (current_sector_index == NUM_SECTORS - 1) return; // TODO: dungeon completion
+
   dungeon_layout[current_dungeon_index * NUM_SECTORS + current_sector_index] |= 0x80;
 
   nt_adr = 0x2084 + sector_down_row * 0x40 + sector_down_column * 0x02;
