@@ -404,7 +404,6 @@ void gain_exp() {
       temp = subrand8(7) + 1;
       player_max_hp[i] += temp;
       entity_hp[i] += temp;
-      if (entity_hp[i] > player_max_hp[i]) entity_hp[i] = player_max_hp[i];
     } else {
       player_xp[i] += temp_exp;
     }
