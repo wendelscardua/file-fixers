@@ -398,6 +398,7 @@ void gain_exp() {
       player_xp[i] = player_xp[i] + temp_exp - temp_goal;
       // TODO: maybe check if they can gain multiple levels
       ++entity_lv[i];
+      if (entity_lv[i] > party_level) party_level = entity_lv[i];
 
       // TODO: maybe per class?
       temp = subrand8(7) + 1;
