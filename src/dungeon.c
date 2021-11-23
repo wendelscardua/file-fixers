@@ -29,7 +29,7 @@ void generate_layout(unsigned char * dungeon_layout_buffer) {
   dungeon_layout = dungeon_layout_buffer;
   temp_int = 0;
   for(temp_y = 0; temp_y < NUM_DUNGEONS; temp_y++) {
-    for(temp_x = 0; temp_x < NUM_DUNGEON_LEVELS; temp_x++) {
+    for(temp_x = 0; temp_x < NUM_SECTORS; temp_x++) {
       dungeon_layout[temp_int++] = rand8() % NUM_SECTOR_TEMPLATES;
     }
   }
@@ -45,7 +45,7 @@ void start_dungeon(unsigned char dungeon_index) {
 
 void load_dungeon_sector(unsigned char sector_index) {
   current_sector_index = sector_index;
-  temp = dungeon_layout[current_dungeon_index * NUM_DUNGEON_LEVELS + current_sector_index];
+  temp = dungeon_layout[current_dungeon_index * NUM_SECTORS + current_sector_index];
   /*
     temp tells which sector template to use now...
     but also tells (via bit 7) if the current sector was already completed
@@ -78,7 +78,7 @@ void load_dungeon_sector(unsigned char sector_index) {
         sector_down_column = temp_x;
         if (!(temp & 0x80)) {
           mt = LockedMetatile;
-        } else if (sector_index == NUM_DUNGEON_LEVELS - 1) {
+        } else if (sector_index == NUM_SECTORS - 1) {
           mt = GroundMetatile;
           sector_down_row = 0xff;
           sector_down_column = 0xff;
@@ -112,7 +112,7 @@ void unlock_sector() {
   if (!sector_locked) return;
 
   sector_locked = 0;
-  dungeon_layout[current_dungeon_index * NUM_DUNGEON_LEVELS + current_sector_index] |= 0x80;
+  dungeon_layout[current_dungeon_index * NUM_SECTORS + current_sector_index] |= 0x80;
 
   nt_adr = 0x2084 + sector_down_row * 0x40 + sector_down_column * 0x02;
 

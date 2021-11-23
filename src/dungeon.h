@@ -1,4 +1,4 @@
-#define NUM_DUNGEON_LEVELS 16
+#define NUM_SECTORS 16
 #define NUM_DUNGEONS 4
 
 typedef enum {
