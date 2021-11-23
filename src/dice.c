@@ -18,3 +18,7 @@ unsigned char roll_dice(unsigned char dice_spec) {
   }
   return total;
 }
+
+unsigned char roll_die(unsigned char sides) {
+  return 1 + subrand8(sides - 1);
+}
