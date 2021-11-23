@@ -1,6 +1,7 @@
 #include "lib/nesdoug.h"
 #include "lib/neslib.h"
 #include "lib/subrand.h"
+#include "dice.h"
 #include "directions.h"
 #include "dungeon.h"
 #include "enemies.h"
@@ -414,18 +415,6 @@ void gain_exp() {
   if (num_enemies == 0 && sector_locked) {
     unlock_sector();
   }
-}
-
-unsigned char roll_dice(unsigned char dice_spec) {
-  unsigned char amount, sides, total;
-  amount = dice_spec & 0b111;
-  sides = (dice_spec >> 3) - 1;
-  total = amount;
-  while(amount > 0) {
-    --amount;
-    total += subrand8(sides);
-  }
-  return total;
 }
 
 #define BASIC_SKILL_ANIM_LEN 0x18
