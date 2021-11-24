@@ -34,6 +34,12 @@ void generate_layout() {
   }
 }
 
+void check_dungeon_completion() {
+  if (yendors & (1 << current_dungeon_index)) {
+    yendors |= (16 << current_dungeon_index);
+  }
+}
+
 void start_dungeon(unsigned char dungeon_index) {
   current_dungeon_index = dungeon_index;
   current_sector_index = 0;

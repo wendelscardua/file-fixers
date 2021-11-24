@@ -263,6 +263,7 @@ void entity_movement_handler() {
     } else if (entity_row[current_entity] == sector_up_row && entity_col[current_entity] == sector_up_column) {
       oam_clear();
       if (current_sector_index == 0) {
+        check_dungeon_completion();
         // TODO: return to OS
       } else {
         load_dungeon_sector(current_sector_index - 1);

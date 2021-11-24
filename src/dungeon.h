@@ -12,7 +12,8 @@ typedef enum {
               LockedMetatile
 } sector_metatile;
 
-void __fastcall__ generate_layout();
+void __fastcall__ generate_layout(void);
+void __fastcall__ check_dungeon_completion(void);
 void __fastcall__ start_dungeon(unsigned char dungeon_index);
 void __fastcall__ load_dungeon_sector(unsigned char sector_index);
 void __fastcall__ draw_dungeon_sprites(void);
