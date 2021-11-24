@@ -44,6 +44,10 @@ unsigned char dungeon_completed(unsigned char dungeon_index) {
   return yendors & (16 << dungeon_index);
 }
 
+unsigned char has_current_dungeon_yendor() {
+  return yendors & (1 << current_dungeon_index);
+}
+
 void start_dungeon(unsigned char dungeon_index) {
   current_dungeon_index = dungeon_index;
   current_sector_index = 0;

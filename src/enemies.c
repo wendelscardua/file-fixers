@@ -22,8 +22,13 @@ unsigned char num_eligible_types;
 #pragma rodata-name ("RODATA")
 
 unsigned char select_enemy_type () {
-  average_difficulty = (party_level + current_sector_index + 1) / 2;
-  min_difficulty = (current_sector_index + 1) / 6;
+  if (has_current_dungeon_yendor()) {
+    temp = NUM_SECTORS;
+  } else {
+    temp = current_sector_index + 1;
+  }
+  average_difficulty = (party_level + temp) / 2;
+  min_difficulty = temp / 6;
   for(i = 0; i < NUM_ENEMY_TYPES; i++) {
     if (enemy_difficulty[i] <= average_difficulty &&
         enemy_difficulty[i] >= min_difficulty) {
