@@ -64,7 +64,9 @@ src/dice.s: src/dice.c \
 	cc65 -Oirs $< --add-source ${CA65_FLAGS}
 
 src/castle.s: src/castle.c \
-              src/castle.h
+              src/castle.h \
+              src/lib/neslib.h \
+              assets/sprites.h
 	cc65 -Oirs $< --add-source ${CA65_FLAGS}
 
 src/dungeon.s: src/dungeon.c \
