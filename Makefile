@@ -163,6 +163,7 @@ assets/sectors.o: assets/sectors.s assets/sectors.h src/charmap.inc \
 
 assets/palettes.o: assets/palettes.s assets/palettes.h \
                    assets/bg.pal assets/sprites.pal \
+                   assets/bg-castle.pal assets/sprites-castle.pal \
                    assets/bg-dungeon.pal assets/sprites-dungeon.pal
 	ca65 $< ${CA65_FLAGS}
 
