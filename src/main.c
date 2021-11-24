@@ -380,7 +380,7 @@ const unsigned char drivers_window_right[]    = {    2,    2,    2,    4,    4 }
 
 void drivers_window_default_cursor_handler() {
   if (cursor_target_x == cursor_x && cursor_target_y == cursor_y
-      && dungeon_completed(cursor_index - 1)) {
+      && cursor_index > 0 && dungeon_completed(cursor_index - 1)) {
     current_cursor_state = Disabled;
   }
   if (pad1_new) {
