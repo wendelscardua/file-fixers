@@ -69,7 +69,8 @@ signed int cursor_dx, cursor_dy;
 enum cursor_state {
                    Default,
                    Clicking,
-                   Loading
+                   Loading,
+                   Disabled
 } current_cursor_state;
 
 unsigned char current_screen;
@@ -398,11 +399,14 @@ void drivers_window_default_cursor_handler() {
     }
 
     if (cursor_target_x == cursor_x && cursor_target_y == cursor_y) {
-      if (pad1_new & PAD_A) {
+      if (dungeon_completed(cursor_index)) {
+        current_cursor_state = Disabled;
+      } else if (pad1_new & PAD_A) {
         current_cursor_state = Clicking;
         cursor_counter = CLICK_DELAY;
       }
     } else {
+      current_cursor_state = Default;
       set_cursor_speed();
     }
   }
