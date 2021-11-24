@@ -19,6 +19,7 @@ debug: ${TARGET}
 
 ${TARGET}: src/main.o src/crt0.o src/lib/unrle.o src/lib/subrand.o \
            src/nametable_loader.o \
+           src/castle.o \
            src/dice.o \
            src/dungeon.o \
            src/irq_buffer.o \
@@ -42,6 +43,7 @@ src/main.s: src/main.c \
             src/lib/neslib.h \
             src/lib/unrle.h \
             src/mmc3/mmc3_code.h \
+            src/castle.h \
             src/dungeon.h \
             src/irq_buffer.h \
             src/nametable_loader.h \
@@ -59,6 +61,10 @@ src/nametable_loader.s: src/nametable_loader.c \
 src/dice.s: src/dice.c \
             src/dice.h \
             src/lib/subrand.h
+	cc65 -Oirs $< --add-source ${CA65_FLAGS}
+
+src/castle.s: src/castle.c \
+              src/castle.h
 	cc65 -Oirs $< --add-source ${CA65_FLAGS}
 
 src/dungeon.s: src/dungeon.c \

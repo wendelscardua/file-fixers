@@ -6,6 +6,7 @@
 #include "lib/neslib.h"
 #include "lib/unrle.h"
 #include "mmc3/mmc3_code.h"
+#include "castle.h"
 #include "dungeon.h"
 #include "irq_buffer.h"
 #include "nametable_loader.h"
@@ -59,7 +60,8 @@ enum game_state {
                  MainWindow,
                  DriversWindow,
                  AboutWindow,
-                 Dungeon
+                 Dungeon,
+                 Castle
 } current_game_state;
 
 unsigned char cursor_index, cursor_counter;
@@ -147,6 +149,8 @@ void main (void) {
       break;
     case Dungeon:
       dungeon_handler();
+    case Castle:
+      castle_handler();
     }
 
     // load the irq array with values it parse
@@ -183,6 +187,9 @@ void draw_sprites (void) {
     break;
   case Dungeon:
     draw_dungeon_sprites();
+    break;
+  case Castle:
+    draw_castle_sprites();
     break;
   }
 }
