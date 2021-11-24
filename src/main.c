@@ -224,6 +224,8 @@ void go_to_title (void) {
   set_chr_mode_3(BG_MAIN_1);
   set_chr_mode_4(BG_MAIN_2);
   set_chr_mode_5(BG_MAIN_3);
+  set_chr_mode_0(SPRITE_0);
+  set_chr_mode_1(SPRITE_1);
 
   pal_bg(bg_palette);
   pal_spr(sprites_palette);
@@ -663,6 +665,8 @@ void go_to_castle (void) {
   set_chr_mode_3(BG_MAIN_1);
   set_chr_mode_4(BG_MAIN_2);
   set_chr_mode_5(BG_MAIN_3);
+  set_chr_mode_0(SPRITE_PLAYERS_0);
+  set_chr_mode_1(SPRITE_0);
 
   pal_bg(castle_bg_palette);
   pal_spr(castle_sprites_palette);

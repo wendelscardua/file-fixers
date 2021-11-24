@@ -297,15 +297,15 @@ _player_sprite:
 .endrepeat
 
 _amda_sprite:
-.byte   0,  0,$08,2
-.byte   8,  0,$09,2
-.byte   0,  8,$18,2
-.byte   8,  8,$19,2
+.byte   0,  0,$88,2
+.byte   8,  0,$89,2
+.byte   0,  8,$98,2
+.byte   8,  8,$99,2
 .byte $80
 
 _intelle_sprite:
-.byte   0,  0,$0a,3
-.byte   8,  0,$0b,3
-.byte   0,  8,$1a,3
-.byte   8,  8,$1b,3
+.byte   0,  0,$8a,3
+.byte   8,  0,$8b,3
+.byte   0,  8,$9a,3
+.byte   8,  8,$9b,3
 .byte $80
