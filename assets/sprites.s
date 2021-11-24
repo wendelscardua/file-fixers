@@ -7,6 +7,7 @@
 .export _default_cursor_sprite
 .export _clicking_cursor_sprite
 .export _loading_cursor_sprite
+.export _disabled_cursor_sprite
 .export _menu_cursor_sprite
 .export _melee_sprite
 .export _player_sprite
@@ -35,6 +36,15 @@ _loading_cursor_sprite:
 .byte   0,- 8,$05,0
 .byte - 8,  0,$14,0
 .byte   0,  0,$15,0
+.byte $80
+
+_disabled_cursor_sprite:
+
+.byte - 8,- 8,$06,0
+.byte   0,- 8,$07,0
+.byte - 8,  0,$16,0
+.byte   0,  0,$17,0
+
 .byte $80
 
 _menu_cursor_sprite:
