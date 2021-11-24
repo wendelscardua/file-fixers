@@ -94,6 +94,7 @@ void drivers_window_default_cursor_handler (void);
 void drivers_window_loading_handler (void);
 void drivers_window_handler (void);
 void flip_screen (void);
+void go_to_castle (void);
 void go_to_title (void);
 void init_wram (void);
 void main_window_default_cursor_handler (void);
@@ -318,7 +319,7 @@ void main_window_loading_handler () {
     break;
   case 1: // Castle.exe
     current_cursor_state = Default;
-    // TODO: go to castle
+    go_to_castle();
     break;
   case 2: // Drivers
     if (cursor_counter == 0) {
@@ -637,4 +638,59 @@ void flip_screen (void) {
     current_screen = 0;
     set_scroll_y(0x000);
   }
+}
+
+void go_to_castle (void) {
+  current_game_state = Castle;
+
+  if (irq_array[0] != 0xff) {
+    while(!is_irq_done() ){}
+    irq_array[0] = 0xff;
+    double_buffer[0] = 0xff;
+  }
+
+  clear_vram_buffer();
+
+  pal_fade_to(4, 0);
+  ppu_off();
+  vram_adr(NTADR_A(0,0));
+  vram_unrle(castle_nametable);
+
+  set_scroll_x(0);
+  set_scroll_y(0);
+
+  set_chr_mode_2(BG_MAIN_0);
+  set_chr_mode_3(BG_MAIN_1);
+  set_chr_mode_4(BG_MAIN_2);
+  set_chr_mode_5(BG_MAIN_3);
+
+  pal_bg(castle_bg_palette);
+  pal_spr(castle_sprites_palette);
+
+  ppu_on_all();
+  pal_fade_to(0, 4);
+}
+
+void return_from_castle() {
+  current_game_state = MainWindow;
+  current_cursor_state = Default;
+  oam_clear();
+  pal_fade_to(4, 0);
+  ppu_off();
+  set_chr_mode_2(BG_MAIN_0);
+  set_chr_mode_3(BG_MAIN_1);
+  set_chr_mode_4(BG_MAIN_2);
+  set_chr_mode_5(BG_MAIN_3);
+  set_chr_mode_0(SPRITE_0);
+  set_chr_mode_1(SPRITE_1);
+  pal_bg(bg_palette);
+  pal_spr(sprites_palette);
+  vram_adr(NTADR_A(0,0));
+  vram_unrle(main_window_nametable);
+  set_scroll_x(0);
+  set_scroll_y(0);
+  current_screen = 0;
+
+  ppu_on_all();
+  pal_fade_to(0, 4);
 }
