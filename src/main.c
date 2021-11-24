@@ -371,12 +371,13 @@ void draw_drivers_window_sprites() {
   draw_cursor();
 }
 
+// close, top left, top right, bottom left, bottom right
 const unsigned char drivers_window_target_x[] = { 0xbc, 0x38, 0x78, 0x38, 0x78 };
 const unsigned char drivers_window_target_y[] = { 0x44, 0x58, 0x58, 0x88, 0x88 };
-const unsigned char drivers_window_up[]       = {    2,    0,    0,    1,    2 };
+const unsigned char drivers_window_up[]       = {    0,    0,    0,    1,    2 };
 const unsigned char drivers_window_down[]     = {    2,    3,    4,    3,    4 };
 const unsigned char drivers_window_left[]     = {    2,    1,    1,    3,    3 };
-const unsigned char drivers_window_right[]    = {    2,    2,    2,    4,    4 };
+const unsigned char drivers_window_right[]    = {    0,    2,    0,    4,    0 };
 
 void drivers_window_default_cursor_handler() {
   if (cursor_target_x == cursor_x && cursor_target_y == cursor_y
