@@ -108,11 +108,14 @@ void draw_dungeon_sprites() {
 }
 
 void unlock_sector() {
-  if (!sector_locked || current_sector_index == NUM_SECTORS - 1) return;
+  if (!sector_locked) return;
 
   sector_locked = 0;
 
-  if (current_sector_index == NUM_SECTORS - 1) return; // TODO: dungeon completion
+  if (current_sector_index == NUM_SECTORS - 1) {
+    yendors |= (1 << current_dungeon_index);
+    return;
+  }
 
   dungeon_layout[current_dungeon_index][current_sector_index] |= 0x80;
 
