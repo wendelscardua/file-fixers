@@ -132,7 +132,8 @@ assets/nametables.o: assets/nametables.s assets/nametables.h \
                      assets/nametables/main-window.rle \
                      assets/nametables/drivers-window.rle \
                      assets/nametables/dungeon-hud.rle \
-                     assets/nametables/actions-menu.rle
+                     assets/nametables/actions-menu.rle \
+                     assets/nametables/castle.rle
 	ca65 $< ${CA65_FLAGS}
 
 assets/sectors.o: assets/sectors.s assets/sectors.h src/charmap.inc \

@@ -14,3 +14,6 @@ _dungeon_hud_nametable: .incbin "nametables/dungeon-hud.rle"
 
 .export _actions_menu_nametable
 _actions_menu_nametable: .incbin "nametables/actions-menu.rle"
+
+.export _castle_nametable
+_castle_nametable: .incbin "nametables/castle.rle"
