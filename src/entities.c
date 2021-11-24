@@ -332,7 +332,7 @@ unsigned char melee_to_hit() {
   to_hit_bonus += 7; // default AC = 7
 
 
-  return (to_hit_bonus > subrand8(19) + 1);
+  return (to_hit_bonus > roll_die(20));
 }
 
 const unsigned int xp_per_level[] =
@@ -402,7 +402,7 @@ void gain_exp() {
       if (entity_lv[i] > party_level) party_level = entity_lv[i];
 
       // TODO: maybe per class?
-      temp = subrand8(7) + 1;
+      temp = roll_die(8);
       player_max_hp[i] += temp;
       entity_hp[i] += temp;
     } else {
@@ -448,7 +448,7 @@ void regen() {
       entity_hp[current_entity] < player_max_hp[current_entity]) {
     if (entity_lv[current_entity] >= 10) {
       // TODO: base on constitution?
-      temp = subrand8(16) + 1;
+      temp = roll_die(16);
       if (temp > entity_lv[current_entity] - 9) {
         temp = entity_lv[current_entity] - 9;
       }

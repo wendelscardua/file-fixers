@@ -64,6 +64,7 @@ src/dice.s: src/dice.c \
 src/dungeon.s: src/dungeon.c \
                src/lib/nesdoug.h \
                src/lib/neslib.h \
+               src/dice.h \
                src/dungeon.h \
                src/entities.h \
                src/temp.h \
@@ -89,6 +90,7 @@ src/entities.s: src/entities.c \
 
 src/enemies.s: src/enemies.c \
                src/lib/subrand.h \
+               src/dice.h \
                src/dungeon.h \
                src/enemies.h \
                src/entities.h \
