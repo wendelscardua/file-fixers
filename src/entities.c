@@ -1,6 +1,7 @@
 #include "lib/nesdoug.h"
 #include "lib/neslib.h"
 #include "lib/subrand.h"
+#include "dice.h"
 #include "directions.h"
 #include "dungeon.h"
 #include "enemies.h"
@@ -331,7 +332,7 @@ unsigned char melee_to_hit() {
   to_hit_bonus += 7; // default AC = 7
 
 
-  return (to_hit_bonus > subrand8(19) + 1);
+  return (to_hit_bonus > roll_die(20));
 }
 
 const unsigned int xp_per_level[] =
@@ -401,7 +402,7 @@ void gain_exp() {
       if (entity_lv[i] > party_level) party_level = entity_lv[i];
 
       // TODO: maybe per class?
-      temp = subrand8(7) + 1;
+      temp = roll_die(8);
       player_max_hp[i] += temp;
       entity_hp[i] += temp;
     } else {
@@ -416,18 +417,6 @@ void gain_exp() {
   }
 }
 
-unsigned char roll_dice(unsigned char dice_spec) {
-  unsigned char amount, sides, total;
-  amount = dice_spec & 0b111;
-  sides = (dice_spec >> 3) - 1;
-  total = amount;
-  while(amount > 0) {
-    --amount;
-    total += subrand8(sides);
-  }
-  return total;
-}
-
 #define BASIC_SKILL_ANIM_LEN 0x18
 
 void entity_action_handler() {
@@ -436,7 +425,7 @@ void entity_action_handler() {
     entity_aux++;
     if (entity_aux >= BASIC_SKILL_ANIM_LEN) {
       if (melee_to_hit()) {
-        temp = roll_dice(entity_attack[current_entity]);
+        temp = roll_dice(entity_attack[current_entity].amount, entity_attack[current_entity].sides);
         if (entity_hp[skill_target_entity] <= temp) {
           entity_hp[skill_target_entity] = 0;
           gain_exp();
@@ -459,7 +448,7 @@ void regen() {
       entity_hp[current_entity] < player_max_hp[current_entity]) {
     if (entity_lv[current_entity] >= 10) {
       // TODO: base on constitution?
-      temp = subrand8(16) + 1;
+      temp = roll_die(16);
       if (temp > entity_lv[current_entity] - 9) {
         temp = entity_lv[current_entity] - 9;
       }

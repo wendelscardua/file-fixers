@@ -1,5 +1,6 @@
 #include "lib/nesdoug.h"
 #include "lib/neslib.h"
+#include "dice.h"
 #include "dungeon.h"
 #include "entities.h"
 #include "temp.h"

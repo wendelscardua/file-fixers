@@ -4,6 +4,7 @@
 *.tiled-session
 data/*.inc
 map.txt
+src/dice.s
 src/dungeon.s
 src/enemies.s
 src/entities.s

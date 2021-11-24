@@ -19,6 +19,7 @@ debug: ${TARGET}
 
 ${TARGET}: src/main.o src/crt0.o src/lib/unrle.o src/lib/subrand.o \
            src/nametable_loader.o \
+           src/dice.o \
            src/dungeon.o \
            src/irq_buffer.o \
            src/entities.o  \
@@ -55,9 +56,15 @@ src/nametable_loader.s: src/nametable_loader.c \
                         src/lib/nesdoug.h
 	cc65 -Oirs $< --add-source ${CA65_FLAGS}
 
+src/dice.s: src/dice.c \
+            src/dice.h \
+            src/lib/subrand.h
+	cc65 -Oirs $< --add-source ${CA65_FLAGS}
+
 src/dungeon.s: src/dungeon.c \
                src/lib/nesdoug.h \
                src/lib/neslib.h \
+               src/dice.h \
                src/dungeon.h \
                src/entities.h \
                src/temp.h \
@@ -69,6 +76,7 @@ src/entities.s: src/entities.c \
                 src/lib/nesdoug.h \
                 src/lib/neslib.h \
                 src/lib/subrand.h \
+                src/dice.h \
                 src/directions.h \
                 src/dungeon.h \
                 src/enemies.h \
@@ -82,6 +90,7 @@ src/entities.s: src/entities.c \
 
 src/enemies.s: src/enemies.c \
                src/lib/subrand.h \
+               src/dice.h \
                src/dungeon.h \
                src/enemies.h \
                src/entities.h \

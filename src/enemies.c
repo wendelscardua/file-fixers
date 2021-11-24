@@ -1,4 +1,5 @@
 #include "lib/subrand.h"
+#include "dice.h"
 #include "dungeon.h"
 #include "enemies.h"
 #include "entities.h"
@@ -55,10 +56,5 @@ void spawn_enemy(unsigned char entity_slot) {
   entity_lv[entity_slot] = temp;
 
   // hp = lv d8
-  i = temp;
-  while(temp > 0) {
-    i += subrand8(7);
-    temp--;
-  }
-  entity_hp[entity_slot] = i;
+  entity_hp[entity_slot] = roll_dice(temp, 8);
 }
