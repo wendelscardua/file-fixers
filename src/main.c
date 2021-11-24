@@ -473,6 +473,34 @@ void drivers_window_loading_handler () {
   }
 }
 
+void return_from_dungeon() {
+  current_game_state = DriversWindow;
+  if (dungeon_completed(cursor_index - 1)) {
+    current_cursor_state = Disabled;
+  } else {
+    current_cursor_state = Default;
+  }
+  oam_clear();
+  pal_fade_to(4, 0);
+  ppu_off();
+  set_chr_mode_2(BG_MAIN_0);
+  set_chr_mode_3(BG_MAIN_1);
+  set_chr_mode_4(BG_MAIN_2);
+  set_chr_mode_5(BG_MAIN_3);
+  set_chr_mode_0(SPRITE_0);
+  set_chr_mode_1(SPRITE_1);
+  pal_bg(bg_palette);
+  pal_spr(sprites_palette);
+  vram_adr(NTADR_A(0,0));
+  vram_unrle(drivers_window_nametable);
+  set_scroll_x(0);
+  set_scroll_y(0);
+  current_screen = 0;
+
+  ppu_on_all();
+  pal_fade_to(0, 4);
+}
+
 // ::CURSOR::
 
 void draw_cursor() {
