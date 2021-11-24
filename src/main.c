@@ -558,6 +558,7 @@ void start_game (void) {
     dungeon_layout_initialized = 1;
 #endif
     generate_layout();
+    yendors = 0;
   }
 
   // TODO initialize later, maybe on config
