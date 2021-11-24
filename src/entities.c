@@ -39,6 +39,8 @@ unsigned char current_entity_moves;
 entity_state_enum current_entity_state;
 unsigned char entity_x, entity_y;
 
+void return_from_dungeon(); // TODO: maybe add a main.h ?
+
 void error() {
   // TODO: error handling?
   multi_vram_buffer_horz("ERROR", 5, NTADR_A(12, 12));
@@ -254,6 +256,8 @@ void entity_movement_handler() {
   if (entity_aux == 0) {
     current_entity_state = EntityInput;
 
+    if (current_entity >= 4) return;
+
     if (!sector_locked && entity_row[current_entity] == sector_down_row && entity_col[current_entity] == sector_down_column) {
       oam_clear();
       load_dungeon_sector(current_sector_index + 1);
@@ -261,7 +265,8 @@ void entity_movement_handler() {
     } else if (entity_row[current_entity] == sector_up_row && entity_col[current_entity] == sector_up_column) {
       oam_clear();
       if (current_sector_index == 0) {
-        // TODO: return to OS
+        check_dungeon_completion();
+        return_from_dungeon();
       } else {
         load_dungeon_sector(current_sector_index - 1);
         init_entities(sector_down_row, sector_down_column);

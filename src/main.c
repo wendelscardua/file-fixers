@@ -69,7 +69,8 @@ signed int cursor_dx, cursor_dy;
 enum cursor_state {
                    Default,
                    Clicking,
-                   Loading
+                   Loading,
+                   Disabled
 } current_cursor_state;
 
 unsigned char current_screen;
@@ -247,6 +248,7 @@ void main_window_handler() {
 
   switch(current_cursor_state) {
   case Default:
+  case Disabled:
     main_window_default_cursor_handler();
     break;
   case Loading:
@@ -354,6 +356,7 @@ void drivers_window_handler() {
 
   switch(current_cursor_state) {
   case Default:
+  case Disabled:
     drivers_window_default_cursor_handler();
     break;
   case Loading:
@@ -376,6 +379,10 @@ const unsigned char drivers_window_left[]     = {    2,    1,    1,    3,    3 }
 const unsigned char drivers_window_right[]    = {    2,    2,    2,    4,    4 };
 
 void drivers_window_default_cursor_handler() {
+  if (cursor_target_x == cursor_x && cursor_target_y == cursor_y
+      && cursor_index > 0 && dungeon_completed(cursor_index - 1)) {
+    current_cursor_state = Disabled;
+  }
   if (pad1_new) {
     signed char nudge_x = cursor_index == 0 ? 0 : rand8() % 8 - 4;
     signed char nudge_y = cursor_index == 0 ? 0 : rand8() % 8 - 4;
@@ -398,11 +405,13 @@ void drivers_window_default_cursor_handler() {
     }
 
     if (cursor_target_x == cursor_x && cursor_target_y == cursor_y) {
-      if (pad1_new & PAD_A) {
+      if (!dungeon_completed(cursor_index - 1)
+          && (pad1_new & PAD_A)) {
         current_cursor_state = Clicking;
         cursor_counter = CLICK_DELAY;
       }
     } else {
+      current_cursor_state = Default;
       set_cursor_speed();
     }
   }
@@ -464,6 +473,34 @@ void drivers_window_loading_handler () {
   }
 }
 
+void return_from_dungeon() {
+  current_game_state = DriversWindow;
+  if (dungeon_completed(cursor_index - 1)) {
+    current_cursor_state = Disabled;
+  } else {
+    current_cursor_state = Default;
+  }
+  oam_clear();
+  pal_fade_to(4, 0);
+  ppu_off();
+  set_chr_mode_2(BG_MAIN_0);
+  set_chr_mode_3(BG_MAIN_1);
+  set_chr_mode_4(BG_MAIN_2);
+  set_chr_mode_5(BG_MAIN_3);
+  set_chr_mode_0(SPRITE_0);
+  set_chr_mode_1(SPRITE_1);
+  pal_bg(bg_palette);
+  pal_spr(sprites_palette);
+  vram_adr(NTADR_A(0,0));
+  vram_unrle(drivers_window_nametable);
+  set_scroll_x(0);
+  set_scroll_y(0);
+  current_screen = 0;
+
+  ppu_on_all();
+  pal_fade_to(0, 4);
+}
+
 // ::CURSOR::
 
 void draw_cursor() {
@@ -481,6 +518,9 @@ void draw_cursor() {
   case Loading:
     oam_meta_spr(INT(cursor_x), INT(cursor_y), default_cursor_sprite);
     oam_meta_spr(INT(cursor_x) + 0x14, INT(cursor_y) + 0x10, loading_cursor_sprite);
+    break;
+  case Disabled:
+    oam_meta_spr(INT(cursor_x), INT(cursor_y), disabled_cursor_sprite);
     break;
   }
 }
@@ -558,6 +598,7 @@ void start_game (void) {
     dungeon_layout_initialized = 1;
 #endif
     generate_layout();
+    yendors = 0;
   }
 
   // TODO initialize later, maybe on config

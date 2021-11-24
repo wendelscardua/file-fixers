@@ -1,6 +1,7 @@
 extern const unsigned char default_cursor_sprite[];
 extern const unsigned char clicking_cursor_sprite[];
 extern const unsigned char loading_cursor_sprite[];
+extern const unsigned char disabled_cursor_sprite[];
 extern const unsigned char menu_cursor_sprite[];
 extern const unsigned char * melee_sprite[4];
 extern const unsigned char * enemy_sprite[48];
