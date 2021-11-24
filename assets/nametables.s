@@ -17,3 +17,6 @@ _actions_menu_nametable: .incbin "nametables/actions-menu.rle"
 
 .export _castle_nametable
 _castle_nametable: .incbin "nametables/castle.rle"
+
+.export _castle_dialog_nametable
+_castle_dialog_nametable: .incbin "nametables/castle-dialog.rle"
