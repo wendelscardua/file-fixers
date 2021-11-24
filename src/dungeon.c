@@ -85,12 +85,12 @@ void load_dungeon_sector(unsigned char sector_index) {
       case DownMetatile:
         sector_down_row = temp_y;
         sector_down_column = temp_x;
-        if (sector_locked) {
-          mt = LockedMetatile;
-        } else if (sector_index == NUM_SECTORS - 1) {
+        if (sector_index == NUM_SECTORS - 1) {
           mt = GroundMetatile;
           sector_down_row = 0xff;
           sector_down_column = 0xff;
+        } else if (sector_locked) {
+          mt = LockedMetatile;
         }
       }
       one_vram_buffer(metatile_UL_tiles[mt], nt_adr);
