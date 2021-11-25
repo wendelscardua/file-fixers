@@ -1,5 +1,6 @@
 #include "lib/neslib.h"
 #include "castle.h"
+#include "irq_buffer.h"
 #include "../assets/sprites.h"
 #define FP(integer,fraction) (((integer)<<8)|((fraction)>>0))
 #define INT(unsigned_fixed_point) ((unsigned_fixed_point>>8)&0xff)
@@ -7,6 +8,7 @@
 #define START_Y FP(0x78, 0x00)
 #define END_Y FP(0x54, 0x00)
 #define Y_STEP FP(0x00, 0x80)
+#define DIALOG_SCANLINE 0xa0
 
 typedef enum {
               Coming,
@@ -40,8 +42,15 @@ void castle_handler() {
     }
     break;
   case Listening:
+    double_buffer[double_buffer_index++] = DIALOG_SCANLINE - 1;
+    double_buffer[double_buffer_index++] = 0xf6;
+    double_buffer[double_buffer_index++] = 8;
+    double_buffer[double_buffer_index++] = 0xa0;
+    double_buffer[double_buffer_index++] = 0;
+    double_buffer[double_buffer_index++] = ((0xa0 & 0xF8) << 2);
+
     // TODO dialog
-    cutscene_state = Turning;
+    // cutscene_state = Turning;
     break;
   case Turning:
     // TODO turn around slowly

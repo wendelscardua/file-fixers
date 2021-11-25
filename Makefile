@@ -66,6 +66,7 @@ src/dice.s: src/dice.c \
 src/castle.s: src/castle.c \
               src/castle.h \
               src/lib/neslib.h \
+              src/irq_buffer.h \
               assets/sprites.h
 	cc65 -Oirs $< --add-source ${CA65_FLAGS}
 

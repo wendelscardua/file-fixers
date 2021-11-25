@@ -659,6 +659,8 @@ void go_to_castle (void) {
   ppu_off();
   vram_adr(NTADR_A(0,0));
   vram_unrle(castle_nametable);
+  vram_adr(NTADR_C(0,0));
+  vram_unrle(castle_dialog_nametable);
 
   set_scroll_x(0);
   set_scroll_y(0);
