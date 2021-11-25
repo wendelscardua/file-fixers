@@ -4,6 +4,7 @@
 #include "castle.h"
 #include "irq_buffer.h"
 #include "temp.h"
+#include "wram.h"
 #include "../assets/dialogs.h"
 #include "../assets/sprites.h"
 #define FP(integer,fraction) (((integer)<<8)|((fraction)>>0))
@@ -35,6 +36,8 @@ unsigned char dialog_row;
 unsigned char dialog_column;
 
 #pragma bss-name(pop)
+char * dialog_queue[5];
+unsigned char dialog_queue_index;
 
 #pragma code-name ("CODE")
 #pragma rodata-name ("RODATA")
@@ -42,7 +45,39 @@ unsigned char dialog_column;
 void init_castle_cutscene() {
   player_y = START_Y;
   cutscene_state = Coming;
-  current_dialog = (char *)dialog_beginning;
+  dialog_queue_index = 0;
+  if (dialogs_checklist == 0) {
+    current_dialog = dialog_beginning;
+    dialog_queue[0] = 0;
+    dialogs_checklist = 0x80;
+  } else if (yendors == 0xff) {
+    current_dialog = dialog_the_end;
+    dialog_queue[0] = 0;
+    dialogs_checklist = 0xff;
+  } else {
+    temp = (yendors & ~dialogs_checklist) & 0x0f;
+    if (temp == 0) {
+      current_dialog = dialog_no_dlls;
+      dialog_queue[0] = 0;
+    } else {
+      i = 0;
+      if (temp & 0b0001) {
+        dialog_queue[i++] = dialog_gpu_dll;
+      }
+      if (temp & 0b0010) {
+        dialog_queue[i++] = dialog_disk_dll;
+      }
+      if (temp & 0b0100) {
+        dialog_queue[i++] = dialog_io_dll;
+      }
+      if (temp & 0b1000) {
+        dialog_queue[i++] = dialog_ram_dll;
+      }
+      dialog_queue[i++] = 0;
+      current_dialog = dialog_queue[0];
+      dialog_queue_index = 1;
+    }
+  }
   current_speaker = *current_dialog;
   dialog_row = FIRST_DIALOG_ROW;
   dialog_column = FIRST_DIALOG_COLUMN;
@@ -90,7 +125,13 @@ void castle_handler() {
       pad_poll(0);
       pad1_new = get_pad_new(0);
       if (pad1_new & PAD_A) {
-        cutscene_state = Turning;
+        if (dialog_queue[dialog_queue_index]) {
+          current_dialog = dialog_queue[dialog_queue_index];
+          dialog_queue_index++;
+          clean_dialog_window();
+        } else {
+          cutscene_state = Turning;
+        }
       }
     } else if (temp <= 2) {
       if (temp != current_speaker) {
