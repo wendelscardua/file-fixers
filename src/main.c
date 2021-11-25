@@ -150,6 +150,7 @@ void main (void) {
       break;
     case Dungeon:
       dungeon_handler();
+      break;
     case Castle:
       castle_handler();
     }
