@@ -1,0 +1,33 @@
+beginning:
+  - Amda: >-
+      Welcome, Heroes of the System!
+      I'm Queen Amda...
+  - Intella: >-
+      ... and I'm Queen Intella.
+      Please save our system from crashing.
+  - Amda: >-
+      Our Kingdom OS relies on four drivers:
+      GPU.DLL, Disk.DLL, IO.DLL and RAM.DLL
+  - Intella: >-
+      Now the drivers are full of bugs.
+      Dive into each driver, removing them.
+      Cleaning the last sector will yield its crypto key.
+      Return with it and the driver will be finally safe.
+  - Amda: >-
+      Now go, heroes! You're our last hope!
+gpu_dll:
+  - Amda: >-
+      Thanks for fixing GPU.DLL!
+disk_dll:
+  - Intella: >-
+      Thanks for fixing Disk.DLL!
+io_dll:
+  - Amda: >-
+      Thanks for fixing IO.DLL!
+ram_dll:
+  - Intella: >-
+      Thanks for fixing RAM.DLL!
+the_end:
+  - Amda: >-
+      The system is finally safe!
+      Thanks heroes!
