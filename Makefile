@@ -145,6 +145,7 @@ assets/nametables.o: assets/nametables.s assets/nametables.h \
                      assets/nametables/title.rle \
                      assets/nametables/main-window.rle \
                      assets/nametables/drivers-window.rle \
+                     assets/nametables/config-window.rle \
                      assets/nametables/dungeon-hud.rle \
                      assets/nametables/actions-menu.rle \
                      assets/nametables/castle.rle \
@@ -221,6 +222,13 @@ assets/nametables/main-window.nam: assets/nametables/main-window.map \
 
 assets/nametables/drivers-window.nam: assets/nametables/drivers-window.map \
                                       assets/nametables/main-window.nam
+	ruby tools/prerender-window.rb assets/nametables/main-window.nam \
+                                       $< \
+                                       4 8 \
+                                       $@
+
+assets/nametables/config-window.nam: assets/nametables/config-window.map \
+                                     assets/nametables/main-window.nam
 	ruby tools/prerender-window.rb assets/nametables/main-window.nam \
                                        $< \
                                        4 8 \
