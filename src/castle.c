@@ -129,6 +129,8 @@ void castle_handler() {
           current_dialog = dialog_queue[dialog_queue_index];
           dialog_queue_index++;
           clean_dialog_window();
+          current_speaker = *current_dialog;
+          ++current_dialog;
         } else {
           cutscene_state = Turning;
         }
