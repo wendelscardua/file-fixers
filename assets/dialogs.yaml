@@ -15,6 +15,9 @@ beginning:
       Return with it and the driver will be finally safe.
   - Amda: >-
       Now go, heroes! You're our last hope!
+no_dlls:
+  - Intella: >-
+      Please fix the four drivers!
 gpu_dll:
   - Amda: >-
       Thanks for fixing GPU.DLL!

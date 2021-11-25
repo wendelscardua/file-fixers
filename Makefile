@@ -176,7 +176,7 @@ assets/palettes.o: assets/palettes.s assets/palettes.h \
 assets/sprites.o: assets/sprites.s assets/sprites.h
 	ca65 $< ${CA65_FLAGS}
 
-assets/dialogs.o: assets/dialogs.s assets/dialogs.h
+assets/dialogs.o: assets/dialogs.s assets/dialogs.h src/charmap.h
 	ca65 $< ${CA65_FLAGS}
 
 assets/enemy-stats.o: assets/enemy-stats.s assets/enemy-stats.h

@@ -1,5 +1,9 @@
+#pragma charmap (',', 0x0c)
 #pragma charmap ('.', 0x0e)
 #pragma charmap (' ', 0x04)
+#pragma charmap (':', 0x1a)
+#pragma charmap ('!', 0x1b)
+#pragma charmap (0x27, 0x3e)
 
 #pragma charmap (0x40, 0x20)
 #pragma charmap (0x41, 0x21)
