@@ -76,6 +76,7 @@ void init_castle_cutscene() {
       dialog_queue[i++] = 0;
       current_dialog = dialog_queue[0];
       dialog_queue_index = 1;
+      dialogs_checklist |= temp;
     }
   }
   current_speaker = *current_dialog;

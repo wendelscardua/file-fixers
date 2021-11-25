@@ -8,7 +8,7 @@
 #pragma bss-name(push, "XRAM")
 // extra RAM at $6000-$7fff
 
-#define WRAM_VERSION 0x0114
+#define WRAM_VERSION 0x0014
 unsigned int wram_start;
 
 unsigned char dungeon_layout_initialized;
