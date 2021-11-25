@@ -274,6 +274,7 @@ void draw_main_window_sprites() {
   draw_cursor();
 }
 
+// none, castle, drivers, about, config
 const unsigned char main_window_target_x[] = { 0x20, 0x48, 0x48, 0xa8, 0x48 };
 const unsigned char main_window_target_y[] = { 0x20, 0x58, 0x78, 0x78, 0x98 };
 const unsigned char main_window_up[]       = {    1,    1,    1,    1,    2 };
@@ -282,6 +283,11 @@ const unsigned char main_window_left[]     = {    1,    1,    2,    2,    4 };
 const unsigned char main_window_right[]    = {    1,    3,    3,    3,    3 };
 
 void main_window_default_cursor_handler() {
+  if (cursor_target_x == cursor_x && cursor_target_y == cursor_y
+      && cursor_index == 2 && dialogs_checklist == 0) {
+    current_cursor_state = Disabled;
+  }
+
   if (pad1_new) {
     signed char nudge_x = rand8() % 8 - 4;
     signed char nudge_y = rand8() % 8 - 4;
@@ -304,11 +310,12 @@ void main_window_default_cursor_handler() {
     }
 
     if (cursor_target_x == cursor_x && cursor_target_y == cursor_y) {
-      if (pad1_new & PAD_A) {
+      if ((pad1_new & PAD_A) && current_cursor_state == Default) {
         current_cursor_state = Clicking;
         cursor_counter = CLICK_DELAY;
       }
     } else {
+      current_cursor_state = Default;
       set_cursor_speed();
     }
   }
@@ -417,8 +424,8 @@ void drivers_window_default_cursor_handler() {
     }
 
     if (cursor_target_x == cursor_x && cursor_target_y == cursor_y) {
-      if (!dungeon_completed(cursor_index - 1)
-          && (pad1_new & PAD_A)) {
+      if ((pad1_new & PAD_A) &&
+          (current_cursor_state == Default)) {
         current_cursor_state = Clicking;
         cursor_counter = CLICK_DELAY;
       }
