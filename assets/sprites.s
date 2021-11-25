@@ -80,37 +80,23 @@ _melee_sprite: .word melee_up_sprite, melee_down_sprite, melee_left_sprite, mele
 
 .repeat 4, palette
   .ident (.concat("enemy_left_0_p", .string(palette))):
-  .byte   4,  7,$80,palette
-  .byte $80
-
-  .ident (.concat("enemy_left_alt_0_p", .string(palette))):
-  .byte   4,  7,$90,palette
-  .byte $80
-
   .ident (.concat("enemy_right_0_p", .string(palette))):
   .byte   4,  7,$80,palette
   .byte $80
 
+  .ident (.concat("enemy_left_alt_0_p", .string(palette))):
   .ident (.concat("enemy_right_alt_0_p", .string(palette))):
   .byte   4,  7,$90,palette
   .byte $80
 
   .ident (.concat("enemy_left_1_p", .string(palette))):
-  .byte   4,  0,$81,palette
-  .byte   4,  8,$91,palette
-  .byte $80
-
-  .ident (.concat("enemy_left_alt_1_p", .string(palette))):
-  .byte   4,  0,$81,palette
-  .byte   4,  8,$92,palette
-  .byte $80
-
   .ident (.concat("enemy_right_1_p", .string(palette))):
   .byte   4,  0,$81,palette
   .byte   4,  8,$91,palette
   .byte $80
 
   .ident (.concat("enemy_right_alt_1_p", .string(palette))):
+  .ident (.concat("enemy_left_alt_1_p", .string(palette))):
   .byte   4,  0,$81,palette
   .byte   4,  8,$92,palette
   .byte $80
@@ -166,25 +152,6 @@ _enemy_sprite:
 
 	.byte $80
 
-  .ident (.concat("player_facing_left_", .string(player_index))):
-
-	.byte   0,  0,$04 + $20 * player_index,1
-	.byte   8,  0,$05 + $20 * player_index,1
-	.byte   0,  8,$14 + $20 * player_index,1
-	.byte   8,  8,$15 + $20 * player_index,1
-
-	.byte $80
-
-
-  .ident (.concat("player_facing_right_", .string(player_index))):
-
-	.byte   8,  0,$04 + $20 * player_index,1|OAM_FLIP_H
-	.byte   0,  0,$05 + $20 * player_index,1|OAM_FLIP_H
-	.byte   8,  8,$14 + $20 * player_index,1|OAM_FLIP_H
-	.byte   0,  8,$15 + $20 * player_index,1|OAM_FLIP_H
-
-	.byte $80
-
   .ident (.concat("player_step_1_up_", .string(player_index))):
 
 	.byte   0,  0,$08 + $20 * player_index,1
@@ -221,6 +188,7 @@ _enemy_sprite:
 
 	.byte $80
 
+  .ident (.concat("player_facing_left_", .string(player_index))):
   .ident (.concat("player_step_1_left_", .string(player_index))):
 
 	.byte   0,  0,$04 + $20 * player_index,1
@@ -239,6 +207,7 @@ _enemy_sprite:
 
 	.byte $80
 
+  .ident (.concat("player_facing_right_", .string(player_index))):
   .ident (.concat("player_step_1_right_", .string(player_index))):
 
 	.byte   8,  0,$04 + $20 * player_index,1|OAM_FLIP_H
