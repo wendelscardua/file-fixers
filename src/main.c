@@ -6,6 +6,7 @@
 #include "lib/neslib.h"
 #include "lib/unrle.h"
 #include "mmc3/mmc3_code.h"
+#include "castle.h"
 #include "dungeon.h"
 #include "irq_buffer.h"
 #include "nametable_loader.h"
@@ -59,7 +60,8 @@ enum game_state {
                  MainWindow,
                  DriversWindow,
                  AboutWindow,
-                 Dungeon
+                 Dungeon,
+                 Castle
 } current_game_state;
 
 unsigned char cursor_index, cursor_counter;
@@ -92,6 +94,7 @@ void drivers_window_default_cursor_handler (void);
 void drivers_window_loading_handler (void);
 void drivers_window_handler (void);
 void flip_screen (void);
+void go_to_castle (void);
 void go_to_title (void);
 void init_wram (void);
 void main_window_default_cursor_handler (void);
@@ -147,6 +150,9 @@ void main (void) {
       break;
     case Dungeon:
       dungeon_handler();
+      break;
+    case Castle:
+      castle_handler();
     }
 
     // load the irq array with values it parse
@@ -184,6 +190,9 @@ void draw_sprites (void) {
   case Dungeon:
     draw_dungeon_sprites();
     break;
+  case Castle:
+    draw_castle_sprites();
+    break;
   }
 }
 
@@ -216,6 +225,8 @@ void go_to_title (void) {
   set_chr_mode_3(BG_MAIN_1);
   set_chr_mode_4(BG_MAIN_2);
   set_chr_mode_5(BG_MAIN_3);
+  set_chr_mode_0(SPRITE_0);
+  set_chr_mode_1(SPRITE_1);
 
   pal_bg(bg_palette);
   pal_spr(sprites_palette);
@@ -263,6 +274,7 @@ void draw_main_window_sprites() {
   draw_cursor();
 }
 
+// none, castle, drivers, about, config
 const unsigned char main_window_target_x[] = { 0x20, 0x48, 0x48, 0xa8, 0x48 };
 const unsigned char main_window_target_y[] = { 0x20, 0x58, 0x78, 0x78, 0x98 };
 const unsigned char main_window_up[]       = {    1,    1,    1,    1,    2 };
@@ -271,6 +283,11 @@ const unsigned char main_window_left[]     = {    1,    1,    2,    2,    4 };
 const unsigned char main_window_right[]    = {    1,    3,    3,    3,    3 };
 
 void main_window_default_cursor_handler() {
+  if (cursor_target_x == cursor_x && cursor_target_y == cursor_y
+      && cursor_index == 2 && dialogs_checklist == 0) {
+    current_cursor_state = Disabled;
+  }
+
   if (pad1_new) {
     signed char nudge_x = rand8() % 8 - 4;
     signed char nudge_y = rand8() % 8 - 4;
@@ -293,11 +310,12 @@ void main_window_default_cursor_handler() {
     }
 
     if (cursor_target_x == cursor_x && cursor_target_y == cursor_y) {
-      if (pad1_new & PAD_A) {
+      if ((pad1_new & PAD_A) && current_cursor_state == Default) {
         current_cursor_state = Clicking;
         cursor_counter = CLICK_DELAY;
       }
     } else {
+      current_cursor_state = Default;
       set_cursor_speed();
     }
   }
@@ -311,7 +329,7 @@ void main_window_loading_handler () {
     break;
   case 1: // Castle.exe
     current_cursor_state = Default;
-    // TODO: go to castle
+    go_to_castle();
     break;
   case 2: // Drivers
     if (cursor_counter == 0) {
@@ -406,8 +424,8 @@ void drivers_window_default_cursor_handler() {
     }
 
     if (cursor_target_x == cursor_x && cursor_target_y == cursor_y) {
-      if (!dungeon_completed(cursor_index - 1)
-          && (pad1_new & PAD_A)) {
+      if ((pad1_new & PAD_A) &&
+          (current_cursor_state == Default)) {
         current_cursor_state = Clicking;
         cursor_counter = CLICK_DELAY;
       }
@@ -600,6 +618,7 @@ void start_game (void) {
 #endif
     generate_layout();
     yendors = 0;
+    dialogs_checklist = 0;
   }
 
   // TODO initialize later, maybe on config
@@ -630,4 +649,67 @@ void flip_screen (void) {
     current_screen = 0;
     set_scroll_y(0x000);
   }
+}
+
+void go_to_castle (void) {
+  current_game_state = Castle;
+
+  init_castle_cutscene();
+
+  if (irq_array[0] != 0xff) {
+    while(!is_irq_done() ){}
+    irq_array[0] = 0xff;
+    double_buffer[0] = 0xff;
+  }
+
+  clear_vram_buffer();
+
+  pal_fade_to(4, 0);
+  ppu_off();
+  vram_adr(NTADR_A(0,0));
+  vram_unrle(castle_nametable);
+  vram_adr(NTADR_C(0,0));
+  vram_unrle(castle_dialog_nametable);
+
+  set_scroll_x(0);
+  set_scroll_y(0);
+
+  set_chr_mode_2(BG_MAIN_0);
+  set_chr_mode_3(BG_MAIN_1);
+  set_chr_mode_4(BG_MAIN_2);
+  set_chr_mode_5(BG_MAIN_3);
+  set_chr_mode_0(SPRITE_PLAYERS_0);
+  set_chr_mode_1(SPRITE_0);
+
+  pal_bg(castle_bg_palette);
+  pal_spr(castle_sprites_palette);
+
+  draw_sprites();
+
+  ppu_on_all();
+  pal_fade_to(0, 4);
+}
+
+void return_from_castle() {
+  current_game_state = MainWindow;
+  current_cursor_state = Default;
+  oam_clear();
+  pal_fade_to(4, 0);
+  ppu_off();
+  set_chr_mode_2(BG_MAIN_0);
+  set_chr_mode_3(BG_MAIN_1);
+  set_chr_mode_4(BG_MAIN_2);
+  set_chr_mode_5(BG_MAIN_3);
+  set_chr_mode_0(SPRITE_0);
+  set_chr_mode_1(SPRITE_1);
+  pal_bg(bg_palette);
+  pal_spr(sprites_palette);
+  vram_adr(NTADR_A(0,0));
+  vram_unrle(main_window_nametable);
+  set_scroll_x(0);
+  set_scroll_y(0);
+  current_screen = 0;
+
+  ppu_on_all();
+  pal_fade_to(0, 4);
 }

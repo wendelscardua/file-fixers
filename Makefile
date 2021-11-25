@@ -19,6 +19,7 @@ debug: ${TARGET}
 
 ${TARGET}: src/main.o src/crt0.o src/lib/unrle.o src/lib/subrand.o \
            src/nametable_loader.o \
+           src/castle.o \
            src/dice.o \
            src/dungeon.o \
            src/irq_buffer.o \
@@ -31,7 +32,8 @@ ${TARGET}: src/main.o src/crt0.o src/lib/unrle.o src/lib/subrand.o \
            assets/palettes.o \
            assets/sectors.o \
            assets/sprites.o \
-           assets/enemy-stats.o
+           assets/enemy-stats.o \
+           assets/dialogs.o
 	ld65 $^ -C MMC3.cfg nes.lib -m map.txt -o ${TARGET} ${LD65_FLAGS}
 
 %.o: %.s
@@ -42,6 +44,7 @@ src/main.s: src/main.c \
             src/lib/neslib.h \
             src/lib/unrle.h \
             src/mmc3/mmc3_code.h \
+            src/castle.h \
             src/dungeon.h \
             src/irq_buffer.h \
             src/nametable_loader.h \
@@ -59,6 +62,17 @@ src/nametable_loader.s: src/nametable_loader.c \
 src/dice.s: src/dice.c \
             src/dice.h \
             src/lib/subrand.h
+	cc65 -Oirs $< --add-source ${CA65_FLAGS}
+
+src/castle.s: src/castle.c \
+              src/castle.h \
+              src/lib/neslib.h \
+              src/charmap.h \
+              src/irq_buffer.h \
+              src/temp.h \
+              src/wram.h \
+              assets/dialogs.h \
+              assets/sprites.h
 	cc65 -Oirs $< --add-source ${CA65_FLAGS}
 
 src/dungeon.s: src/dungeon.c \
@@ -132,7 +146,9 @@ assets/nametables.o: assets/nametables.s assets/nametables.h \
                      assets/nametables/main-window.rle \
                      assets/nametables/drivers-window.rle \
                      assets/nametables/dungeon-hud.rle \
-                     assets/nametables/actions-menu.rle
+                     assets/nametables/actions-menu.rle \
+                     assets/nametables/castle.rle \
+                     assets/nametables/castle-dialog.rle
 	ca65 $< ${CA65_FLAGS}
 
 assets/sectors.o: assets/sectors.s assets/sectors.h src/charmap.inc \
@@ -156,14 +172,21 @@ assets/sectors.o: assets/sectors.s assets/sectors.h src/charmap.inc \
 
 assets/palettes.o: assets/palettes.s assets/palettes.h \
                    assets/bg.pal assets/sprites.pal \
+                   assets/bg-castle.pal assets/sprites-castle.pal \
                    assets/bg-dungeon.pal assets/sprites-dungeon.pal
 	ca65 $< ${CA65_FLAGS}
 
 assets/sprites.o: assets/sprites.s assets/sprites.h
 	ca65 $< ${CA65_FLAGS}
 
+assets/dialogs.o: assets/dialogs.s assets/dialogs.h src/charmap.h
+	ca65 $< ${CA65_FLAGS}
+
 assets/enemy-stats.o: assets/enemy-stats.s assets/enemy-stats.h
 	ca65 $< ${CA65_FLAGS}
+
+assets/dialogs.s: assets/dialogs.yaml tools/compile-dialogs.rb
+	ruby tools/compile-dialogs.rb $< $@
 
 assets/enemy-stats.s: assets/enemy-stats.yaml src/enemies.inc tools/compile-enemy-stats.rb
 	ruby tools/compile-enemy-stats.rb $< $@

@@ -12,6 +12,8 @@
 .export _melee_sprite
 .export _player_sprite
 .export _enemy_sprite
+.export _amda_sprite
+.export _intelle_sprite
 
 _default_cursor_sprite:
 .byte   0,  0,$00,0
@@ -293,3 +295,17 @@ _player_sprite:
 .repeat 4, player_index
   .word .ident (.concat("player_step_2_right_", .string(player_index)))
 .endrepeat
+
+_amda_sprite:
+.byte   0,  0,$88,2
+.byte   8,  0,$89,2
+.byte   0,  8,$98,2
+.byte   8,  8,$99,2
+.byte $80
+
+_intelle_sprite:
+.byte   0,  0,$8a,3
+.byte   8,  0,$8b,3
+.byte   0,  8,$9a,3
+.byte   8,  8,$9b,3
+.byte $80

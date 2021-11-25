@@ -363,11 +363,6 @@ music_data:
 sounds_data:
 .include "music/soundfx.s"
 
-
-
-
-.segment "SAMPLES"
-
 .segment "VECTORS"
 
 .word nmi	;$fffa vblank nmi
