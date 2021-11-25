@@ -611,6 +611,7 @@ void start_game (void) {
 #endif
     generate_layout();
     yendors = 0;
+    dialogs_checklist = 0;
   }
 
   // TODO initialize later, maybe on config
