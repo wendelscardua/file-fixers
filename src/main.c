@@ -645,6 +645,8 @@ void flip_screen (void) {
 void go_to_castle (void) {
   current_game_state = Castle;
 
+  init_castle_cutscene();
+
   if (irq_array[0] != 0xff) {
     while(!is_irq_done() ){}
     irq_array[0] = 0xff;
@@ -670,6 +672,8 @@ void go_to_castle (void) {
 
   pal_bg(castle_bg_palette);
   pal_spr(castle_sprites_palette);
+
+  draw_sprites();
 
   ppu_on_all();
   pal_fade_to(0, 4);
