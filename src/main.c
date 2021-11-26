@@ -587,7 +587,8 @@ const unsigned char config_window_right[]    = {    0,    3,    3,    3,    6,  
 
 void config_window_default_cursor_handler() {
   if (cursor_target_x == cursor_x && cursor_target_y == cursor_y
-      && cursor_index > 0 && party_initialized == 1) {
+      && cursor_index > 0 && party_initialized == 1
+      && cursor_index != 1 && cursor_index != 4 && cursor_index != 7 && cursor_index != 10) {
     current_cursor_state = Disabled;
   }
   if (pad1_new) {
