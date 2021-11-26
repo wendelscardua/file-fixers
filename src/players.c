@@ -1,5 +1,4 @@
 #include "lib/neslib.h"
-#include "charmap.h"
 #include "dice.h"
 #include "players.h"
 #include "skills.h"
@@ -12,10 +11,8 @@
 void initialize_party() {
   const dice_spec_t default_attack = { 6, 1 };
 
-  // TODO replace with proper initialization
   for(i = 0; i < 4; i++) {
     player_xp[i] = 0;
-    player_class[i] = Fighter;
     player_skills[i][0] = SkAttack;
     player_skills[i][1] = SkItem;
     player_skills[i][2] = SkPass;
@@ -33,11 +30,6 @@ void initialize_party() {
     // TODO: maybe per class?
     player_max_hp[i] = entity_hp[i] = 16;
   }
-
-  memcpy(player_name[0], "Lorem", 5);
-  memcpy(player_name[1], "Ipsum", 5);
-  memcpy(player_name[2], "Dolor", 5);
-  memcpy(player_name[3], "Amet ", 5);
 
   party_level = 1;
 }

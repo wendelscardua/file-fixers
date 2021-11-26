@@ -6,6 +6,7 @@
 #include "lib/neslib.h"
 #include "lib/unrle.h"
 #include "mmc3/mmc3_code.h"
+#include "charmap.h"
 #include "castle.h"
 #include "dungeon.h"
 #include "irq_buffer.h"
@@ -387,6 +388,7 @@ void main_window_loading_handler () {
         for(i = 0; i < 4; i++) {
           multi_vram_buffer_horz((char *) player_name[i], 5, NTADR_ALT_AUTO(CONFIG_ORIG_X + 4, CONFIG_ORIG_Y + 2 + 2 * i));
           temp = entity_lv[i];
+          if (temp == 0) temp = 1;
           one_vram_buffer(0x10 + (temp / 10), NTADR_ALT_AUTO(CONFIG_ORIG_X + 16, CONFIG_ORIG_Y + 2 + 2 * i));
           one_vram_buffer(0x10 + (temp % 10), NTADR_ALT_AUTO(CONFIG_ORIG_X + 17, CONFIG_ORIG_Y + 2 + 2 * i));
         }
@@ -635,11 +637,15 @@ void config_window_loading_handler() {
         current_cursor_state = Default;
         current_game_state = MainWindow;
         flip_screen();
+        for(i = 0; i < 4; i++) {
+          if (player_class[i] == None) return;
+        }
+        initialize_party();
       }
     }
     break;
   default:
-    // TODO: edit name, change class
+        // TODO: edit name, change class
     break;
   }
 }
@@ -740,11 +746,7 @@ void start_game (void) {
   vram_unrle(main_window_nametable);
 
   if (!dungeon_layout_initialized) {
-#ifdef DEBUG
-    dungeon_layout_initialized = 0;
-#else
     dungeon_layout_initialized = 1;
-#endif
     generate_layout();
     yendors = 0;
     dialogs_checklist = 0;
@@ -752,12 +754,10 @@ void start_game (void) {
 
   // TODO initialize later, maybe on config
   if (!party_initialized) {
-#ifdef DEBUG
-    party_initialized = 0;
-#else
-    party_initialized = 1;
-#endif
-    initialize_party();
+    if (player_name[0][0] == 0) memcpy(player_name[0], "Lorem", 5);
+    if (player_name[1][0] == 0) memcpy(player_name[1], "Ipsum", 5);
+    if (player_name[2][0] == 0) memcpy(player_name[2], "Dolor", 5);
+    if (player_name[3][0] == 0) memcpy(player_name[3], "Amet ", 5);
   }
 
   ppu_on_all();
