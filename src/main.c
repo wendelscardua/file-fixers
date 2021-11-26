@@ -117,6 +117,7 @@ void main_window_default_cursor_handler (void);
 void main_window_loading_handler (void);
 void main_window_handler (void);
 void refresh_config_classes (void);
+void refresh_config_names (void);
 void reset_cursor (void);
 void set_cursor_speed (void);
 void start_game (void);
@@ -394,7 +395,6 @@ void main_window_loading_handler () {
         set_cursor_speed();
         current_game_state = ConfigWindow;
         for(i = 0; i < 4; i++) {
-          multi_vram_buffer_horz((char *) player_name[i], 5, NTADR_ALT_AUTO(CONFIG_ORIG_X + 4, CONFIG_ORIG_Y + 2 + 2 * i));
           temp = entity_lv[i];
           if (temp == 0) temp = 1;
           one_vram_buffer(0x10 + (temp / 10), NTADR_ALT_AUTO(CONFIG_ORIG_X + 16, CONFIG_ORIG_Y + 2 + 2 * i));
@@ -406,6 +406,7 @@ void main_window_loading_handler () {
         flip_screen();
         start_nametable_loader(NTADR_ALT_AUTO(0, 0));
         refresh_config_classes();
+        refresh_config_names();
         keyboard_loaded = 0;
         keyboard_row = 0;
         keyboard_column = 0;
@@ -647,6 +648,22 @@ void config_window_default_cursor_handler() {
 
 #define KEYBOARD_SCANLINE 0xb0
 
+const unsigned char upper_keys[][] =
+  {
+   "ABCDEFGHI?",
+   "JKLMNOPQR?",
+   "STUVWXYZ ?",
+   "0123456789"
+  };
+
+const unsigned char lower_keys[][] =
+  {
+   "abcdefghi?",
+   "jklmnopqr?",
+   "stuvwxyz ?",
+   "0123456789"
+  };
+
 void config_window_keyboard_handler() {
   if (keyboard_scanline > KEYBOARD_SCANLINE) keyboard_scanline -= 2;
   double_buffer[double_buffer_index++] = keyboard_scanline - 1;
@@ -670,13 +687,23 @@ void config_window_keyboard_handler() {
     } else if (pad1_new & PAD_RIGHT) {
       if (keyboard_column < 8 || (keyboard_row == 3 && keyboard_column == 8)) ++keyboard_column;
     } else if (pad1_new & PAD_A) {
-
+      if (input_length == 5) {
+        *input_field = upper_keys[keyboard_row][keyboard_column];
+      } else {
+        *input_field = lower_keys[keyboard_row][keyboard_column];
+      }
+      ++input_field;
+      --input_length;
+      refresh_config_names();
+      if (input_length == 0) keyboard_active = 0;
     }
   }
 }
 
 void config_window_loading_handler() {
   // started loading
+  i = (cursor_index - 1) / 3;
+
   switch(cursor_index) {
   case 0: // Close button
     if (cursor_counter == 0) {
@@ -705,17 +732,19 @@ void config_window_loading_handler() {
   case 4:
   case 7:
   case 10:
-    input_length = 5;
-    input_field = player_name[cursor_index / 3];
+    input_field = player_name[i];
+    for (input_length = 0; input_length < 5; input_length++) {
+      player_name[i][input_length] = 0;
+    }
     keyboard_active = 1;
     keyboard_scanline = 0xf0;
     current_cursor_state = Default;
+    refresh_config_names();
     break;
   case 2:
   case 5:
   case 8:
   case 11:
-    i = cursor_index / 3;
     if (player_class[i] > None) --player_class[i];
     refresh_config_classes();
     current_cursor_state = Default;
@@ -724,7 +753,6 @@ void config_window_loading_handler() {
   case 6:
   case 9:
   case 12:
-    i = cursor_index / 3 - 1;
     if (player_class[i] < Support) ++player_class[i];
     refresh_config_classes();
     current_cursor_state = Default;
@@ -746,6 +774,12 @@ void draw_config_window_sprites() {
 void refresh_config_classes() {
   for(i = 0; i < 4; i++) {
     multi_vram_buffer_horz((char *) class_names[player_class[i]], 7, NTADR_AUTO(CONFIG_ORIG_X + 5, CONFIG_ORIG_Y + 3 + 2 * i));
+  }
+}
+
+void refresh_config_names() {
+  for(i = 0; i < 4; i++) {
+    multi_vram_buffer_horz((char *) player_name[i], 5, NTADR_AUTO(CONFIG_ORIG_X + 4, CONFIG_ORIG_Y + 2 + 2 * i));
   }
 }
 
