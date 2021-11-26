@@ -1,4 +1,5 @@
 #include "lib/neslib.h"
+#include "charmap.h"
 #include "dice.h"
 #include "players.h"
 #include "skills.h"
@@ -7,6 +8,14 @@
 
 #pragma code-name ("CODE")
 #pragma rodata-name ("RODATA")
+
+const char class_names[4][7] =
+  {
+   "...    ",
+   "Fighter",
+   "Mage   ",
+   "Support"
+  };
 
 void initialize_party() {
   const dice_spec_t default_attack = { 6, 1 };

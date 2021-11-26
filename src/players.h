@@ -7,5 +7,7 @@ typedef enum {
               Support
 } player_class_type;
 
+extern const char class_names[4][7];
+
 void initialize_party(void);
 #endif
