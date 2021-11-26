@@ -23,3 +23,6 @@ _castle_nametable: .incbin "nametables/castle.rle"
 
 .export _castle_dialog_nametable
 _castle_dialog_nametable: .incbin "nametables/castle-dialog.rle"
+
+.export _keyboard_nametable
+_keyboard_nametable: .incbin "nametables/keyboard.rle"
