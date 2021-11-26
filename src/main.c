@@ -74,6 +74,10 @@ enum game_state {
 unsigned char cursor_index, cursor_counter;
 unsigned int cursor_x, cursor_y, cursor_target_x, cursor_target_y;
 signed int cursor_dx, cursor_dy;
+unsigned char keyboard_loaded, keyboard_row, keyboard_column, keyboard_active;
+unsigned char input_length;
+unsigned char * input_field;
+unsigned char keyboard_scanline;
 
 enum cursor_state {
                    Default,
@@ -93,6 +97,7 @@ unsigned char current_screen;
 #pragma code-name ("CODE")
 
 void config_window_default_cursor_handler (void);
+void config_window_keyboard_handler (void);
 void config_window_loading_handler (void);
 void config_window_handler (void);
 void draw_cursor (void);
@@ -395,8 +400,16 @@ void main_window_loading_handler () {
           one_vram_buffer(0x10 + (temp / 10), NTADR_ALT_AUTO(CONFIG_ORIG_X + 16, CONFIG_ORIG_Y + 2 + 2 * i));
           one_vram_buffer(0x10 + (temp % 10), NTADR_ALT_AUTO(CONFIG_ORIG_X + 17, CONFIG_ORIG_Y + 2 + 2 * i));
         }
+        set_unrle_buffer(unrle_buffer);
+        unrle_to_buffer(keyboard_nametable);
+        set_nametable_loader_buffer(unrle_buffer);
         flip_screen();
+        start_nametable_loader(NTADR_ALT_AUTO(0, 0));
         refresh_config_classes();
+        keyboard_loaded = 0;
+        keyboard_row = 0;
+        keyboard_column = 0;
+        keyboard_active = 0;
       }
     }
     break;
@@ -565,6 +578,15 @@ void config_window_handler() {
   pad_poll(0);
   pad1_new = get_pad_new(0);
 
+  if (!keyboard_loaded && !yield_nametable_loader()) {
+    keyboard_loaded = 1;
+  }
+
+  if (keyboard_active) {
+    config_window_keyboard_handler();
+    return;
+  }
+
   switch(current_cursor_state) {
   case Default:
   case Disabled:
@@ -623,6 +645,36 @@ void config_window_default_cursor_handler() {
   }
 }
 
+#define KEYBOARD_SCANLINE 0xb0
+
+void config_window_keyboard_handler() {
+  if (keyboard_scanline > KEYBOARD_SCANLINE) keyboard_scanline -= 2;
+  double_buffer[double_buffer_index++] = keyboard_scanline - 1;
+  double_buffer[double_buffer_index++] = 0xf6;
+  double_buffer[double_buffer_index++] = (current_screen == 0 ? 8 : 0);
+  temp_int = (input_length == 5) ? 0x00 : 0x40;
+  double_buffer[double_buffer_index++] = temp_int;
+  double_buffer[double_buffer_index++] = 0;
+  double_buffer[double_buffer_index++] = ((temp_int & 0xF8) << 2);
+
+  if (keyboard_scanline > KEYBOARD_SCANLINE) return;
+
+  if (pad1_new) {
+    if (pad1_new & PAD_UP) {
+      if (keyboard_row > 0) --keyboard_row;
+      if (keyboard_column == 9) keyboard_column = 8;
+    } else if (pad1_new & PAD_DOWN) {
+      if (keyboard_row < 3) ++keyboard_row;
+    } else if (pad1_new & PAD_LEFT) {
+      if (keyboard_column > 0) --keyboard_column;
+    } else if (pad1_new & PAD_RIGHT) {
+      if (keyboard_column < 8 || (keyboard_row == 3 && keyboard_column == 8)) ++keyboard_column;
+    } else if (pad1_new & PAD_A) {
+
+    }
+  }
+}
+
 void config_window_loading_handler() {
   // started loading
   switch(cursor_index) {
@@ -653,7 +705,11 @@ void config_window_loading_handler() {
   case 4:
   case 7:
   case 10:
-    // TODO: edit
+    input_length = 5;
+    input_field = player_name[cursor_index / 3];
+    keyboard_active = 1;
+    keyboard_scanline = 0xf0;
+    current_cursor_state = Default;
     break;
   case 2:
   case 5:
@@ -681,6 +737,10 @@ void config_window_loading_handler() {
 void draw_config_window_sprites() {
   // TODO: display rotating characters
   draw_cursor();
+
+  if (keyboard_active && keyboard_scanline == KEYBOARD_SCANLINE) {
+    oam_spr(keyboard_column * 0x10 + 0x30, keyboard_row * 0x08 + 0x08 + KEYBOARD_SCANLINE - 1, 0x24, 1 | OAM_BEHIND);
+  }
 }
 
 void refresh_config_classes() {
