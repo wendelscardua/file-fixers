@@ -41,4 +41,5 @@ void initialize_party() {
   }
 
   party_level = 1;
+  party_initialized = 1;
 }
