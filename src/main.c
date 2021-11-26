@@ -648,8 +648,31 @@ void config_window_loading_handler() {
       }
     }
     break;
+  case 1:
+  case 4:
+  case 7:
+  case 10:
+    // TODO: edit
+    break;
+  case 2:
+  case 5:
+  case 8:
+  case 11:
+    i = cursor_index / 3;
+    if (player_class[i] > None) --player_class[i];
+    refresh_config_classes();
+    current_cursor_state = Default;
+    break;
+  case 3:
+  case 6:
+  case 9:
+  case 12:
+    i = cursor_index / 3 - 1;
+    if (player_class[i] < Support) ++player_class[i];
+    refresh_config_classes();
+    current_cursor_state = Default;
+    break;
   default:
-        // TODO: edit name, change class
     break;
   }
 }
