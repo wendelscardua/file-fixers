@@ -411,6 +411,7 @@ void main_window_loading_handler () {
         keyboard_row = 0;
         keyboard_column = 0;
         keyboard_active = 0;
+        set_chr_mode_1(SPRITE_PLAYERS_0);
       }
     }
     break;
@@ -725,6 +726,7 @@ void config_window_loading_handler() {
           if (player_class[i] == None) return;
         }
         initialize_party();
+        set_chr_mode_1(SPRITE_1);
       }
     }
     break;
@@ -763,8 +765,25 @@ void config_window_loading_handler() {
 }
 
 void draw_config_window_sprites() {
-  // TODO: display rotating characters
+  const unsigned char spin_sequence[] = { 0x80, 0x84, 0x82, 0x84 };
+
   draw_cursor();
+
+  temp_x = (get_frame_count() & 0b110000) >> 4;
+  temp_char = spin_sequence[temp_x];
+  temp_attr = 1 | (temp_x <= 1 ? 0 : OAM_FLIP_H);
+  temp_x = (temp_x <= 1 ? 0x28 : 0x30);
+
+  temp_y = 0x50 - 1;
+
+  for (i = 0; i < 4; i++) {
+    oam_spr(temp_x, temp_y, temp_char, temp_attr);
+    oam_spr(0x28 + 0x30 - temp_x, temp_y, temp_char + 0x01, temp_attr);
+    oam_spr(temp_x, temp_y + 0x08, temp_char + 0x10, temp_attr);
+    oam_spr(0x28 + 0x30 - temp_x, temp_y + 0x08, temp_char + 0x11, temp_attr);
+    temp_char += 0x20;
+    temp_y += 0x10;
+  }
 
   if (keyboard_active && keyboard_scanline == KEYBOARD_SCANLINE) {
     oam_spr(keyboard_column * 0x10 + 0x30, keyboard_row * 0x08 + 0x08 + KEYBOARD_SCANLINE - 1, 0x24, 1 | OAM_BEHIND);
