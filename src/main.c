@@ -24,6 +24,9 @@
 #define NTADR_AUTO(x, y) (current_screen == 0 ? (NTADR_A((x), (y))) : (NTADR_C((x), (y))))
 #define NTADR_ALT_AUTO(x, y) (current_screen == 0 ? (NTADR_C((x), (y))) : (NTADR_A((x), (y))))
 
+#define CONFIG_ORIG_X 4
+#define CONFIG_ORIG_Y 8
+
 #define SFX_TOGGLE 0
 #define SFX_SELECT 1
 #define SFX_START 2
@@ -108,6 +111,7 @@ void init_wram (void);
 void main_window_default_cursor_handler (void);
 void main_window_loading_handler (void);
 void main_window_handler (void);
+void refresh_config_classes (void);
 void reset_cursor (void);
 void set_cursor_speed (void);
 void start_game (void);
@@ -384,8 +388,6 @@ void main_window_loading_handler () {
         cursor_target_y = FP(0x44, 0);
         set_cursor_speed();
         current_game_state = ConfigWindow;
-#define CONFIG_ORIG_X 4
-#define CONFIG_ORIG_Y 8
         for(i = 0; i < 4; i++) {
           multi_vram_buffer_horz((char *) player_name[i], 5, NTADR_ALT_AUTO(CONFIG_ORIG_X + 4, CONFIG_ORIG_Y + 2 + 2 * i));
           temp = entity_lv[i];
@@ -394,6 +396,7 @@ void main_window_loading_handler () {
           one_vram_buffer(0x10 + (temp % 10), NTADR_ALT_AUTO(CONFIG_ORIG_X + 17, CONFIG_ORIG_Y + 2 + 2 * i));
         }
         flip_screen();
+        refresh_config_classes();
       }
     }
     break;
@@ -654,6 +657,12 @@ void config_window_loading_handler() {
 void draw_config_window_sprites() {
   // TODO: display rotating characters
   draw_cursor();
+}
+
+void refresh_config_classes() {
+  for(i = 0; i < 4; i++) {
+    multi_vram_buffer_horz((char *) class_names[player_class[i]], 7, NTADR_AUTO(CONFIG_ORIG_X + 5, CONFIG_ORIG_Y + 3 + 2 * i));
+  }
 }
 
 // ::CURSOR::
