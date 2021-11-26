@@ -6,6 +6,7 @@
 #include "lib/neslib.h"
 #include "lib/unrle.h"
 #include "mmc3/mmc3_code.h"
+#include "charmap.h"
 #include "castle.h"
 #include "dungeon.h"
 #include "irq_buffer.h"
@@ -19,6 +20,12 @@
 
 #define FP(integer,fraction) (((integer)<<8)|((fraction)>>0))
 #define INT(unsigned_fixed_point) ((unsigned_fixed_point>>8)&0xff)
+
+#define NTADR_AUTO(x, y) (current_screen == 0 ? (NTADR_A((x), (y))) : (NTADR_C((x), (y))))
+#define NTADR_ALT_AUTO(x, y) (current_screen == 0 ? (NTADR_C((x), (y))) : (NTADR_A((x), (y))))
+
+#define CONFIG_ORIG_X 4
+#define CONFIG_ORIG_Y 8
 
 #define SFX_TOGGLE 0
 #define SFX_SELECT 1
@@ -59,7 +66,7 @@ enum game_state {
                  Title,
                  MainWindow,
                  DriversWindow,
-                 AboutWindow,
+                 ConfigWindow,
                  Dungeon,
                  Castle
 } current_game_state;
@@ -67,6 +74,10 @@ enum game_state {
 unsigned char cursor_index, cursor_counter;
 unsigned int cursor_x, cursor_y, cursor_target_x, cursor_target_y;
 signed int cursor_dx, cursor_dy;
+unsigned char keyboard_loaded, keyboard_row, keyboard_column, keyboard_active;
+unsigned char input_length;
+unsigned char * input_field;
+unsigned char keyboard_scanline;
 
 enum cursor_state {
                    Default,
@@ -85,7 +96,12 @@ unsigned char current_screen;
 #pragma rodata-name ("RODATA")
 #pragma code-name ("CODE")
 
+void config_window_default_cursor_handler (void);
+void config_window_keyboard_handler (void);
+void config_window_loading_handler (void);
+void config_window_handler (void);
 void draw_cursor (void);
+void draw_config_window_sprites (void);
 void draw_drivers_window_sprites (void);
 void draw_main_window_sprites (void);
 void draw_sprites (void);
@@ -100,6 +116,8 @@ void init_wram (void);
 void main_window_default_cursor_handler (void);
 void main_window_loading_handler (void);
 void main_window_handler (void);
+void refresh_config_classes (void);
+void refresh_config_names (void);
 void reset_cursor (void);
 void set_cursor_speed (void);
 void start_game (void);
@@ -148,6 +166,9 @@ void main (void) {
     case DriversWindow:
       drivers_window_handler();
       break;
+    case ConfigWindow:
+      config_window_handler();
+      break;
     case Dungeon:
       dungeon_handler();
       break;
@@ -186,6 +207,9 @@ void draw_sprites (void) {
     break;
   case DriversWindow:
     draw_drivers_window_sprites();
+    break;
+  case ConfigWindow:
+    draw_config_window_sprites();
     break;
   case Dungeon:
     draw_dungeon_sprites();
@@ -284,13 +308,14 @@ const unsigned char main_window_right[]    = {    1,    3,    3,    3,    3 };
 
 void main_window_default_cursor_handler() {
   if (cursor_target_x == cursor_x && cursor_target_y == cursor_y
-      && cursor_index == 2 && dialogs_checklist == 0) {
+      && ((cursor_index == 2 && dialogs_checklist == 0)
+          || (cursor_index == 1 && party_initialized == 0))) {
     current_cursor_state = Disabled;
   }
 
   if (pad1_new) {
-    signed char nudge_x = rand8() % 8 - 4;
-    signed char nudge_y = rand8() % 8 - 4;
+    signed char nudge_x = rand8() % 4 - 2;
+    signed char nudge_y = rand8() % 4 - 2;
     if (pad1_new & PAD_UP) {
       cursor_index = main_window_up[cursor_index];
       cursor_target_x = FP(main_window_target_x[cursor_index] + nudge_x, 0);
@@ -337,11 +362,7 @@ void main_window_loading_handler () {
       unrle_to_buffer(drivers_window_nametable);
 
       set_nametable_loader_buffer(unrle_buffer);
-      if (current_screen == 0) {
-        start_nametable_loader(NTADR_C(0, 0));
-      } else {
-        start_nametable_loader(NTADR_A(0, 0));
-      }
+      start_nametable_loader(NTADR_ALT_AUTO(0, 0));
     } else {
       if (!yield_nametable_loader()) {
         current_cursor_state = Default;
@@ -359,8 +380,40 @@ void main_window_loading_handler () {
     current_cursor_state = Default;
     break;
   case 4: // Config.sys
-    // TODO
-    current_cursor_state = Default;
+    if (cursor_counter == 0) {
+      set_unrle_buffer(unrle_buffer);
+      unrle_to_buffer(config_window_nametable);
+
+      set_nametable_loader_buffer(unrle_buffer);
+      start_nametable_loader(NTADR_ALT_AUTO(0, 0));
+    } else {
+      if (!yield_nametable_loader()) {
+        current_cursor_state = Default;
+        cursor_index = 0;
+        cursor_target_x = FP(0xbc, 0);
+        cursor_target_y = FP(0x44, 0);
+        set_cursor_speed();
+        current_game_state = ConfigWindow;
+        for(i = 0; i < 4; i++) {
+          temp = entity_lv[i];
+          if (temp == 0) temp = 1;
+          one_vram_buffer(0x10 + (temp / 10), NTADR_ALT_AUTO(CONFIG_ORIG_X + 16, CONFIG_ORIG_Y + 2 + 2 * i));
+          one_vram_buffer(0x10 + (temp % 10), NTADR_ALT_AUTO(CONFIG_ORIG_X + 17, CONFIG_ORIG_Y + 2 + 2 * i));
+        }
+        set_unrle_buffer(unrle_buffer);
+        unrle_to_buffer(keyboard_nametable);
+        set_nametable_loader_buffer(unrle_buffer);
+        flip_screen();
+        start_nametable_loader(NTADR_ALT_AUTO(0, 0));
+        refresh_config_classes();
+        refresh_config_names();
+        keyboard_loaded = 0;
+        keyboard_row = 0;
+        keyboard_column = 0;
+        keyboard_active = 0;
+        set_chr_mode_1(SPRITE_PLAYERS_0);
+      }
+    }
     break;
   }
 }
@@ -403,8 +456,8 @@ void drivers_window_default_cursor_handler() {
     current_cursor_state = Disabled;
   }
   if (pad1_new) {
-    signed char nudge_x = cursor_index == 0 ? 0 : rand8() % 8 - 4;
-    signed char nudge_y = cursor_index == 0 ? 0 : rand8() % 8 - 4;
+    signed char nudge_x = cursor_index == 0 ? 0 : rand8() % 4 - 2;
+    signed char nudge_y = cursor_index == 0 ? 0 : rand8() % 4 - 2;
     if (pad1_new & PAD_UP) {
       cursor_index = drivers_window_up[cursor_index];
       cursor_target_x = FP(drivers_window_target_x[cursor_index] + nudge_x, 0);
@@ -520,6 +573,235 @@ void return_from_dungeon() {
   pal_fade_to(0, 4);
 }
 
+// ::CONFIG::
+
+void config_window_handler() {
+  rand16();
+  pad_poll(0);
+  pad1_new = get_pad_new(0);
+
+  if (!keyboard_loaded && !yield_nametable_loader()) {
+    keyboard_loaded = 1;
+  }
+
+  if (keyboard_active) {
+    config_window_keyboard_handler();
+    return;
+  }
+
+  switch(current_cursor_state) {
+  case Default:
+  case Disabled:
+    config_window_default_cursor_handler();
+    break;
+  case Loading:
+    config_window_loading_handler();
+    break;
+  }
+  update_cursor();
+}
+
+// close, edit1, class1a, class1b, ..., class4b
+const unsigned char config_window_target_x[] = { 0xbc, 0x6c, 0x44, 0x84, 0x6c, 0x44, 0x84, 0x6c, 0x44, 0x84, 0x6c, 0x44, 0x84 };
+const unsigned char config_window_target_y[] = { 0x44, 0x54, 0x5c, 0x5c, 0x64, 0x6c, 0x6c, 0x74, 0x7c, 0x7c, 0x84, 0x8c, 0x8c };
+const unsigned char config_window_up[]       = {    0,    0,    1,    1,    3,    4,    4,    6,    7,    7,    9,   10,   10 };
+const unsigned char config_window_down[]     = {    1,    3,    4,    4,    6,    7,    7,    9,   10,   10,   12,   12,   12 };
+const unsigned char config_window_left[]     = {    1,    2,    2,    2,    5,    5,    5,    8,    8,    8,   11,   11,   11 };
+const unsigned char config_window_right[]    = {    0,    3,    3,    3,    6,    6,    6,    9,    9,    9,   12,   12,   12 };
+
+void config_window_default_cursor_handler() {
+  if (cursor_target_x == cursor_x && cursor_target_y == cursor_y
+      && cursor_index > 0 && party_initialized == 1
+      && cursor_index != 1 && cursor_index != 4 && cursor_index != 7 && cursor_index != 10) {
+    current_cursor_state = Disabled;
+  }
+  if (pad1_new) {
+    if (pad1_new & PAD_UP) {
+      cursor_index = config_window_up[cursor_index];
+      cursor_target_x = FP(config_window_target_x[cursor_index], 0);
+      cursor_target_y = FP(config_window_target_y[cursor_index], 0);
+    } else if (pad1_new & PAD_DOWN) {
+      cursor_index = config_window_down[cursor_index];
+      cursor_target_x = FP(config_window_target_x[cursor_index], 0);
+      cursor_target_y = FP(config_window_target_y[cursor_index], 0);
+    } else if (pad1_new & PAD_LEFT) {
+      cursor_index = config_window_left[cursor_index];
+      cursor_target_x = FP(config_window_target_x[cursor_index], 0);
+      cursor_target_y = FP(config_window_target_y[cursor_index], 0);
+    } else if (pad1_new & PAD_RIGHT) {
+      cursor_index = config_window_right[cursor_index];
+      cursor_target_x = FP(config_window_target_x[cursor_index], 0);
+      cursor_target_y = FP(config_window_target_y[cursor_index], 0);
+    }
+
+    if (cursor_target_x == cursor_x && cursor_target_y == cursor_y) {
+      if ((pad1_new & PAD_A) &&
+          (current_cursor_state == Default)) {
+        current_cursor_state = Clicking;
+        cursor_counter = CLICK_DELAY;
+      }
+    } else {
+      current_cursor_state = Default;
+      set_cursor_speed();
+    }
+  }
+}
+
+#define KEYBOARD_SCANLINE 0xb0
+
+const unsigned char upper_keys[][] =
+  {
+   "ABCDEFGHI?",
+   "JKLMNOPQR?",
+   "STUVWXYZ ?",
+   "0123456789"
+  };
+
+const unsigned char lower_keys[][] =
+  {
+   "abcdefghi?",
+   "jklmnopqr?",
+   "stuvwxyz ?",
+   "0123456789"
+  };
+
+void config_window_keyboard_handler() {
+  if (keyboard_scanline > KEYBOARD_SCANLINE) keyboard_scanline -= 2;
+  double_buffer[double_buffer_index++] = keyboard_scanline - 1;
+  double_buffer[double_buffer_index++] = 0xf6;
+  double_buffer[double_buffer_index++] = (current_screen == 0 ? 8 : 0);
+  temp_int = (input_length == 5) ? 0x00 : 0x40;
+  double_buffer[double_buffer_index++] = temp_int;
+  double_buffer[double_buffer_index++] = 0;
+  double_buffer[double_buffer_index++] = ((temp_int & 0xF8) << 2);
+
+  if (keyboard_scanline > KEYBOARD_SCANLINE) return;
+
+  if (pad1_new) {
+    if (pad1_new & PAD_UP) {
+      if (keyboard_row > 0) --keyboard_row;
+      if (keyboard_column == 9) keyboard_column = 8;
+    } else if (pad1_new & PAD_DOWN) {
+      if (keyboard_row < 3) ++keyboard_row;
+    } else if (pad1_new & PAD_LEFT) {
+      if (keyboard_column > 0) --keyboard_column;
+    } else if (pad1_new & PAD_RIGHT) {
+      if (keyboard_column < 8 || (keyboard_row == 3 && keyboard_column == 8)) ++keyboard_column;
+    } else if (pad1_new & PAD_A) {
+      if (input_length == 5) {
+        *input_field = upper_keys[keyboard_row][keyboard_column];
+      } else {
+        *input_field = lower_keys[keyboard_row][keyboard_column];
+      }
+      ++input_field;
+      --input_length;
+      refresh_config_names();
+      if (input_length == 0) keyboard_active = 0;
+    }
+  }
+}
+
+void config_window_loading_handler() {
+  // started loading
+  i = (cursor_index - 1) / 3;
+
+  switch(cursor_index) {
+  case 0: // Close button
+    if (cursor_counter == 0) {
+      set_unrle_buffer(unrle_buffer);
+      unrle_to_buffer(main_window_nametable);
+
+      set_nametable_loader_buffer(unrle_buffer);
+      if (current_screen == 0) {
+        start_nametable_loader(NTADR_C(0, 0));
+      } else {
+        start_nametable_loader(NTADR_A(0, 0));
+      }
+    } else {
+      if (!yield_nametable_loader()) {
+        current_cursor_state = Default;
+        current_game_state = MainWindow;
+        flip_screen();
+        for(i = 0; i < 4; i++) {
+          if (player_class[i] == None) return;
+        }
+        initialize_party();
+        set_chr_mode_1(SPRITE_1);
+      }
+    }
+    break;
+  case 1:
+  case 4:
+  case 7:
+  case 10:
+    input_field = player_name[i];
+    for (input_length = 0; input_length < 5; input_length++) {
+      player_name[i][input_length] = 0;
+    }
+    keyboard_active = 1;
+    keyboard_scanline = 0xf0;
+    current_cursor_state = Default;
+    refresh_config_names();
+    break;
+  case 2:
+  case 5:
+  case 8:
+  case 11:
+    if (player_class[i] > None) --player_class[i];
+    refresh_config_classes();
+    current_cursor_state = Default;
+    break;
+  case 3:
+  case 6:
+  case 9:
+  case 12:
+    if (player_class[i] < Support) ++player_class[i];
+    refresh_config_classes();
+    current_cursor_state = Default;
+    break;
+  default:
+    break;
+  }
+}
+
+void draw_config_window_sprites() {
+  const unsigned char spin_sequence[] = { 0x80, 0x84, 0x82, 0x84 };
+
+  draw_cursor();
+
+  temp_x = (get_frame_count() & 0b110000) >> 4;
+  temp_char = spin_sequence[temp_x];
+  temp_attr = 1 | (temp_x <= 1 ? 0 : OAM_FLIP_H);
+  temp_x = (temp_x <= 1 ? 0x28 : 0x30);
+
+  temp_y = 0x50 - 1;
+
+  for (i = 0; i < 4; i++) {
+    oam_spr(temp_x, temp_y, temp_char, temp_attr);
+    oam_spr(0x28 + 0x30 - temp_x, temp_y, temp_char + 0x01, temp_attr);
+    oam_spr(temp_x, temp_y + 0x08, temp_char + 0x10, temp_attr);
+    oam_spr(0x28 + 0x30 - temp_x, temp_y + 0x08, temp_char + 0x11, temp_attr);
+    temp_char += 0x20;
+    temp_y += 0x10;
+  }
+
+  if (keyboard_active && keyboard_scanline == KEYBOARD_SCANLINE) {
+    oam_spr(keyboard_column * 0x10 + 0x30, keyboard_row * 0x08 + 0x08 + KEYBOARD_SCANLINE - 1, 0x24, 1 | OAM_BEHIND);
+  }
+}
+
+void refresh_config_classes() {
+  for(i = 0; i < 4; i++) {
+    multi_vram_buffer_horz((char *) class_names[player_class[i]], 7, NTADR_AUTO(CONFIG_ORIG_X + 5, CONFIG_ORIG_Y + 3 + 2 * i));
+  }
+}
+
+void refresh_config_names() {
+  for(i = 0; i < 4; i++) {
+    multi_vram_buffer_horz((char *) player_name[i], 5, NTADR_AUTO(CONFIG_ORIG_X + 4, CONFIG_ORIG_Y + 2 + 2 * i));
+  }
+}
+
 // ::CURSOR::
 
 void draw_cursor() {
@@ -611,11 +893,7 @@ void start_game (void) {
   vram_unrle(main_window_nametable);
 
   if (!dungeon_layout_initialized) {
-#ifdef DEBUG
-    dungeon_layout_initialized = 0;
-#else
     dungeon_layout_initialized = 1;
-#endif
     generate_layout();
     yendors = 0;
     dialogs_checklist = 0;
@@ -623,12 +901,10 @@ void start_game (void) {
 
   // TODO initialize later, maybe on config
   if (!party_initialized) {
-#ifdef DEBUG
-    party_initialized = 0;
-#else
-    party_initialized = 1;
-#endif
-    initialize_party();
+    if (player_name[0][0] == 0) memcpy(player_name[0], "Lorem", 5);
+    if (player_name[1][0] == 0) memcpy(player_name[1], "Ipsum", 5);
+    if (player_name[2][0] == 0) memcpy(player_name[2], "Dolor", 5);
+    if (player_name[3][0] == 0) memcpy(player_name[3], "Amet ", 5);
   }
 
   ppu_on_all();
