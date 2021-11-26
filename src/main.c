@@ -298,7 +298,8 @@ const unsigned char main_window_right[]    = {    1,    3,    3,    3,    3 };
 
 void main_window_default_cursor_handler() {
   if (cursor_target_x == cursor_x && cursor_target_y == cursor_y
-      && cursor_index == 2 && dialogs_checklist == 0) {
+      && ((cursor_index == 2 && dialogs_checklist == 0)
+          || (cursor_index == 1 && party_initialized == 0))) {
     current_cursor_state = Disabled;
   }
 
