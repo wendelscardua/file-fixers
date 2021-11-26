@@ -73,8 +73,12 @@ void load_dungeon_sector(unsigned char sector_index) {
   clear_vram_buffer();
 
   multi_vram_buffer_horz(dungeon_name[current_dungeon_index], 8, NTADR_A(9, 2));
-  one_vram_buffer(0x10 + (sector_index>>4), NTADR_A(26, 2));
-  one_vram_buffer(0x10 + (sector_index & 0x0f), NTADR_A(27, 2));
+
+  // display sector_index as hexadecimal
+  one_vram_buffer(0x10 + (sector_index>>4), NTADR_A(26, 2)); // works for sector < a0
+  i = (sector_index & 0x0f) + 0x10;
+  if (i > 0x19) i += 0x07;
+  one_vram_buffer(i, NTADR_A(27, 2));
 
   temp_int = 0;
   nt_adr = 0x2084;
