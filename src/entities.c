@@ -12,7 +12,7 @@
 #include "../assets/enemy-stats.h"
 #include "../assets/sprites.h"
 
-#pragma code-name ("CODE")
+#pragma code-name ("STARTUP")
 #pragma rodata-name ("RODATA")
 
 #pragma bss-name(push, "ZEROPAGE")
@@ -62,8 +62,39 @@ void refresh_moves_hud() {
   one_vram_buffer(0x10 + temp, NTADR_A(23, 27));
 }
 
+void refresh_gauge(unsigned char row) {
+  // temp_int_x = value
+  // temp_int_y = max_value
+  for(i = 0; i < 8; i++) {
+    if (temp_int_y == 0) {
+      one_vram_buffer(row == 0 ? 0x71 : 0x81, NTADR_A(6 + i, 26 + row));
+    } else {
+      temp_int = (i + 1) * temp_int_y / 8;
+      if (temp_int_x >= temp_int) {
+        one_vram_buffer(row == 0 ? 0x75 : 0x85, NTADR_A(6 + i, 26 + row));
+      } else {
+        temp_int = i * temp_int_y / 8;
+        if (temp_int_x <= temp_int) {
+          one_vram_buffer(row == 0 ? 0x71 : 0x81, NTADR_A(6 + i, 26 + row));
+        } else {
+          temp = 32 * (temp_int_x - temp_int) / temp_int_y;
+          one_vram_buffer((row == 0 ? 0x71 : 0x81) + temp,
+                          NTADR_A(6 + i, 26 + row));
+        }
+      }
+    }
+  }
+}
+
+void refresh_hp_mp_hud() {
+  temp_int_x = entity_hp[current_entity];
+  temp_int_y = entity_max_hp[current_entity];
+  refresh_gauge(0);
+}
+
 void refresh_hud() {
   refresh_moves_hud();
+  refresh_hp_mp_hud();
 
   if (entity_type[current_entity] == Player) {
     multi_vram_buffer_horz((char *) player_name[current_entity], 5, NTADR_A(3, 25));
