@@ -546,6 +546,11 @@ void drivers_window_loading_handler () {
 }
 
 void return_from_dungeon() {
+  // restore players
+  for(i = 0; i < 4; i++) {
+    entity_hp[i] = player_max_hp[i];
+  }
+
   current_game_state = DriversWindow;
   if (dungeon_completed(cursor_index - 1)) {
     current_cursor_state = Disabled;
