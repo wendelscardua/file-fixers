@@ -16,6 +16,7 @@
 #include "wram.h"
 #include "../assets/nametables.h"
 #include "../assets/palettes.h"
+#include "../assets/sectors.h"
 #include "../assets/sprites.h"
 
 #define FP(integer,fraction) (((integer)<<8)|((fraction)>>0))
@@ -929,6 +930,8 @@ void go_to_game_over () {
   pal_spr(dungeon_sprites_palette);
 
   ppu_on_all(); //	turn on screen
+  multi_vram_buffer_horz(dungeon_name[current_dungeon_index], 8, NTADR_A(23, 9));
+  multi_vram_buffer_horz(dungeon_name[current_dungeon_index], 8, NTADR_A(7, 22));
 }
 
 // ::ETC::
