@@ -86,15 +86,24 @@ void refresh_gauge(unsigned char row) {
   }
 }
 
-void refresh_hp_mp_hud() {
+void refresh_hp_sp_hud() {
   temp_int_x = entity_hp[current_entity];
   temp_int_y = entity_max_hp[current_entity];
   refresh_gauge(0);
+
+  if (current_entity < 4) {
+    temp_int_x = player_sp[current_entity];
+    temp_int_y = player_max_sp[current_entity];
+  } else {
+    temp_int_x = 0;
+    temp_int_y = 0;
+  }
+  refresh_gauge(1);
 }
 
 void refresh_hud() {
   refresh_moves_hud();
-  refresh_hp_mp_hud();
+  refresh_hp_sp_hud();
 
   if (entity_type[current_entity] == Player) {
     multi_vram_buffer_horz((char *) player_name[current_entity], 5, NTADR_A(3, 25));
