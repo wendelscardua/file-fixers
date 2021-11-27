@@ -68,7 +68,8 @@ enum game_state {
                  DriversWindow,
                  ConfigWindow,
                  Dungeon,
-                 Castle
+                 Castle,
+                 GameOver
 } current_game_state;
 
 unsigned char cursor_index, cursor_counter;
@@ -110,7 +111,9 @@ void drivers_window_default_cursor_handler (void);
 void drivers_window_loading_handler (void);
 void drivers_window_handler (void);
 void flip_screen (void);
+void game_over_handler (void);
 void go_to_castle (void);
+void go_to_game_over (void);
 void go_to_title (void);
 void init_wram (void);
 void main_window_default_cursor_handler (void);
@@ -174,6 +177,8 @@ void main (void) {
       break;
     case Castle:
       castle_handler();
+    case GameOver:
+      game_over_handler();
     }
 
     // load the irq array with values it parse
@@ -877,6 +882,53 @@ void update_cursor () {
     ++cursor_counter;
     break;
   }
+}
+
+// ::GAME OVER::
+
+void game_over_handler() {
+  pad_poll(0);
+  pad1_new = get_pad_new(0);
+  if (pad1_new & PAD_START) {
+    dungeon_layout_initialized = 0;
+    party_initialized = 0;
+    start_game();
+  }
+}
+
+void go_to_game_over () {
+  current_game_state = GameOver;
+
+  if (irq_array[0] != 0xff) {
+    while(!is_irq_done() ){}
+    irq_array[0] = 0xff;
+    double_buffer[0] = 0xff;
+  }
+
+  clear_vram_buffer();
+
+  ppu_off(); // screen off
+  // draw some things
+  vram_adr(NTADR_A(0,0));
+  vram_unrle(blue_screen_nametable);
+  music_stop();
+
+  set_scroll_x(0);
+  set_scroll_y(0);
+
+  oam_clear();
+
+  set_chr_mode_2(BG_MAIN_0);
+  set_chr_mode_3(BG_MAIN_1);
+  set_chr_mode_4(BG_MAIN_2);
+  set_chr_mode_5(BG_MAIN_3);
+  set_chr_mode_0(SPRITE_0);
+  set_chr_mode_1(SPRITE_1);
+
+  pal_bg(dungeon_bg_palette);
+  pal_spr(dungeon_sprites_palette);
+
+  ppu_on_all(); //	turn on screen
 }
 
 // ::ETC::

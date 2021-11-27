@@ -40,6 +40,7 @@ entity_state_enum current_entity_state;
 unsigned char entity_x, entity_y;
 
 void return_from_dungeon(); // TODO: maybe add a main.h ?
+void go_to_game_over();
 
 void error() {
   // TODO: error handling?
@@ -120,6 +121,7 @@ void entity_handler() {
   switch(current_entity_state) {
   case EntityInput:
     entity_input_handler();
+    if (num_players == 0) go_to_game_over();
     break;
   case EntityMovement:
     entity_movement_handler();
