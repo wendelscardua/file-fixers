@@ -15,6 +15,8 @@ extern unsigned char party_initialized;
 extern unsigned char player_name[4][5];
 extern player_class_type player_class[];
 extern unsigned int player_xp[];
+extern unsigned int player_sp[];
+extern unsigned int player_max_sp[4];
 extern skill_type player_skills[4][9];
 extern unsigned char party_level;
 
