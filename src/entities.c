@@ -17,7 +17,7 @@
 
 #pragma bss-name(push, "ZEROPAGE")
 
-unsigned char num_entities, num_enemies;
+unsigned char num_entities, num_enemies, num_players;
 unsigned char entity_aux;
 unsigned char temp_w, temp_h;
 unsigned char menu_cursor_row, menu_cursor_col;
@@ -73,10 +73,15 @@ void refresh_hud() {
 
 void init_entities(unsigned char stairs_row, unsigned char stairs_col) {
   turn_counter = 0;
+  num_enemies = 0;
+  num_players = 0;
 
   for(num_entities = 0; num_entities < 4; num_entities++) {
+    if (entity_hp[num_entities] == 0) continue;
+
     entity_direction[num_entities] = Down;
     entity_turn_counter[num_entities] = subrand8(12);
+    num_players++;
   }
   entity_col[0] = entity_col[2] = stairs_col;
   entity_row[1] = entity_row[3] = stairs_row;
@@ -84,8 +89,6 @@ void init_entities(unsigned char stairs_row, unsigned char stairs_col) {
   entity_row[2] = stairs_row + 1;
   entity_col[1] = stairs_col - 1;
   entity_col[3] = stairs_col + 1;
-
-  num_enemies = 0;
 
   while (num_enemies == 0) {
     room_ptr = current_sector_room_data;
@@ -377,7 +380,11 @@ const unsigned int xp_per_level[] =
 
 void gain_exp() {
   unsigned int exp, temp_exp, temp_goal;
-  if (current_entity >= 4 || skill_target_entity < 4) return;
+  if (current_entity >= 4) {
+    num_players--;
+    return;
+  }
+  if (skill_target_entity < 4) return;
 
   exp = entity_lv[skill_target_entity];
   // ML * ML + 1
