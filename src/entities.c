@@ -514,6 +514,15 @@ void regen() {
       entity_hp[current_entity]++;
     }
   }
+  // TODO: scale with level?
+  if ((turn_counter & 0x111) == 0 &&
+      player_sp[current_entity] < player_max_sp[current_entity]) {
+    temp = roll_die(3); // scale with wiz + int ?
+    player_sp[current_entity] += temp;
+    if (player_sp[current_entity] > player_max_sp[current_entity]) {
+      player_sp[current_entity] = player_max_sp[current_entity];
+    }
+  }
 }
 
 void next_entity() {
