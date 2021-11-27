@@ -4,7 +4,8 @@ typedef enum {
               None,
               Fighter,
               Mage,
-              Support
+              Support,
+              NumClasses
 } player_class_type;
 
 extern const char class_names[4][7];
