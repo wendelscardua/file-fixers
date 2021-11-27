@@ -965,6 +965,10 @@ void start_game (void) {
     if (player_name[1][0] == 0) memcpy(player_name[1], "Ipsum", 5);
     if (player_name[2][0] == 0) memcpy(player_name[2], "Dolor", 5);
     if (player_name[3][0] == 0) memcpy(player_name[3], "Amet ", 5);
+    for(i = 0; i < 4; i++) {
+      entity_lv[i] = 1;
+      player_class[i] = None;
+    }
   }
 
   ppu_on_all();
