@@ -12,7 +12,7 @@
 #include "../assets/enemy-stats.h"
 #include "../assets/sprites.h"
 
-#pragma code-name ("CODE")
+#pragma code-name ("STARTUP")
 #pragma rodata-name ("RODATA")
 
 #pragma bss-name(push, "ZEROPAGE")
@@ -62,8 +62,48 @@ void refresh_moves_hud() {
   one_vram_buffer(0x10 + temp, NTADR_A(23, 27));
 }
 
+void refresh_gauge(unsigned char row) {
+  // temp_int_x = value
+  // temp_int_y = max_value
+  for(i = 0; i < 8; i++) {
+    if (temp_int_y == 0) {
+      one_vram_buffer(row == 0 ? 0x71 : 0x81, NTADR_A(6 + i, 26 + row));
+    } else {
+      temp_int = (i + 1) * temp_int_y / 8;
+      if (temp_int_x >= temp_int) {
+        one_vram_buffer(row == 0 ? 0x75 : 0x85, NTADR_A(6 + i, 26 + row));
+      } else {
+        temp_int = i * temp_int_y / 8;
+        if (temp_int_x <= temp_int) {
+          one_vram_buffer(row == 0 ? 0x71 : 0x81, NTADR_A(6 + i, 26 + row));
+        } else {
+          temp = 32 * (temp_int_x - temp_int) / temp_int_y;
+          one_vram_buffer((row == 0 ? 0x71 : 0x81) + temp,
+                          NTADR_A(6 + i, 26 + row));
+        }
+      }
+    }
+  }
+}
+
+void refresh_hp_sp_hud() {
+  temp_int_x = entity_hp[current_entity];
+  temp_int_y = entity_max_hp[current_entity];
+  refresh_gauge(0);
+
+  if (current_entity < 4) {
+    temp_int_x = player_sp[current_entity];
+    temp_int_y = player_max_sp[current_entity];
+  } else {
+    temp_int_x = 0;
+    temp_int_y = 0;
+  }
+  refresh_gauge(1);
+}
+
 void refresh_hud() {
   refresh_moves_hud();
+  refresh_hp_sp_hud();
 
   if (entity_type[current_entity] == Player) {
     multi_vram_buffer_horz((char *) player_name[current_entity], 5, NTADR_A(3, 25));
@@ -417,8 +457,46 @@ void gain_exp() {
 
       // TODO: maybe per class?
       temp = roll_die(8);
-      player_max_hp[i] += temp;
+      entity_max_hp[i] += temp;
       entity_hp[i] += temp;
+
+      switch(player_class[i]) {
+      case Fighter:
+        if (entity_lv[i] <= 10) temp = 1;
+        else temp = 2;
+        break;
+      case Mage:
+        if (entity_lv[i] <= 12) temp = 2;
+        else temp = 3;
+        break;
+      case Support:
+        if (entity_lv[i] <= 20) temp = 1;
+        else temp = 2;
+        break;
+      default:
+        // TODO: error
+        break;
+      }
+
+      // TODO: maybe add wiz
+      temp = 2 + subrand8(16 / 2 + temp - 1); // wiz~16
+
+      switch(player_class[i]) {
+      case Fighter:
+        temp = temp * 3 / 2;
+        break;
+      case Mage:
+        temp = temp * 2;
+        break;
+      case Support:
+        temp = temp * 3 / 2;
+        break;
+      default:
+        // TODO: error
+        break;
+      }
+      player_sp[i] += temp;
+      player_max_sp[i] += temp;
     } else {
       player_xp[i] += temp_exp;
     }
@@ -459,7 +537,7 @@ void entity_action_handler() {
 
 void regen() {
   if ((turn_counter & 0x111) == 0 &&
-      entity_hp[current_entity] < player_max_hp[current_entity]) {
+      entity_hp[current_entity] < entity_max_hp[current_entity]) {
     if (entity_lv[current_entity] >= 10) {
       // TODO: base on constitution?
       temp = roll_die(16);
@@ -467,11 +545,20 @@ void regen() {
         temp = entity_lv[current_entity] - 9;
       }
       entity_hp[current_entity] += temp;
-      if (entity_hp[current_entity] > player_max_hp[current_entity]) {
-        entity_hp[current_entity] = player_max_hp[current_entity];
+      if (entity_hp[current_entity] > entity_max_hp[current_entity]) {
+        entity_hp[current_entity] = entity_max_hp[current_entity];
       }
     } else {
       entity_hp[current_entity]++;
+    }
+  }
+  // TODO: scale with level?
+  if ((turn_counter & 0x111) == 0 &&
+      player_sp[current_entity] < player_max_sp[current_entity]) {
+    temp = roll_die(3); // scale with wiz + int ?
+    player_sp[current_entity] += temp;
+    if (player_sp[current_entity] > player_max_sp[current_entity]) {
+      player_sp[current_entity] = player_max_sp[current_entity];
     }
   }
 }

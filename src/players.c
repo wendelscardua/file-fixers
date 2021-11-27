@@ -1,4 +1,5 @@
 #include "lib/neslib.h"
+#include "lib/subrand.h"
 #include "charmap.h"
 #include "dice.h"
 #include "players.h"
@@ -37,7 +38,23 @@ void initialize_party() {
     entity_moves[i] = 1;
     entity_attack[i] = default_attack;
     // TODO: maybe per class?
-    player_max_hp[i] = entity_hp[i] = 16;
+    entity_max_hp[i] = entity_hp[i] = 16;
+
+    // TODO: maybe add wiz attribute and stuff
+    switch(player_class[i]) {
+    case Fighter:
+      player_max_sp[i] = player_sp[i] = 1 + 2 + subrand8(2);
+      break;
+    case Mage:
+      player_max_sp[i] = player_sp[i] = 1 + 5 + subrand8(2);
+      break;
+    case Support:
+      player_max_sp[i] = player_sp[i] = 1 + 2 + subrand8(2);
+      break;
+    default:
+      // TODO error?
+      break;
+    }
   }
 
   party_level = 1;
