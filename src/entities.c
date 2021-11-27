@@ -50,6 +50,25 @@ void error() {
 }
 #endif
 
+void refresh_skills_hud() {
+  // input: i = player index
+  temp_x = 3;
+  temp_y = 0;
+  for(temp = 0; temp < 9; temp++) {
+    temp_attr = player_skills[i][temp];
+    if (temp_attr == SkNone) continue;
+
+    multi_vram_buffer_horz(skill_name[temp_attr], 8, NTADR_C((temp_x), (temp_y + 5 * i)));
+
+    temp_y++;
+    if (temp_y == 3) {
+      temp_y = 0; temp_x += 9;
+      ppu_wait_nmi();
+      clear_vram_buffer();
+    }
+  }
+}
+
 void refresh_moves_hud() {
   temp = current_entity_moves;
   temp_x = 0;
@@ -126,6 +145,9 @@ void init_entities(unsigned char stairs_row, unsigned char stairs_col) {
     entity_direction[num_entities] = Down;
     entity_turn_counter[num_entities] = subrand8(12);
     num_players++;
+
+    i = num_entities;
+    refresh_skills_hud();
   }
   entity_col[0] = entity_col[2] = stairs_col;
   entity_row[1] = entity_row[3] = stairs_row;
@@ -458,6 +480,9 @@ void gain_exp() {
       ++entity_lv[i];
       if (entity_lv[i] > party_level) party_level = entity_lv[i];
 
+
+      // increase HP
+
       // TODO: maybe per class?
       temp = roll_die(8);
       entity_max_hp[i] += temp;
@@ -481,6 +506,8 @@ void gain_exp() {
         break;
       }
 
+      // increase SP
+
       // TODO: maybe add wiz
       temp = 2 + subrand8(16 / 2 + temp - 1); // wiz~16
 
@@ -500,6 +527,14 @@ void gain_exp() {
       }
       player_sp[i] += temp;
       player_max_sp[i] += temp;
+
+      // gain skill
+      temp = entity_lv[i];
+      if (temp == 5 || temp == 10 || temp == 15 || temp == 20 || temp == 25 || temp == 30) {
+        temp = entity_lv[i] / 5;
+        player_skills[i][3 + temp] = skills_per_class[player_class[i]][temp];
+        refresh_skills_hud();
+      }
     } else {
       player_xp[i] += temp_exp;
     }

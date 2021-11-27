@@ -26,6 +26,7 @@ ${TARGET}: src/main.o src/crt0.o src/lib/unrle.o src/lib/subrand.o \
            src/entities.o  \
            src/enemies.o \
            src/players.o \
+           src/skills.o \
            src/temp.o \
            src/wram.o \
            assets/nametables.o \
@@ -125,6 +126,12 @@ src/players.s: src/players.c \
                src/skills.h \
                src/temp.h \
                src/wram.h
+	cc65 -Oirs $< --add-source ${CA65_FLAGS}
+
+src/skills.s: src/skills.c \
+              src/skills.h \
+              src/charmap.h \
+              src/players.h
 	cc65 -Oirs $< --add-source ${CA65_FLAGS}
 
 src/temp.s: src/temp.c

@@ -1,3 +1,4 @@
+#include "charmap.h"
 #include "players.h"
 #include "skills.h"
 
@@ -11,7 +12,7 @@ const skill_type skills_per_class[NumClasses - 1][6] =
    { SkHeal, SkHaste, SkProtect, SkSlow, SkTele, SkRaise }
   };
 
-const unsigned char skill_name[NumSkills][] =
+const char skill_name[NumSkills][8] =
   {
    "........",
    "Attack  ",

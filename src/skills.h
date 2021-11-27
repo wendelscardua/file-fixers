@@ -31,6 +31,6 @@ typedef enum {
 } skill_type;
 
 extern const skill_type skills_per_class[NumClasses - 1][6];
-extern const unsigned char skill_name[][];
+extern const char skill_name[NumSkills][8];
 
 #endif
