@@ -459,6 +459,44 @@ void gain_exp() {
       temp = roll_die(8);
       entity_max_hp[i] += temp;
       entity_hp[i] += temp;
+
+      switch(player_class[i]) {
+      case Fighter:
+        if (entity_lv[i] <= 10) temp = 1;
+        else temp = 2;
+        break;
+      case Mage:
+        if (entity_lv[i] <= 12) temp = 2;
+        else temp = 3;
+        break;
+      case Support:
+        if (entity_lv[i] <= 20) temp = 1;
+        else temp = 2;
+        break;
+      default:
+        // TODO: error
+        break;
+      }
+
+      // TODO: maybe add wiz
+      temp = 2 + subrand8(16 / 2 + temp - 1); // wiz~16
+
+      switch(player_class[i]) {
+      case Fighter:
+        temp = temp * 3 / 2;
+        break;
+      case Mage:
+        temp = temp * 2;
+        break;
+      case Support:
+        temp = temp * 3 / 2;
+        break;
+      default:
+        // TODO: error
+        break;
+      }
+      player_sp[i] += temp;
+      player_max_sp[i] += temp;
     } else {
       player_xp[i] += temp_exp;
     }
