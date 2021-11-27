@@ -61,5 +61,5 @@ void spawn_enemy(unsigned char entity_slot) {
   entity_lv[entity_slot] = temp;
 
   // hp = lv d8
-  entity_hp[entity_slot] = roll_dice(temp, 8);
+  entity_max_hp[entity_slot] = entity_hp[entity_slot] = roll_dice(temp, 8);
 }

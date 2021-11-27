@@ -37,7 +37,7 @@ void initialize_party() {
     entity_moves[i] = 1;
     entity_attack[i] = default_attack;
     // TODO: maybe per class?
-    player_max_hp[i] = entity_hp[i] = 16;
+    entity_max_hp[i] = entity_hp[i] = 16;
   }
 
   party_level = 1;

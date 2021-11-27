@@ -8,7 +8,7 @@
 #pragma bss-name(push, "XRAM")
 // extra RAM at $6000-$7fff
 
-#define WRAM_VERSION 0x0017
+#define WRAM_VERSION 0x0018
 unsigned int wram_start;
 
 unsigned char dungeon_layout_initialized;
@@ -20,7 +20,6 @@ unsigned char party_initialized;
 unsigned char player_name[4][5];
 player_class_type player_class[4];
 unsigned int player_xp[4];
-unsigned char player_max_hp[4];
 skill_type player_skills[4][9];
 unsigned char party_level;
 
@@ -28,7 +27,8 @@ entity_type_enum entity_type[MAX_ENTITIES];
 unsigned char entity_lv[MAX_ENTITIES];
 unsigned char entity_speed[MAX_ENTITIES];
 unsigned char entity_moves[MAX_ENTITIES];
-unsigned char entity_hp[MAX_ENTITIES];
+unsigned int entity_hp[MAX_ENTITIES];
+unsigned int entity_max_hp[MAX_ENTITIES];
 dice_spec_t entity_attack[MAX_ENTITIES];
 
 // this one doesn't need to be saved, it's here because of space

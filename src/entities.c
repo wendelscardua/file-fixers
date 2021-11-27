@@ -417,7 +417,7 @@ void gain_exp() {
 
       // TODO: maybe per class?
       temp = roll_die(8);
-      player_max_hp[i] += temp;
+      entity_max_hp[i] += temp;
       entity_hp[i] += temp;
     } else {
       player_xp[i] += temp_exp;
@@ -459,7 +459,7 @@ void entity_action_handler() {
 
 void regen() {
   if ((turn_counter & 0x111) == 0 &&
-      entity_hp[current_entity] < player_max_hp[current_entity]) {
+      entity_hp[current_entity] < entity_max_hp[current_entity]) {
     if (entity_lv[current_entity] >= 10) {
       // TODO: base on constitution?
       temp = roll_die(16);
@@ -467,8 +467,8 @@ void regen() {
         temp = entity_lv[current_entity] - 9;
       }
       entity_hp[current_entity] += temp;
-      if (entity_hp[current_entity] > player_max_hp[current_entity]) {
-        entity_hp[current_entity] = player_max_hp[current_entity];
+      if (entity_hp[current_entity] > entity_max_hp[current_entity]) {
+        entity_hp[current_entity] = entity_max_hp[current_entity];
       }
     } else {
       entity_hp[current_entity]++;
