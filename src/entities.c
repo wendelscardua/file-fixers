@@ -42,10 +42,13 @@ unsigned char entity_x, entity_y;
 void return_from_dungeon(); // TODO: maybe add a main.h ?
 void go_to_game_over();
 
+#ifdef DEBUG
 void error() {
   // TODO: error handling?
   multi_vram_buffer_horz("ERROR", 5, NTADR_A(12, 12));
+  while(1);
 }
+#endif
 
 void refresh_moves_hud() {
   temp = current_entity_moves;
@@ -529,8 +532,10 @@ void entity_action_handler() {
       next_entity();
     }
     break;
+#ifdef DEBUG
   default:
     error();
+#endif
     break;
   }
 }
