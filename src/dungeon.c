@@ -1,5 +1,6 @@
 #include "lib/nesdoug.h"
 #include "lib/neslib.h"
+#include "lib/unrle.h"
 #include "dice.h"
 #include "dungeon.h"
 #include "entities.h"
@@ -65,7 +66,9 @@ void load_dungeon_sector(unsigned char sector_index) {
   */
   sector_locked = ((temp & 0x80) == 0);
   temp &= 0x7f;
-  current_sector = (unsigned char *) sector_metatiles[temp];
+  set_unrle_buffer(unrle_buffer);
+  unrle_to_buffer((unsigned char *) sector_metatiles[temp]);
+  current_sector = unrle_buffer;
   current_sector_room_data = (unsigned char *) sector_rooms[temp];
 
   set_scroll_y(0);

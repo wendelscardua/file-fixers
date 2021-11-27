@@ -26,3 +26,6 @@ _castle_dialog_nametable: .incbin "nametables/castle-dialog.rle"
 
 .export _keyboard_nametable
 _keyboard_nametable: .incbin "nametables/keyboard.rle"
+
+.export _blue_screen_nametable
+_blue_screen_nametable: .incbin "nametables/blue-screen.rle"

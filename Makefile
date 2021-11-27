@@ -79,6 +79,7 @@ src/castle.s: src/castle.c \
 src/dungeon.s: src/dungeon.c \
                src/lib/nesdoug.h \
                src/lib/neslib.h \
+               src/lib/unrle.h \
                src/dice.h \
                src/dungeon.h \
                src/entities.h \
@@ -151,25 +152,26 @@ assets/nametables.o: assets/nametables.s assets/nametables.h \
                      assets/nametables/actions-menu.rle \
                      assets/nametables/castle.rle \
                      assets/nametables/castle-dialog.rle \
-                     assets/nametables/keyboard.rle
+                     assets/nametables/keyboard.rle \
+                     assets/nametables/blue-screen.rle
 	ca65 $< ${CA65_FLAGS}
 
 assets/sectors.o: assets/sectors.s assets/sectors.h src/charmap.inc \
-                  assets/sectors/sector-00.bin \
+                  assets/sectors/sector-00.rle \
                   assets/sectors/sector-00-room.bin \
-                  assets/sectors/sector-01.bin \
+                  assets/sectors/sector-01.rle \
                   assets/sectors/sector-01-room.bin \
-                  assets/sectors/sector-02.bin \
+                  assets/sectors/sector-02.rle \
                   assets/sectors/sector-02-room.bin \
-                  assets/sectors/sector-03.bin \
+                  assets/sectors/sector-03.rle \
                   assets/sectors/sector-03-room.bin \
-                  assets/sectors/sector-04.bin \
+                  assets/sectors/sector-04.rle \
                   assets/sectors/sector-04-room.bin \
-                  assets/sectors/sector-05.bin \
+                  assets/sectors/sector-05.rle \
                   assets/sectors/sector-05-room.bin \
-                  assets/sectors/sector-06.bin \
+                  assets/sectors/sector-06.rle \
                   assets/sectors/sector-06-room.bin \
-                  assets/sectors/sector-07.bin \
+                  assets/sectors/sector-07.rle \
                   assets/sectors/sector-07-room.bin
 	ca65 $< ${CA65_FLAGS}
 
@@ -211,6 +213,9 @@ src/music/soundfx.nsf: src/music/soundfx.ftm
 
 src/music/soundfx.s: src/music/soundfx.nsf
 	${NSF2DATA} src/music/soundfx.nsf -ca65 -ntsc
+
+assets/sectors/%.rle: assets/sectors/%.bin
+	ruby tools/rle-compress.rb $< $@
 
 %.rle: %.nam
 	ruby tools/rle-compress.rb $< $@

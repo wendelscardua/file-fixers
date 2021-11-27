@@ -7,3 +7,4 @@ extern unsigned char actions_menu_nametable[];
 extern unsigned char castle_nametable[];
 extern unsigned char castle_dialog_nametable[];
 extern unsigned char keyboard_nametable[];
+extern unsigned char blue_screen_nametable[];

@@ -1,7 +1,7 @@
 .segment "RODATA"
 
 .repeat 8, sector_index
-  .ident(.concat("sector_0", .string(sector_index))): .incbin .concat("sectors/sector-0",.string(sector_index),".bin")
+  .ident(.concat("sector_0", .string(sector_index))): .incbin .concat("sectors/sector-0",.string(sector_index),".rle")
 .endrepeat
 
 .repeat 8, sector_index
