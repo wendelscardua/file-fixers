@@ -93,6 +93,7 @@ src/entities.s: src/entities.c \
                 src/lib/nesdoug.h \
                 src/lib/neslib.h \
                 src/lib/subrand.h \
+                src/charmap.h \
                 src/dice.h \
                 src/directions.h \
                 src/dungeon.h \

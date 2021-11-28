@@ -1,6 +1,7 @@
 #include "lib/nesdoug.h"
 #include "lib/neslib.h"
 #include "lib/subrand.h"
+#include "charmap.h"
 #include "dice.h"
 #include "directions.h"
 #include "dungeon.h"
@@ -41,6 +42,40 @@ unsigned char entity_x, entity_y;
 
 void return_from_dungeon(); // TODO: maybe add a main.h ?
 void go_to_game_over();
+
+const unsigned int xp_per_level[] =
+  {
+   0, // 1
+   20, // 2
+   30, // 3
+   50, // 4
+   100, // 5
+   200, // 6
+   400, // 7
+   800, // 8
+   1600, // 9
+   3200, // 10
+   3600, // 11
+   4000, // 12
+   5000, // 13
+   6000, // 14
+   7000, // 15
+   9000, // 16
+   11000, // 17
+   13000, // 18
+   15000, // 19
+   17000, // 20
+   20000, // 21
+   23000, // 22
+   26000, // 23
+   29000, // 24
+   32000, // 25
+   32000, // 26
+   32000, // 27
+   32000, // 28
+   32000, // 29
+   32000 // 30
+  };
 
 #ifdef DEBUG
 void error() {
@@ -123,14 +158,106 @@ void refresh_hp_sp_hud() {
   refresh_gauge(1);
 }
 
+void write_xp() {
+  temp_char = 0x10;
+  if (temp_int >= 40000u) {
+    temp_int -= 40000u;
+    temp_char += 4;
+  }
+  if (temp_int >= 20000u) {
+    temp_int -= 20000u;
+    temp_char += 2;
+  }
+  if (temp_int >= 10000u) {
+    temp_int -= 10000u;
+    temp_char += 1;
+  }
+  one_vram_buffer(temp_char, NTADR_A(19, temp_y));
+
+  temp_char = 0x10;
+  if (temp_int >= 8000u) {
+    temp_int -= 8000u;
+    temp_char += 8;
+  }
+  if (temp_int >= 4000u) {
+    temp_int -= 4000u;
+    temp_char += 4;
+  }
+  if (temp_int >= 2000u) {
+    temp_int -= 2000u;
+    temp_char += 2;
+  }
+  if (temp_int >= 1000u) {
+    temp_int -= 1000u;
+    temp_char += 1;
+  }
+  one_vram_buffer(temp_char, NTADR_A(20, temp_y));
+
+  temp_char = 0x10;
+  if (temp_int >= 800u) {
+    temp_int -= 800u;
+    temp_char += 8;
+  }
+  if (temp_int >= 400u) {
+    temp_int -= 400u;
+    temp_char += 4;
+  }
+  if (temp_int >= 200u) {
+    temp_int -= 200u;
+    temp_char += 2;
+  }
+  if (temp_int >= 100u) {
+    temp_int -= 100u;
+    temp_char += 1;
+  }
+  one_vram_buffer(temp_char, NTADR_A(21, temp_y));
+
+  temp_char = 0x10;
+  if (temp_int >= 80u) {
+    temp_int -= 80u;
+    temp_char += 8;
+  }
+  if (temp_int >= 40u) {
+    temp_int -= 40u;
+    temp_char += 4;
+  }
+  if (temp_int >= 20u) {
+    temp_int -= 20u;
+    temp_char += 2;
+  }
+  if (temp_int >= 10u) {
+    temp_int -= 10u;
+    temp_char += 1;
+  }
+  one_vram_buffer(temp_char, NTADR_A(22, temp_y));
+
+  one_vram_buffer(0x10 + temp_int, NTADR_A(23, temp_y));
+}
+
+void refresh_xp_hud() {
+  temp_y = 25;
+  temp_int = player_xp[current_entity];
+  write_xp();
+  temp_y = 26;
+  temp_int = xp_per_level[entity_lv[current_entity]];
+  write_xp();
+}
+
 void refresh_hud() {
   refresh_moves_hud();
   refresh_hp_sp_hud();
 
+  temp = entity_lv[current_entity];
+  one_vram_buffer(0x10 + (temp / 10), NTADR_A(12, 25));
+  one_vram_buffer(0x10 + (temp % 10), NTADR_A(13, 25));
+
   if (entity_type[current_entity] == Player) {
     multi_vram_buffer_horz((char *) player_name[current_entity], 5, NTADR_A(3, 25));
+    refresh_xp_hud();
   } else {
     multi_vram_buffer_horz((char *) enemy_name[entity_type[current_entity]], 5, NTADR_A(3, 25));
+    multi_vram_buffer_horz("     ", 5, NTADR_A(19, 25));
+    multi_vram_buffer_horz("     ", 5, NTADR_A(19, 26));
   }
 }
 
@@ -409,41 +536,6 @@ unsigned char melee_to_hit() {
 
   return (to_hit_bonus > roll_die(20));
 }
-
-const unsigned int xp_per_level[] =
-  {
-   0, // 0
-   0, // 1
-   20, // 2
-   30, // 3
-   50, // 4
-   100, // 5
-   200, // 6
-   400, // 7
-   800, // 8
-   1600, // 9
-   3200, // 10
-   3600, // 11
-   4000, // 12
-   5000, // 13
-   6000, // 14
-   7000, // 15
-   9000, // 16
-   11000, // 17
-   13000, // 18
-   15000, // 19
-   17000, // 20
-   20000, // 21
-   23000, // 22
-   26000, // 23
-   29000, // 24
-   32000, // 25
-   32000, // 26
-   32000, // 27
-   32000, // 28
-   32000, // 29
-   32000 // 30
-  };
 
 void gain_exp() {
   unsigned int exp, temp_exp, temp_goal;
