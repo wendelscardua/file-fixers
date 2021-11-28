@@ -18,7 +18,8 @@ debug: CA65_FLAGS += -g -DDEBUG=1
 debug: ${TARGET}
 
 ${TARGET}: MMC3.cfg \
-           src/main.o src/crt0.o src/lib/unrle.o src/lib/subrand.o \
+           src/main.o src/crt0.o \
+           src/lib/unrle.o src/lib/subrand.o src/lib/farcall.o \
            src/nametable_loader.o \
            src/castle.o \
            src/dice.o \
