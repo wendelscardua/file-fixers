@@ -733,10 +733,12 @@ void config_window_loading_handler() {
         current_cursor_state = Default;
         current_game_state = MainWindow;
         flip_screen();
-        for(i = 0; i < 4; i++) {
-          if (player_class[i] == None) return;
+        if (!party_initialized) {
+          for(i = 0; i < 4; i++) {
+            if (player_class[i] == None) return;
+          }
+          initialize_party();
         }
-        initialize_party();
         set_chr_mode_1(SPRITE_1);
       }
     }
