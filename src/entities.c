@@ -8,6 +8,7 @@
 #include "enemies.h"
 #include "entities.h"
 #include "irq_buffer.h"
+#include "main.h"
 #include "temp.h"
 #include "wram.h"
 #include "../assets/enemy-stats.h"
@@ -41,9 +42,6 @@ unsigned char current_entity;
 unsigned char current_entity_moves;
 entity_state_enum current_entity_state;
 unsigned char entity_x, entity_y;
-
-void return_from_dungeon(); // TODO: maybe add a main.h ?
-void go_to_game_over();
 
 const unsigned int xp_per_level[] =
   {
