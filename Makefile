@@ -102,6 +102,7 @@ src/entities.s: src/entities.c \
                 src/enemies.h \
                 src/entities.h \
                 src/irq_buffer.h \
+                src/main.h \
                 src/temp.h \
                 src/wram.h \
                 assets/enemy-stats.h \
