@@ -466,11 +466,11 @@ void gain_exp() {
     if (entity_hp[i] == 0) continue;
     temp = entity_lv[i];
     if (temp >= 30) continue;
-    // current player gets 100% xp, others get 50%
+    // current player gets 150% xp, others get 100%
     if (i == current_entity) {
-      temp_exp = exp;
+      temp_exp = exp + exp / 2;
     } else {
-      temp_exp = exp / 2;
+      temp_exp = exp;
     }
 
     temp_goal = xp_per_level[temp];
