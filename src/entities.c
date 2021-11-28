@@ -27,6 +27,8 @@ unsigned char current_entity_skill;
 unsigned char skill_target_row, skill_target_col;
 unsigned char skill_target_entity;
 
+unsigned char entity_sprite_index;
+
 unsigned char turn_counter;
 
 #pragma bss-name(pop)
@@ -735,17 +737,19 @@ void draw_entities() {
       break;
     }
   }
+  entity_sprite_index = get_frame_count() & 0x0f;
 
-  for(i = 0; i < num_entities; ++i) {
-    if (entity_hp[i] == 0) continue;
-    if (i == current_entity && current_entity_state == EntityMovement) {
-      switch(entity_type[i]) {
+  for(i = 0; i < MAX_ENTITIES; ++i, entity_sprite_index = (entity_sprite_index + 7) & 0x0f) {
+    if (entity_sprite_index >= num_entities) continue;
+    if (entity_hp[entity_sprite_index] == 0) continue;
+    if (entity_sprite_index == current_entity && current_entity_state == EntityMovement) {
+      switch(entity_type[entity_sprite_index]) {
       case Player:
-        switch(entity_direction[i]) {
-        case Up: temp = (PLAYER_STEP_1_UP_SPR << 2) | i; break;
-        case Down: temp = (PLAYER_STEP_1_DOWN_SPR << 2) | i; break;
-        case Left: temp = (PLAYER_STEP_1_LEFT_SPR << 2) | i; break;
-        case Right: temp = (PLAYER_STEP_1_RIGHT_SPR << 2) | i; break;
+        switch(entity_direction[entity_sprite_index]) {
+        case Up: temp = (PLAYER_STEP_1_UP_SPR << 2) | entity_sprite_index; break;
+        case Down: temp = (PLAYER_STEP_1_DOWN_SPR << 2) | entity_sprite_index; break;
+        case Left: temp = (PLAYER_STEP_1_LEFT_SPR << 2) | entity_sprite_index; break;
+        case Right: temp = (PLAYER_STEP_1_RIGHT_SPR << 2) | entity_sprite_index; break;
         }
         if (entity_aux & 0b1000) {
           temp += (1 << 2);
@@ -753,7 +757,7 @@ void draw_entities() {
         oam_meta_spr(entity_x, entity_y, player_sprite[temp]);
         break;
       default: // enemies
-        switch(entity_direction[i]) {
+        switch(entity_direction[entity_sprite_index]) {
         case Up: temp = ENEMY_LEFT_1_SPR; break;
         case Down: temp = ENEMY_RIGHT_1_SPR; break;
         case Left: temp = ENEMY_LEFT_1_SPR; break;
@@ -765,25 +769,25 @@ void draw_entities() {
         oam_meta_spr(entity_x,
                      entity_y,
                      enemy_sprite[
-                                  enemy_sprite_index[entity_type[i]] | temp
+                                  enemy_sprite_index[entity_type[entity_sprite_index]] | temp
                                   ]);
       }
     } else {
-      temp_x = entity_col[i] * 0x10 + 0x20;
-      temp_y = entity_row[i] * 0x10 + 0x20 - 1;
-      switch(entity_type[i]) {
+      temp_x = entity_col[entity_sprite_index] * 0x10 + 0x20;
+      temp_y = entity_row[entity_sprite_index] * 0x10 + 0x20 - 1;
+      switch(entity_type[entity_sprite_index]) {
       case Player:
-        switch(entity_direction[i]) {
-        case Up: temp = (PLAYER_UP_SPR << 2) | i; break;
-        case Down: temp = (PLAYER_DOWN_SPR << 2) | i; break;
-        case Left: temp = (PLAYER_LEFT_SPR << 2) | i; break;
-        case Right: temp = (PLAYER_RIGHT_SPR << 2) | i; break;
+        switch(entity_direction[entity_sprite_index]) {
+        case Up: temp = (PLAYER_UP_SPR << 2) | entity_sprite_index; break;
+        case Down: temp = (PLAYER_DOWN_SPR << 2) | entity_sprite_index; break;
+        case Left: temp = (PLAYER_LEFT_SPR << 2) | entity_sprite_index; break;
+        case Right: temp = (PLAYER_RIGHT_SPR << 2) | entity_sprite_index; break;
         }
         oam_meta_spr(temp_x, temp_y, player_sprite[temp]);
 
         break;
       default: // enemies
-        switch(entity_direction[i]) {
+        switch(entity_direction[entity_sprite_index]) {
         case Up: temp = ENEMY_LEFT_2_SPR; break;
         case Down: temp = ENEMY_RIGHT_2_SPR; break;
         case Left: temp = ENEMY_LEFT_1_SPR; break;
@@ -792,7 +796,7 @@ void draw_entities() {
         oam_meta_spr(temp_x,
                      temp_y,
                      enemy_sprite[
-                                  enemy_sprite_index[entity_type[i]] | temp
+                                  enemy_sprite_index[entity_type[entity_sprite_index]] | temp
                                   ]);
       }
     }
