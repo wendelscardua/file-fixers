@@ -124,6 +124,10 @@ DATA_PTR:			.res 2
 ; linker complains if I don't have at least one mention of each bank
 .segment "ONCE"
 .segment "BANK0"
+.segment "BANK1"
+.segment "BANK2"
+.segment "BANK3"
+.segment "BANK4"
 
 .segment "STARTUP"
 ; this should be mapped to the last PRG bank
@@ -214,7 +218,7 @@ bne @1
 lda #0 ; PRG bank zero
 jsr _set_prg_8000
 ; set which bank at $a000
-lda #1 ; PRG bank 1
+lda #(<NES_PRG_BANKS * 2 - 3) ; PRG bank 1
 jsr _set_prg_a000
 
 ; with CHR invert, set $0000-$03FF
