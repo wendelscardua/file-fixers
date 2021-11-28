@@ -626,7 +626,7 @@ void gain_exp() {
       temp_y = 5;
       for(temp_x = 0; temp_x < 6; temp_x++, temp_y += 5) {
         if (temp == temp_y) {
-          player_skills[i][3 + temp_x] = skills_per_class[player_class[i]][temp_x];
+          player_skills[i][3 + temp_x] = skills_per_class[player_class[i] - 1][temp_x];
           refresh_skills_hud();
           break;
         }
