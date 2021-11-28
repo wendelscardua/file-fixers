@@ -93,10 +93,9 @@ void refresh_skills_hud() {
   temp_y = 0;
   for(temp = 0; temp < 9; temp++) {
     temp_attr = player_skills[i][temp];
-    if (temp_attr == SkNone) continue;
-
-    multi_vram_buffer_horz(skill_name[temp_attr], 8, NTADR_C((temp_x), (temp_y + 5 * i)));
-
+    if (temp_attr != SkNone) {
+      multi_vram_buffer_horz(skill_name[temp_attr], 8, NTADR_C((temp_x), (temp_y + 5 * i)));
+    }
     temp_y++;
     if (temp_y == 3) {
       temp_y = 0; temp_x += 9;
@@ -440,7 +439,7 @@ void entity_input_handler() {
     } else {
       next_entity();
     }
-    break;
+      break;
   }
 }
 
@@ -623,11 +622,14 @@ void gain_exp() {
       player_max_sp[i] += temp;
 
       // gain skill
-      temp = entity_lv[i];
-      if (temp == 5 || temp == 10 || temp == 15 || temp == 20 || temp == 25 || temp == 30) {
-        temp = entity_lv[i] / 5;
-        player_skills[i][3 + temp] = skills_per_class[player_class[i]][temp];
-        refresh_skills_hud();
+      temp = entity_lv[current_entity];
+      temp_y = 5;
+      for(temp_x = 0; temp_x < 6; temp_x++, temp_y += 5) {
+        if (temp == temp_y) {
+          player_skills[i][3 + temp_x] = skills_per_class[player_class[i]][temp_x];
+          refresh_skills_hud();
+          break;
+        }
       }
     } else {
       player_xp[i] += temp_exp;
