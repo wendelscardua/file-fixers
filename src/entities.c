@@ -799,7 +799,7 @@ void draw_entities() {
   }
 
   if (current_entity_state == EntityMenu) {
-    temp_x = 0x40 * menu_cursor_col + 0x08;
+    temp_x = 0x48 * menu_cursor_col + 0x08;
     temp_y = 0x08 * menu_cursor_row + 0xc4;
     if ((get_frame_count() & 0b11000) == 0b11000) {
       temp_x -= 0x04;
