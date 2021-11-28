@@ -5,8 +5,7 @@
 
 
 ; Edited to work with MMC3 code
-;.define SOUND_BANK 12 -- commented out to use RODATA for music data
-;segment BANK12
+.define SOUND_BANK 4
 
 
 FT_BASE_ADR		= $0100		;page in RAM, should be $xx00
@@ -320,11 +319,9 @@ sta PPU_SCROLL
 
 
 
-.ifdef SOUND_BANK
-  lda #SOUND_BANK ;swap the music in place before using
-  ;SOUND_BANK is defined above
-  jsr _set_prg_8000
-.endif
+lda #SOUND_BANK ;swap the music in place before using
+;SOUND_BANK is defined above
+jsr _set_prg_8000
 
 ldx #<music_data
 ldy #>music_data
@@ -359,7 +356,7 @@ jmp _main			;no parameters
 ; the music code itself is in the regular CODE banks.
 ; It could be moved into BANK12 if music data is small.
 
-.segment "RODATA"
+.segment "BANK4"
 
 music_data:
 .include "music/soundtrack.s"
