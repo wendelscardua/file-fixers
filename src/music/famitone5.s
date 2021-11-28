@@ -2017,7 +2017,7 @@ tax
 lda ft_volume_table, x
 rts
 
-.segment "RODATA"
+.segment .concat("BANK", .string(SOUND_BANK))
 
 ft_volume_table:
 .byte 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0

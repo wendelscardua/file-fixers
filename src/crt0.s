@@ -356,7 +356,7 @@ jmp _main			;no parameters
 ; the music code itself is in the regular CODE banks.
 ; It could be moved into BANK12 if music data is small.
 
-.segment "BANK4"
+.segment .concat("BANK", .string(SOUND_BANK))
 
 music_data:
 .include "music/soundtrack.s"
