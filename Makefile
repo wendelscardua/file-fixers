@@ -125,6 +125,7 @@ src/irq_buffer.s: src/irq_buffer.c
 
 src/players.s: src/players.c \
                src/lib/neslib.h \
+               src/lib/subrand.h \
                src/charmap.h \
                src/dice.h \
                src/skills.h \
