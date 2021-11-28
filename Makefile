@@ -17,7 +17,8 @@ debug: LD65_FLAGS += --dbgfile ${PROJECT}.dbg
 debug: CA65_FLAGS += -g -DDEBUG=1
 debug: ${TARGET}
 
-${TARGET}: src/main.o src/crt0.o src/lib/unrle.o src/lib/subrand.o \
+${TARGET}: MMC3.cfg \
+           src/main.o src/crt0.o src/lib/unrle.o src/lib/subrand.o \
            src/nametable_loader.o \
            src/castle.o \
            src/dice.o \
@@ -35,7 +36,7 @@ ${TARGET}: src/main.o src/crt0.o src/lib/unrle.o src/lib/subrand.o \
            assets/sprites.o \
            assets/enemy-stats.o \
            assets/dialogs.o
-	ld65 $^ -C MMC3.cfg nes.lib -m map.txt -o ${TARGET} ${LD65_FLAGS}
+	ld65 -C $^ nes.lib -m map.txt -o ${TARGET} ${LD65_FLAGS}
 
 %.o: %.s
 	ca65 $< ${CA65_FLAGS}
