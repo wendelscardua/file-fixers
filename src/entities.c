@@ -553,6 +553,10 @@ void gain_exp() {
   // TODO: bonus per monster attack:
   exp += 5;
 
+#ifdef DEBUG
+  exp += 500;
+#endif
+
   for(i = 0; i < 4; i++) {
     if (entity_hp[i] == 0) continue;
     temp = entity_lv[i];
@@ -620,7 +624,7 @@ void gain_exp() {
       player_max_sp[i] += temp;
 
       // gain skill
-      temp = entity_lv[current_entity];
+      temp = entity_lv[i];
       temp_y = 5;
       for(temp_x = 0; temp_x < 6; temp_x++, temp_y += 5) {
         if (temp == temp_y) {
