@@ -506,8 +506,11 @@ void entity_ask_target_handler() {
   } else if (pad1_new & PAD_A) {
     temp_x = skill_target_col;
     temp_y = skill_target_row;
+    if (collides_with_map()
+        || (skill_target_col == sector_down_column && skill_target_row == sector_down_row)
+        || (skill_target_col == sector_up_column && skill_target_row == sector_up_row)) return;
     skill_target_entity = find_entity();
-    if (skill_target_entity == 0xff) {
+    if ((skill_target_entity == 0xff) == (current_entity_skill != SkTele)) {
       entity_aux = 0;
       current_entity_state = EntityInput;
       return;
@@ -677,6 +680,10 @@ void entity_action_handler() {
       if (entity_hp[skill_target_entity] > entity_max_hp[skill_target_entity]) {
         entity_hp[skill_target_entity] = entity_max_hp[skill_target_entity];
       }
+      break;
+    case SkTele:
+      entity_row[current_entity] = skill_target_row;
+      entity_col[current_entity] = skill_target_col;
       break;
     }
     entity_aux = 0;
