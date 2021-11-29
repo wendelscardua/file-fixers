@@ -10,6 +10,13 @@
 
   ; push the current prg bank on the stack
   lda BP_BANK_8000
+
+  ; don't switch to the same bank
+  cmp tmp4
+  bne :+
+  jsr callptr4
+  rts
+:
   jsr pusha
 
   ; select the new bank
@@ -41,6 +48,16 @@
 
   ; push the current prg bank on the stack
   lda BP_BANK_8000
+  ; don't switch to the same bank
+  cmp tmp4
+  bne :+
+  pla
+  tax
+  pla
+  jsr callptr4
+  rts
+:
+
   jsr pusha
 
   ; select the new bank
