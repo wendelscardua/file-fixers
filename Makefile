@@ -135,6 +135,7 @@ src/players.s: src/players.c \
 
 src/skills.s: src/skills.c \
               src/skills.h \
+              src/lib/farcall.h \
               src/charmap.h \
               src/players.h
 	cc65 -Oirs $< --add-source ${CA65_FLAGS}

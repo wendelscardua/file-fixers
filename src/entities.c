@@ -90,6 +90,7 @@ void refresh_skills_hud() {
   // input: i = player index
   temp_x = 3;
   temp_y = 0;
+  temp_bank = change_prg_8000(2);
   for(temp = 0; temp < 9; temp++) {
     temp_attr = player_skills[i][temp];
     if (temp_attr != SkNone) {
@@ -102,6 +103,7 @@ void refresh_skills_hud() {
       clear_vram_buffer();
     }
   }
+  set_prg_8000(temp_bank);
 }
 
 void refresh_moves_hud() {
@@ -580,8 +582,10 @@ void gain_exp() {
       temp_y = 5;
       for(temp_x = 0; temp_x < 6; temp_x++, temp_y += 5) {
         if (temp == temp_y) {
+          temp_bank = change_prg_8000(2);
           player_skills[i][3 + temp_x] = skills_per_class[player_class[i] - 1][temp_x];
           refresh_skills_hud();
+          set_prg_8000(temp_bank);
           break;
         }
       }
@@ -722,13 +726,13 @@ void draw_entities() {
         if (entity_aux & 0b1000) {
           temp++;
         }
-        set_prg_8000(1);
+        temp_bank = change_prg_8000(1);
         oam_meta_spr(entity_x,
                      entity_y,
                      enemy_sprite[
                                   enemy_sprite_index[entity_type[entity_sprite_index]] | temp
                                   ]);
-        set_prg_8000(0);
+        set_prg_8000(temp_bank);
       }
     } else {
       temp_x = entity_col[entity_sprite_index] * 0x10 + 0x20;
@@ -751,13 +755,13 @@ void draw_entities() {
         case Left: temp = ENEMY_LEFT_1_SPR; break;
         case Right: temp = ENEMY_RIGHT_1_SPR; break;
         }
-        set_prg_8000(1);
+        temp_bank = change_prg_8000(1);
         oam_meta_spr(temp_x,
                      temp_y,
                      enemy_sprite[
                                   enemy_sprite_index[entity_type[entity_sprite_index]] | temp
                                   ]);
-        set_prg_8000(0);
+        set_prg_8000(temp_bank);
       }
     }
   }
