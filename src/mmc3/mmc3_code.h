@@ -11,6 +11,10 @@ void __fastcall__ set_prg_8000(unsigned char bank_id);
 // returns: The current bank.
 unsigned char __fastcall__ get_prg_8000(void);
 
+// Switch to given PRG bank at $8000-9fff
+// returns: the previous PRG bank
+unsigned char __fastcall__ change_prg_8000(unsigned char bank_id);
+
 
 // WARNING, DON'T USE THIS IN THE CURRENT CFG, unless you
 // really know what you're doing. El Crasho.
