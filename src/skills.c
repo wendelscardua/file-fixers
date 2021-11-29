@@ -125,11 +125,20 @@ unsigned char set_melee_skill_target() {
   return ((skill_target_entity = find_entity()) != 0xff);
 }
 
+unsigned char set_forward_skill_target() {
+  return 0;
+}
+
 unsigned char skill_can_hit() {
   switch(skill_kinds[current_entity_skill]) {
   case SkkNone: return 0;
   case SkkSelf: return 1;
   case SkkMelee: return set_melee_skill_target();
+  case SkkForward: return 0; // TODO
+  case SkkTargeted: return 1;
+  case SkkArea: return 0; // TODO
+  case SkkEnemies: return 1;
+  case SkkRaisable: return 0; // TODO
   default: return 0;
   }
 }
