@@ -737,6 +737,13 @@ void next_entity() {
       current_entity_state = EntityInput;
       entity_aux = 0;
 
+      // consume status timer
+      if (entity_status_turns[current_entity] > 0) {
+        entity_status_turns[current_entity]--;
+      } else {
+        entity_status[current_entity] = 0;
+      }
+
       entity_x = entity_col[current_entity] * 0x10 + 0x20;
       entity_y = entity_row[current_entity] * 0x10 + 0x20 - 1;
 
