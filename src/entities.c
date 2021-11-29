@@ -1,6 +1,7 @@
 #include "lib/nesdoug.h"
 #include "lib/neslib.h"
 #include "lib/subrand.h"
+#include "mmc3/mmc3_code.h"
 #include "charmap.h"
 #include "dice.h"
 #include "directions.h"
@@ -14,7 +15,7 @@
 #include "../assets/enemy-stats.h"
 #include "../assets/sprites.h"
 
-#pragma code-name ("STARTUP")
+#pragma code-name ("CODE")
 #pragma rodata-name ("RODATA")
 
 #pragma bss-name(push, "ZEROPAGE")
@@ -89,6 +90,7 @@ void refresh_skills_hud() {
   // input: i = player index
   temp_x = 3;
   temp_y = 0;
+  temp_bank = change_prg_8000(2);
   for(temp = 0; temp < 9; temp++) {
     temp_attr = player_skills[i][temp];
     if (temp_attr != SkNone) {
@@ -101,6 +103,7 @@ void refresh_skills_hud() {
       clear_vram_buffer();
     }
   }
+  set_prg_8000(temp_bank);
 }
 
 void refresh_moves_hud() {
@@ -158,79 +161,30 @@ void refresh_hp_sp_hud() {
 }
 
 void write_xp() {
-  temp_char = 0x10;
-  if (temp_int >= 40000u) {
-    temp_int -= 40000u;
-    temp_char += 4;
-  }
-  if (temp_int >= 20000u) {
-    temp_int -= 20000u;
-    temp_char += 2;
-  }
-  if (temp_int >= 10000u) {
+  char xp_str_buffer[5];
+
+  xp_str_buffer[0] = 0x10;
+  while (temp_int >= 10000u) {
     temp_int -= 10000u;
-    temp_char += 1;
+    xp_str_buffer[0]++;
   }
-  one_vram_buffer(temp_char, NTADR_A(19, temp_y));
-
-  temp_char = 0x10;
-  if (temp_int >= 8000u) {
-    temp_int -= 8000u;
-    temp_char += 8;
-  }
-  if (temp_int >= 4000u) {
-    temp_int -= 4000u;
-    temp_char += 4;
-  }
-  if (temp_int >= 2000u) {
-    temp_int -= 2000u;
-    temp_char += 2;
-  }
-  if (temp_int >= 1000u) {
+  xp_str_buffer[1] = 0x10;
+  while (temp_int >= 1000u) {
     temp_int -= 1000u;
-    temp_char += 1;
+    xp_str_buffer[1]++;
   }
-  one_vram_buffer(temp_char, NTADR_A(20, temp_y));
-
-  temp_char = 0x10;
-  if (temp_int >= 800u) {
-    temp_int -= 800u;
-    temp_char += 8;
-  }
-  if (temp_int >= 400u) {
-    temp_int -= 400u;
-    temp_char += 4;
-  }
-  if (temp_int >= 200u) {
-    temp_int -= 200u;
-    temp_char += 2;
-  }
-  if (temp_int >= 100u) {
+  xp_str_buffer[2] = 0x10;
+  while (temp_int >= 100u) {
     temp_int -= 100u;
-    temp_char += 1;
+    xp_str_buffer[2]++;
   }
-  one_vram_buffer(temp_char, NTADR_A(21, temp_y));
-
-  temp_char = 0x10;
-  if (temp_int >= 80u) {
-    temp_int -= 80u;
-    temp_char += 8;
-  }
-  if (temp_int >= 40u) {
-    temp_int -= 40u;
-    temp_char += 4;
-  }
-  if (temp_int >= 20u) {
-    temp_int -= 20u;
-    temp_char += 2;
-  }
-  if (temp_int >= 10u) {
+  xp_str_buffer[3] = 0x10;
+  while (temp_int >= 10u) {
     temp_int -= 10u;
-    temp_char += 1;
+    xp_str_buffer[3]++;
   }
-  one_vram_buffer(temp_char, NTADR_A(22, temp_y));
-
-  one_vram_buffer(0x10 + temp_int, NTADR_A(23, temp_y));
+  xp_str_buffer[4] = 0x10 + temp_int;
+  multi_vram_buffer_horz(xp_str_buffer, 5, NTADR_A(19, temp_y));
 }
 
 void refresh_xp_hud() {
@@ -628,8 +582,10 @@ void gain_exp() {
       temp_y = 5;
       for(temp_x = 0; temp_x < 6; temp_x++, temp_y += 5) {
         if (temp == temp_y) {
+          temp_bank = change_prg_8000(2);
           player_skills[i][3 + temp_x] = skills_per_class[player_class[i] - 1][temp_x];
           refresh_skills_hud();
+          set_prg_8000(temp_bank);
           break;
         }
       }
@@ -770,11 +726,13 @@ void draw_entities() {
         if (entity_aux & 0b1000) {
           temp++;
         }
+        temp_bank = change_prg_8000(1);
         oam_meta_spr(entity_x,
                      entity_y,
                      enemy_sprite[
                                   enemy_sprite_index[entity_type[entity_sprite_index]] | temp
                                   ]);
+        set_prg_8000(temp_bank);
       }
     } else {
       temp_x = entity_col[entity_sprite_index] * 0x10 + 0x20;
@@ -797,11 +755,13 @@ void draw_entities() {
         case Left: temp = ENEMY_LEFT_1_SPR; break;
         case Right: temp = ENEMY_RIGHT_1_SPR; break;
         }
+        temp_bank = change_prg_8000(1);
         oam_meta_spr(temp_x,
                      temp_y,
                      enemy_sprite[
                                   enemy_sprite_index[entity_type[entity_sprite_index]] | temp
                                   ]);
+        set_prg_8000(temp_bank);
       }
     }
   }

@@ -96,7 +96,7 @@ unsigned char current_screen;
 // the fixed bank
 
 #pragma rodata-name ("RODATA")
-#pragma code-name ("CODE")
+#pragma code-name ("STARTUP")
 
 void config_window_default_cursor_handler (void);
 void config_window_keyboard_handler (void);

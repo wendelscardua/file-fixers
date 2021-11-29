@@ -7,6 +7,7 @@ Stega: .byte "Stega"
 Nefet: .byte "Nefet"
 .export _enemy_name
 _enemy_name: .word Eicar, Crypt, Buggy, Stega, Nefet
+.segment "BANK1"
 .export _enemy_difficulty
 _enemy_difficulty: .byte 1, 3, 4, 8, 16
 .export _enemy_base_level

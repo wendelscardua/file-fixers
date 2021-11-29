@@ -2,8 +2,8 @@
 #include "players.h"
 #include "skills.h"
 
-#pragma code-name ("CODE")
-#pragma rodata-name ("RODATA")
+#pragma code-name ("BANK2")
+#pragma rodata-name ("BANK2")
 
 const skill_type skills_per_class[NumClasses - 1][6] =
   {

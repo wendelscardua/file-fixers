@@ -1,6 +1,7 @@
 #ifndef _SKILLS_H_
 #define _SKILLS_H_
 
+#include "lib/farcall.h"
 #include "players.h"
 
 typedef enum {
