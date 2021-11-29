@@ -27,6 +27,8 @@ extern unsigned char entity_moves[];
 extern unsigned int entity_hp[];
 extern unsigned int entity_max_hp[];
 extern dice_spec_t entity_attack[];
+extern unsigned char entity_status[];
+extern unsigned char entity_status_turns[];
 
 void init_wram (void);
 
