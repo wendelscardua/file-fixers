@@ -596,8 +596,8 @@ void gain_exp() {
 
       // gain skill
       temp = entity_lv[i];
-      temp_y = 5;
-      for(temp_x = 0; temp_x < 6; temp_x++, temp_y += 5) {
+      temp_y = LEVEL_FOR_SKILL;
+      for(temp_x = 0; temp_x < 6; temp_x++, temp_y += LEVEL_FOR_SKILL) {
         if (temp == temp_y) {
           temp_bank = change_prg_8000(2);
           player_skills[i][3 + temp_x] = skills_per_class[player_class[i] - 1][temp_x];

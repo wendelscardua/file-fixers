@@ -4,6 +4,8 @@
 #include "lib/farcall.h"
 #include "players.h"
 
+#define LEVEL_FOR_SKILL 3
+
 typedef enum {
               // default skills
               SkNone,
