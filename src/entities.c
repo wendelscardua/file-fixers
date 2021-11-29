@@ -1,6 +1,7 @@
 #include "lib/nesdoug.h"
 #include "lib/neslib.h"
 #include "lib/subrand.h"
+#include "mmc3/mmc3_code.h"
 #include "charmap.h"
 #include "dice.h"
 #include "directions.h"
@@ -770,11 +771,13 @@ void draw_entities() {
         if (entity_aux & 0b1000) {
           temp++;
         }
+        set_prg_8000(1);
         oam_meta_spr(entity_x,
                      entity_y,
                      enemy_sprite[
                                   enemy_sprite_index[entity_type[entity_sprite_index]] | temp
                                   ]);
+        set_prg_8000(0);
       }
     } else {
       temp_x = entity_col[entity_sprite_index] * 0x10 + 0x20;
@@ -797,11 +800,13 @@ void draw_entities() {
         case Left: temp = ENEMY_LEFT_1_SPR; break;
         case Right: temp = ENEMY_RIGHT_1_SPR; break;
         }
+        set_prg_8000(1);
         oam_meta_spr(temp_x,
                      temp_y,
                      enemy_sprite[
                                   enemy_sprite_index[entity_type[entity_sprite_index]] | temp
                                   ]);
+        set_prg_8000(0);
       }
     }
   }

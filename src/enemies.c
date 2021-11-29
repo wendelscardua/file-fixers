@@ -18,8 +18,8 @@ unsigned char average_difficulty, min_difficulty;
 entity_type_enum eligible_types[NUM_ENEMY_TYPES];
 unsigned char num_eligible_types;
 
-#pragma code-name ("CODE")
-#pragma rodata-name ("RODATA")
+#pragma code-name ("BANK1")
+#pragma rodata-name ("BANK1")
 
 unsigned char select_enemy_type () {
   if (has_current_dungeon_yendor()) {

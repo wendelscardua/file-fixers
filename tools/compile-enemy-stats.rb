@@ -58,6 +58,7 @@ File.open(output_file, 'wb') do |f|
   f.puts '.export _enemy_name'
   f.puts "_enemy_name: .word #{str_name_list}"
 
+  f.puts '.segment "BANK1"'
   attr_lists.each do |attr_name, list|
     str_list = list.map(&:to_s).join(', ')
     f.puts ".export _enemy_#{attr_name}"
