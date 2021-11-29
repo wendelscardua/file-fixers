@@ -300,37 +300,17 @@ unsigned char entity_collides() {
   return 0;
 }
 
-unsigned char set_melee_skill_target() {
-  skill_target_row = entity_row[current_entity];
-  skill_target_col = entity_col[current_entity];
-  switch (entity_direction[current_entity]) {
-  case Up: --skill_target_row; break;
-  case Down: ++skill_target_row; break;
-  case Left: --skill_target_col; break;
-  case Right: ++skill_target_col; break;
-  default:
-    return 0;
-  }
-
-  if (skill_target_row > 9 || skill_target_col > 11) return 0;
-
-  for(skill_target_entity = 0; skill_target_entity < num_entities; skill_target_entity++) {
-    if ((entity_hp[skill_target_entity] > 0) &&
-        (entity_row[skill_target_entity] == skill_target_row) &&
-        (entity_col[skill_target_entity] == skill_target_col)) return 1;
-  }
-
-  return 0;
-}
-
 unsigned char enemy_lock_on_melee_target() {
   temp = entity_direction[current_entity];
+  skill_target_row = entity_row[current_entity];
+  skill_target_col = entity_col[current_entity];
+  skill_target_direction = entity_direction[current_entity];
   for(i = 0; i < 4; i++) {
     if (set_melee_skill_target() && skill_target_entity < 4) return 1;
 
     temp++;
     if (temp >= 4) temp = 0;
-    entity_direction[current_entity] = temp;
+    skill_target_direction = entity_direction[current_entity] = temp;
   }
   return 0;
 }
@@ -465,6 +445,9 @@ void entity_menu_handler() {
       break;
     case SkAttack:
       entity_aux = 0;
+      skill_target_row = entity_row[current_entity];
+      skill_target_col = entity_col[current_entity];
+      skill_target_direction = entity_direction[current_entity];
       if (set_melee_skill_target()) {
         current_entity_state = EntityPlayAction;
       } else {
@@ -478,9 +461,18 @@ void entity_menu_handler() {
       next_entity();
       break;
     default:
-      if (!consume_sp()) { break; }
-      // TODO: implement skill
-      next_entity();
+      if (!have_enough_sp()) { break; }
+      skill_target_row = entity_row[current_entity];
+      skill_target_col = entity_col[current_entity];
+      skill_target_direction = entity_direction[current_entity];
+      if (skill_is_targeted()) {
+        current_entity_state = EntityAskTarget;
+        break;
+      } else if (skill_can_hit()) {
+        consume_sp();
+        entity_aux = 0;
+        current_entity_state = EntityPlayAction;
+      }
       break;
     }
   }
@@ -701,6 +693,15 @@ void next_entity() {
       break;
     }
   }
+}
+
+unsigned char find_entity() {
+  // finds an entity at coords temp_x, temp_y
+  // return 0xff if not found
+  for(i = 0; i < num_entities; i++) {
+    if (entity_row[i] == temp_y && entity_col[i] == temp_x) return i;
+  }
+  return 0xff;
 }
 
 void draw_entities() {
