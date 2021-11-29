@@ -588,6 +588,9 @@ void gain_exp() {
         // TODO: error
         break;
       }
+      if (player_max_sp[i] > 255 - temp) {
+        temp = 255 - player_max_sp[i];
+      }
       player_sp[i] += temp;
       player_max_sp[i] += temp;
 
