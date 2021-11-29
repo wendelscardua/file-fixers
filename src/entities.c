@@ -359,10 +359,11 @@ void entity_input_handler() {
     if (pad1_new & (PAD_UP|PAD_DOWN|PAD_LEFT|PAD_RIGHT)) {
       temp_x = entity_col[current_entity];
       temp_y = entity_row[current_entity];
-      if (pad1_new & PAD_UP) { --temp_y; temp = entity_direction[current_entity] = Up; }
-      if (pad1_new & PAD_DOWN) { ++temp_y; temp = entity_direction[current_entity] = Down; }
-      if (pad1_new & PAD_LEFT) { --temp_x; temp = entity_direction[current_entity] = Left; }
-      if (pad1_new & PAD_RIGHT) { ++temp_x; temp = entity_direction[current_entity] = Right; }
+      if (pad1_new & PAD_UP) { --temp_y; temp = Up; }
+      if (pad1_new & PAD_DOWN) { ++temp_y; temp = Down; }
+      if (pad1_new & PAD_LEFT) { --temp_x; temp = Left; }
+      if (pad1_new & PAD_RIGHT) { ++temp_x; temp = Right; }
+      entity_direction[current_entity] = temp;
 
       if (current_entity_moves > 0 && !entity_collides()) {
         entity_row[current_entity] = temp_y;
@@ -391,7 +392,7 @@ void entity_input_handler() {
     } else {
       next_entity();
     }
-      break;
+    break;
   }
 }
 
