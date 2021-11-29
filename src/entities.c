@@ -281,6 +281,9 @@ void entity_handler() {
   case EntityMenu:
     entity_menu_handler();
     break;
+  case EntityAskTarget:
+    entity_ask_target_handler();
+    break;
   case EntityPlayAction:
     entity_action_handler();
     break;
@@ -292,6 +295,7 @@ extern unsigned char * current_sector;
 unsigned char collides_with_map() {
   if (temp_x == 0xff || temp_y == 0xff || temp_x == 12 || temp_y == 10) return 1;
   if (current_sector[temp_y * 12 + temp_x] == NullMetatile) return 1;
+  return 0;
 }
 
 unsigned char entity_collides() {
@@ -474,11 +478,44 @@ void entity_menu_handler() {
         break;
       } else if (skill_can_hit()) {
         consume_sp();
+        refresh_hp_sp_hud();
         entity_aux = 0;
         current_entity_state = EntityPlayAction;
       }
       break;
     }
+  }
+}
+
+void entity_ask_target_handler() {
+  pad_poll(0);
+  pad1_new = get_pad_new(0);
+  if (pad1_new == 0) return;
+
+  if (pad1_new & PAD_UP) {
+    if (skill_target_row > 0) { --skill_target_row; }
+  } else if (pad1_new & PAD_DOWN) {
+    if (skill_target_row < 9) { ++skill_target_row; }
+  } else if (pad1_new & PAD_LEFT) {
+    if (skill_target_col > 0) { --skill_target_col; }
+  } else if (pad1_new & PAD_RIGHT) {
+    if (skill_target_col < 11) { ++skill_target_col; }
+  } else if (pad1_new & PAD_B) {
+    entity_aux = 0;
+    current_entity_state = EntityInput;
+  } else if (pad1_new & PAD_A) {
+    temp_x = skill_target_col;
+    temp_y = skill_target_row;
+    skill_target_entity = find_entity();
+    if (skill_target_entity == 0xff) {
+      entity_aux = 0;
+      current_entity_state = EntityInput;
+      return;
+    }
+    consume_sp();
+    refresh_hp_sp_hud();
+    entity_aux = 0;
+    current_entity_state = EntityPlayAction;
   }
 }
 
@@ -719,6 +756,16 @@ void draw_entities() {
       break;
     }
   }
+
+  if (current_entity_state == EntityAskTarget) {
+    temp_x = 0x10 * skill_target_col + 0x15;
+    temp_y = 0x10 * skill_target_row + 0x20;
+    if ((get_frame_count() & 0b11000) == 0b11000) {
+      temp_x -= 0x04;
+    }
+    oam_meta_spr(temp_x, temp_y, menu_cursor_sprite);
+  }
+
   entity_sprite_index = get_frame_count() & 0x0f;
 
   for(i = 0; i < MAX_ENTITIES; ++i, entity_sprite_index = (entity_sprite_index + 7) & 0x0f) {

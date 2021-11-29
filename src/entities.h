@@ -28,6 +28,7 @@ void entity_input_handler (void);
 void entity_movement_handler (void);
 void entity_action_handler (void);
 void entity_menu_handler (void);
+void entity_ask_target_handler (void);
 unsigned char collides_with_map (void);
 unsigned char find_entity();
 
