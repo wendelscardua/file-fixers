@@ -159,79 +159,30 @@ void refresh_hp_sp_hud() {
 }
 
 void write_xp() {
-  temp_char = 0x10;
-  if (temp_int >= 40000u) {
-    temp_int -= 40000u;
-    temp_char += 4;
-  }
-  if (temp_int >= 20000u) {
-    temp_int -= 20000u;
-    temp_char += 2;
-  }
-  if (temp_int >= 10000u) {
+  char xp_str_buffer[5];
+
+  xp_str_buffer[0] = 0x10;
+  while (temp_int >= 10000u) {
     temp_int -= 10000u;
-    temp_char += 1;
+    xp_str_buffer[0]++;
   }
-  one_vram_buffer(temp_char, NTADR_A(19, temp_y));
-
-  temp_char = 0x10;
-  if (temp_int >= 8000u) {
-    temp_int -= 8000u;
-    temp_char += 8;
-  }
-  if (temp_int >= 4000u) {
-    temp_int -= 4000u;
-    temp_char += 4;
-  }
-  if (temp_int >= 2000u) {
-    temp_int -= 2000u;
-    temp_char += 2;
-  }
-  if (temp_int >= 1000u) {
+  xp_str_buffer[1] = 0x10;
+  while (temp_int >= 1000u) {
     temp_int -= 1000u;
-    temp_char += 1;
+    xp_str_buffer[1]++;
   }
-  one_vram_buffer(temp_char, NTADR_A(20, temp_y));
-
-  temp_char = 0x10;
-  if (temp_int >= 800u) {
-    temp_int -= 800u;
-    temp_char += 8;
-  }
-  if (temp_int >= 400u) {
-    temp_int -= 400u;
-    temp_char += 4;
-  }
-  if (temp_int >= 200u) {
-    temp_int -= 200u;
-    temp_char += 2;
-  }
-  if (temp_int >= 100u) {
+  xp_str_buffer[2] = 0x10;
+  while (temp_int >= 100u) {
     temp_int -= 100u;
-    temp_char += 1;
+    xp_str_buffer[2]++;
   }
-  one_vram_buffer(temp_char, NTADR_A(21, temp_y));
-
-  temp_char = 0x10;
-  if (temp_int >= 80u) {
-    temp_int -= 80u;
-    temp_char += 8;
-  }
-  if (temp_int >= 40u) {
-    temp_int -= 40u;
-    temp_char += 4;
-  }
-  if (temp_int >= 20u) {
-    temp_int -= 20u;
-    temp_char += 2;
-  }
-  if (temp_int >= 10u) {
+  xp_str_buffer[3] = 0x10;
+  while (temp_int >= 10u) {
     temp_int -= 10u;
-    temp_char += 1;
+    xp_str_buffer[3]++;
   }
-  one_vram_buffer(temp_char, NTADR_A(22, temp_y));
-
-  one_vram_buffer(0x10 + temp_int, NTADR_A(23, temp_y));
+  xp_str_buffer[4] = 0x10 + temp_int;
+  multi_vram_buffer_horz(xp_str_buffer, 5, NTADR_A(19, temp_y));
 }
 
 void refresh_xp_hud() {
