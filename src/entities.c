@@ -674,6 +674,10 @@ void entity_action_handler() {
         skill_damage(roll_dice(entity_attack[current_entity].amount, entity_attack[current_entity].sides));
       }
       break;
+    case SkHaste:
+      entity_status[skill_target_entity] |= STATUS_HASTE;
+      entity_status_turns[skill_target_entity] = STATUS_LENGTH;
+      break;
     case SkHeal:
       // TODO: maybe add chance to fumble
       entity_hp[skill_target_entity] += roll_dice(6, 4);
@@ -735,7 +739,14 @@ void next_entity() {
 
     if (entity_hp[current_entity] == 0) continue;
 
-    entity_turn_counter[current_entity] += entity_speed[current_entity];
+    if (entity_turn_counter[current_entity] < NORMAL_SPEED) {
+      temp = entity_speed[current_entity];
+      if (entity_status[current_entity] & STATUS_HASTE) {
+        temp = temp * 2;
+      }
+      entity_turn_counter[current_entity] += temp;
+    }
+
     if (entity_turn_counter[current_entity] >= NORMAL_SPEED) {
       entity_turn_counter[current_entity] -= NORMAL_SPEED;
       current_entity_moves = entity_moves[current_entity];
