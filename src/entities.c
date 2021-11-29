@@ -27,6 +27,8 @@ unsigned char temp_w, temp_h;
 unsigned char menu_cursor_row, menu_cursor_col, menu_cursor_index;
 unsigned char *room_ptr;
 
+unsigned char current_entity;
+
 unsigned char entity_sprite_index;
 
 unsigned char turn_counter;
@@ -37,7 +39,6 @@ unsigned char entity_row[MAX_ENTITIES];
 unsigned char entity_col[MAX_ENTITIES];
 direction entity_direction[MAX_ENTITIES];
 unsigned char entity_turn_counter[MAX_ENTITIES];
-unsigned char current_entity;
 unsigned char current_entity_moves;
 entity_state_enum current_entity_state;
 unsigned char entity_x, entity_y;
@@ -477,7 +478,9 @@ void entity_menu_handler() {
       next_entity();
       break;
     default:
-      // special skill
+      if (!consume_sp()) { break; }
+      // TODO: implement skill
+      next_entity();
       break;
     }
   }

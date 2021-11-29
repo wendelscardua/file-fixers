@@ -38,4 +38,8 @@ extern unsigned char current_entity_skill;
 extern unsigned char skill_target_row, skill_target_col;
 extern unsigned char skill_target_entity;
 
+#pragma wrapped-call (push, farcallax, bank)
+unsigned char consume_sp (void);
+#pragma wrapped-call (pop)
+
 #endif
