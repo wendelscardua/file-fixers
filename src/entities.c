@@ -15,7 +15,7 @@
 #include "../assets/enemy-stats.h"
 #include "../assets/sprites.h"
 
-#pragma code-name ("STARTUP")
+#pragma code-name ("CODE")
 #pragma rodata-name ("RODATA")
 
 #pragma bss-name(push, "ZEROPAGE")
