@@ -288,10 +288,14 @@ void entity_handler() {
 }
 
 extern unsigned char * current_sector;
-unsigned char entity_collides() {
-  if (temp_x == 0xff || temp_y == 0xff || temp_x == 12 || temp_y == 10) return 1;
 
+unsigned char collides_with_map() {
+  if (temp_x == 0xff || temp_y == 0xff || temp_x == 12 || temp_y == 10) return 1;
   if (current_sector[temp_y * 12 + temp_x] == NullMetatile) return 1;
+}
+
+unsigned char entity_collides() {
+  if (collides_with_map()) return 1;
 
   for(i = 0; i < num_entities; i++) {
     if (entity_hp[i] > 0 && entity_col[i] == temp_x && entity_row[i] == temp_y) return 1;
@@ -699,7 +703,7 @@ unsigned char find_entity() {
   // finds an entity at coords temp_x, temp_y
   // return 0xff if not found
   for(i = 0; i < num_entities; i++) {
-    if (entity_row[i] == temp_y && entity_col[i] == temp_x) return i;
+    if (entity_hp[i] > 0 && entity_row[i] == temp_y && entity_col[i] == temp_x) return i;
   }
   return 0xff;
 }
