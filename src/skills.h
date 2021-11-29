@@ -30,7 +30,7 @@ typedef enum {
               SkTaunt, // TODO (make near enemies target self)
               SkThrow, // TODO (damage and push enemy)
               SkThunder, // TODO (damage all enemies)
-              SkTele, // TODO (move self to anywhere)
+              SkTele,
               NumSkills
 } skill_type;
 
