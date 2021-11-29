@@ -1,37 +1,6 @@
 // Contains functions to help with working with multiple PRG/CHR banks
 // For MMC3 code.
 
-// Maximum level of recursion to allow with banked_call and similar functions.
-#define MAX_BANK_DEPTH 10
-
-unsigned char bankLevel;
-unsigned char bankBuffer[MAX_BANK_DEPTH];
-
-
-
-
-// Switch to another bank and call this function.
-// Note: Using banked_call to call a second function from within  
-// another banked_call is safe. This will break if you nest more  
-// than 10 calls deep.
-void banked_call(unsigned char bankId, void (*method)(void));
-
-
-// Internal function used by banked_call(), don't call this directly.
-// Switch to the given bank, and keep track of the current bank, so 
-// that we may jump back to it as needed.
-void bank_push(unsigned char bankId);
-
-
-// Internal function used by banked_call(), don't call this directly.
-// Go back to the last bank pushed on using bank_push.
-void bank_pop(void);
-
-
-
-
-
-
 // Switch to the given bank (at $8000-9fff). Your prior bank is not saved.
 // Can be used for reading data with a function in the fixed bank.
 // bank_id: The bank to switch to.
@@ -68,7 +37,7 @@ void __fastcall__ set_chr_mode_5(unsigned char chr_id);
 #define MIRROR_VERTICAL 0
 #define MIRROR_HORIZONTAL 1
 
-// Set the current mirroring mode. Your options are 
+// Set the current mirroring mode. Your options are
 // MIRROR_HORIZONTAL, and MIRROR_VERTICAL.
 void __fastcall__ set_mirroring(unsigned char mirroring);
 
@@ -77,7 +46,7 @@ void __fastcall__ set_mirroring(unsigned char mirroring);
 #define WRAM_ON 0x80
 #define WRAM_READ_ONLY 0xC0
 
-// Set the WRAM mode. Your options are 
+// Set the WRAM mode. Your options are
 // WRAM_OFF, WRAM_ON, and WRAM_READ_ONLY.
 // May not work in some emulators. Init code turns it ON.
 void __fastcall__ set_wram_mode(unsigned char mode);
@@ -88,7 +57,7 @@ void __fastcall__ set_wram_mode(unsigned char mode);
 void disable_irq(void);
 
 
-// This points an array to the IRQ system 
+// This points an array to the IRQ system
 // Also turns ON the system
 void set_irq_ptr(char * address);
 
@@ -98,17 +67,3 @@ void set_irq_ptr(char * address);
 // if the irq pointer is pointing to 0xff it is
 // safe to edit.
 unsigned char is_irq_done(void);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
