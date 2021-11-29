@@ -23,7 +23,7 @@
 unsigned char num_entities, num_enemies, num_players;
 unsigned char entity_aux;
 unsigned char temp_w, temp_h;
-unsigned char menu_cursor_row, menu_cursor_col;
+unsigned char menu_cursor_row, menu_cursor_col, menu_cursor_index;
 unsigned char *room_ptr;
 unsigned char current_entity_skill;
 unsigned char skill_target_row, skill_target_col;
@@ -227,6 +227,14 @@ void init_entities(unsigned char stairs_row, unsigned char stairs_col) {
     num_players++;
 
     i = num_entities;
+#ifdef DEBUG
+    temp_bank = change_prg_8000(2);
+    temp = player_class[i];
+    for(temp_x = 0; temp_x < 6; temp_x++) {
+      player_skills[i][3 + temp_x] = skills_per_class[temp - 1][temp_x];
+    }
+    set_prg_8000(temp_bank);
+#endif
     refresh_skills_hud();
   }
   entity_col[0] = entity_col[2] = stairs_col;
@@ -377,6 +385,7 @@ void entity_input_handler() {
       current_entity_state = EntityMenu;
       menu_cursor_row = 0;
       menu_cursor_col = 0;
+      menu_cursor_index = 0;
     } else if (pad1_new & PAD_B) { // Pass
       next_entity();
     }
@@ -439,18 +448,18 @@ void entity_menu_handler() {
   pad_poll(0);
   pad1_new = get_pad_new(0);
   if (pad1_new & PAD_UP) {
-    if (menu_cursor_row > 0) --menu_cursor_row;
+    if (menu_cursor_row > 0) { --menu_cursor_row; --menu_cursor_index; }
   } else if (pad1_new & PAD_DOWN) {
-    if (menu_cursor_row < 2) ++menu_cursor_row;
+    if (menu_cursor_row < 2) { ++menu_cursor_row; ++menu_cursor_index; }
   } else if (pad1_new & PAD_LEFT) {
-    if (menu_cursor_col > 0) --menu_cursor_col;
+    if (menu_cursor_col > 0) { --menu_cursor_col; menu_cursor_index -= 3; }
   } else if (pad1_new & PAD_RIGHT) {
-    if (menu_cursor_col < 2) ++menu_cursor_col;
+    if (menu_cursor_col < 2) { ++menu_cursor_col; menu_cursor_index += 3; }
   } else if (pad1_new & PAD_B) {
     entity_aux = 0;
     current_entity_state = EntityInput;
   } else if (pad1_new & PAD_A) {
-    switch (current_entity_skill = player_skills[current_entity][menu_cursor_col * 3 + menu_cursor_row]) {
+    switch (current_entity_skill = player_skills[current_entity][menu_cursor_index]) {
     case SkNone:
       entity_aux = 0;
       current_entity_state = EntityInput;
