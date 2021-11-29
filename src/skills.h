@@ -20,7 +20,7 @@ typedef enum {
               SkFreeze, // TODO (reduce/zero moves?)
               SkJoust, // TODO (move forward and hit first enemy?)
               SkHaste, // TODO (increase speed - how long?)
-              SkHeal, // TODO (restore hp - how much?)
+              SkHeal,
               SkProtect, // TODO (add AC - how long/much?)
               SkRaise, // TODO (revive)
               SkShield, // TODO (add self AC)

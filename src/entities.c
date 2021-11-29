@@ -89,11 +89,12 @@ void refresh_skills_hud() {
   // input: i = player index
   temp_x = 3;
   temp_y = 0;
-  temp_bank = change_prg_8000(2);
   for(temp = 0; temp < 9; temp++) {
     temp_attr = player_skills[i][temp];
     if (temp_attr != SkNone) {
+      temp_bank = change_prg_8000(2);
       multi_vram_buffer_horz(skill_name[temp_attr], 8, NTADR_C((temp_x), (temp_y + 5 * i)));
+      set_prg_8000(temp_bank);
     }
     temp_y++;
     if (temp_y == 3) {
@@ -102,7 +103,6 @@ void refresh_skills_hud() {
       clear_vram_buffer();
     }
   }
-  set_prg_8000(temp_bank);
 }
 
 void refresh_moves_hud() {
@@ -634,8 +634,8 @@ void gain_exp() {
         if (temp == temp_y) {
           temp_bank = change_prg_8000(2);
           player_skills[i][3 + temp_x] = skills_per_class[player_class[i] - 1][temp_x];
-          refresh_skills_hud();
           set_prg_8000(temp_bank);
+          refresh_skills_hud();
           break;
         }
       }
@@ -651,31 +651,36 @@ void gain_exp() {
   }
 }
 
+void skill_damage(unsigned char damage) {
+  if (entity_hp[skill_target_entity] <= damage) {
+    entity_hp[skill_target_entity] = 0;
+    gain_exp();
+  } else {
+    entity_hp[skill_target_entity] -= damage;
+  }
+}
+
 #define BASIC_SKILL_ANIM_LEN 0x18
 
 void entity_action_handler() {
-  switch(current_entity_skill) {
-  case SkAttack:
-    entity_aux++;
-    if (entity_aux >= BASIC_SKILL_ANIM_LEN) {
+  entity_aux++;
+  if (entity_aux >= BASIC_SKILL_ANIM_LEN) {
+    switch(current_entity_skill) {
+    case SkAttack:
       if (melee_to_hit()) {
-        temp = roll_dice(entity_attack[current_entity].amount, entity_attack[current_entity].sides);
-        if (entity_hp[skill_target_entity] <= temp) {
-          entity_hp[skill_target_entity] = 0;
-          gain_exp();
-        } else {
-          entity_hp[skill_target_entity] -= temp;
-        }
+        skill_damage(roll_dice(entity_attack[current_entity].amount, entity_attack[current_entity].sides));
       }
-      entity_aux = 0;
-      next_entity();
+      break;
+    case SkHeal:
+      // TODO: maybe add chance to fumble
+      entity_hp[skill_target_entity] += roll_dice(6, 4);
+      if (entity_hp[skill_target_entity] > entity_max_hp[skill_target_entity]) {
+        entity_hp[skill_target_entity] = entity_max_hp[skill_target_entity];
+      }
+      break;
     }
-    break;
-#ifdef DEBUG
-  default:
-    error();
-#endif
-    break;
+    entity_aux = 0;
+    next_entity();
   }
 }
 
@@ -746,6 +751,7 @@ unsigned char find_entity() {
 }
 
 void draw_entities() {
+  // TODO: spell effects
   if (current_entity_state == EntityPlayAction) {
     switch(current_entity_skill) {
     case SkAttack:
