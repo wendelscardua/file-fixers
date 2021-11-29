@@ -1,18 +1,22 @@
 #include "lib/nesdoug.h"
 #include "lib/neslib.h"
 #include "lib/subrand.h"
+#include "mmc3/mmc3_code.h"
+#include "charmap.h"
 #include "dice.h"
 #include "directions.h"
 #include "dungeon.h"
 #include "enemies.h"
 #include "entities.h"
 #include "irq_buffer.h"
+#include "main.h"
+#include "skills.h"
 #include "temp.h"
 #include "wram.h"
 #include "../assets/enemy-stats.h"
 #include "../assets/sprites.h"
 
-#pragma code-name ("STARTUP")
+#pragma code-name ("CODE")
 #pragma rodata-name ("RODATA")
 
 #pragma bss-name(push, "ZEROPAGE")
@@ -20,11 +24,12 @@
 unsigned char num_entities, num_enemies, num_players;
 unsigned char entity_aux;
 unsigned char temp_w, temp_h;
-unsigned char menu_cursor_row, menu_cursor_col;
+unsigned char menu_cursor_row, menu_cursor_col, menu_cursor_index;
 unsigned char *room_ptr;
-unsigned char current_entity_skill;
-unsigned char skill_target_row, skill_target_col;
-unsigned char skill_target_entity;
+
+unsigned char current_entity;
+
+unsigned char entity_sprite_index;
 
 unsigned char turn_counter;
 
@@ -34,17 +39,70 @@ unsigned char entity_row[MAX_ENTITIES];
 unsigned char entity_col[MAX_ENTITIES];
 direction entity_direction[MAX_ENTITIES];
 unsigned char entity_turn_counter[MAX_ENTITIES];
-unsigned char current_entity;
 unsigned char current_entity_moves;
 entity_state_enum current_entity_state;
 unsigned char entity_x, entity_y;
 
-void return_from_dungeon(); // TODO: maybe add a main.h ?
-void go_to_game_over();
+const unsigned int xp_per_level[] =
+  {
+   0, // 1
+   20, // 2
+   30, // 3
+   50, // 4
+   100, // 5
+   200, // 6
+   400, // 7
+   800, // 8
+   1600, // 9
+   3200, // 10
+   3600, // 11
+   4000, // 12
+   5000, // 13
+   6000, // 14
+   7000, // 15
+   9000, // 16
+   11000, // 17
+   13000, // 18
+   15000, // 19
+   17000, // 20
+   20000, // 21
+   23000, // 22
+   26000, // 23
+   29000, // 24
+   32000, // 25
+   32000, // 26
+   32000, // 27
+   32000, // 28
+   32000, // 29
+   32000 // 30
+  };
 
+#ifdef DEBUG
 void error() {
   // TODO: error handling?
   multi_vram_buffer_horz("ERROR", 5, NTADR_A(12, 12));
+  while(1);
+}
+#endif
+
+void refresh_skills_hud() {
+  // input: i = player index
+  temp_x = 3;
+  temp_y = 0;
+  for(temp = 0; temp < 9; temp++) {
+    temp_attr = player_skills[i][temp];
+    if (temp_attr != SkNone) {
+      temp_bank = change_prg_8000(2);
+      multi_vram_buffer_horz(skill_name[temp_attr], 8, NTADR_C((temp_x), (temp_y + 5 * i)));
+      set_prg_8000(temp_bank);
+    }
+    temp_y++;
+    if (temp_y == 3) {
+      temp_y = 0; temp_x += 9;
+      ppu_wait_nmi();
+      clear_vram_buffer();
+    }
+  }
 }
 
 void refresh_moves_hud() {
@@ -101,14 +159,57 @@ void refresh_hp_sp_hud() {
   refresh_gauge(1);
 }
 
+void write_xp() {
+  char xp_str_buffer[5];
+
+  xp_str_buffer[0] = 0x10;
+  while (temp_int >= 10000u) {
+    temp_int -= 10000u;
+    xp_str_buffer[0]++;
+  }
+  xp_str_buffer[1] = 0x10;
+  while (temp_int >= 1000u) {
+    temp_int -= 1000u;
+    xp_str_buffer[1]++;
+  }
+  xp_str_buffer[2] = 0x10;
+  while (temp_int >= 100u) {
+    temp_int -= 100u;
+    xp_str_buffer[2]++;
+  }
+  xp_str_buffer[3] = 0x10;
+  while (temp_int >= 10u) {
+    temp_int -= 10u;
+    xp_str_buffer[3]++;
+  }
+  xp_str_buffer[4] = 0x10 + temp_int;
+  multi_vram_buffer_horz(xp_str_buffer, 5, NTADR_A(19, temp_y));
+}
+
+void refresh_xp_hud() {
+  temp_y = 25;
+  temp_int = player_xp[current_entity];
+  write_xp();
+  temp_y = 26;
+  temp_int = xp_per_level[entity_lv[current_entity]];
+  write_xp();
+}
+
 void refresh_hud() {
   refresh_moves_hud();
   refresh_hp_sp_hud();
 
+  temp = entity_lv[current_entity];
+  one_vram_buffer(0x10 + (temp / 10), NTADR_A(12, 25));
+  one_vram_buffer(0x10 + (temp % 10), NTADR_A(13, 25));
+
   if (entity_type[current_entity] == Player) {
     multi_vram_buffer_horz((char *) player_name[current_entity], 5, NTADR_A(3, 25));
+    refresh_xp_hud();
   } else {
     multi_vram_buffer_horz((char *) enemy_name[entity_type[current_entity]], 5, NTADR_A(3, 25));
+    multi_vram_buffer_horz("     ", 5, NTADR_A(19, 25));
+    multi_vram_buffer_horz("     ", 5, NTADR_A(19, 26));
   }
 }
 
@@ -123,6 +224,17 @@ void init_entities(unsigned char stairs_row, unsigned char stairs_col) {
     entity_direction[num_entities] = Down;
     entity_turn_counter[num_entities] = subrand8(12);
     num_players++;
+
+    i = num_entities;
+#ifdef DEBUG
+    temp_bank = change_prg_8000(2);
+    temp = player_class[i];
+    for(temp_x = 0; temp_x < 6; temp_x++) {
+      player_skills[i][3 + temp_x] = skills_per_class[temp - 1][temp_x];
+    }
+    set_prg_8000(temp_bank);
+#endif
+    refresh_skills_hud();
   }
   entity_col[0] = entity_col[2] = stairs_col;
   entity_row[1] = entity_row[3] = stairs_row;
@@ -169,6 +281,9 @@ void entity_handler() {
   case EntityMenu:
     entity_menu_handler();
     break;
+  case EntityAskTarget:
+    entity_ask_target_handler();
+    break;
   case EntityPlayAction:
     entity_action_handler();
     break;
@@ -176,10 +291,15 @@ void entity_handler() {
 }
 
 extern unsigned char * current_sector;
-unsigned char entity_collides() {
-  if (temp_x == 0xff || temp_y == 0xff || temp_x == 12 || temp_y == 10) return 1;
 
+unsigned char collides_with_map() {
+  if (temp_x == 0xff || temp_y == 0xff || temp_x == 12 || temp_y == 10) return 1;
   if (current_sector[temp_y * 12 + temp_x] == NullMetatile) return 1;
+  return 0;
+}
+
+unsigned char entity_collides() {
+  if (collides_with_map()) return 1;
 
   for(i = 0; i < num_entities; i++) {
     if (entity_hp[i] > 0 && entity_col[i] == temp_x && entity_row[i] == temp_y) return 1;
@@ -188,37 +308,17 @@ unsigned char entity_collides() {
   return 0;
 }
 
-unsigned char set_melee_skill_target() {
-  skill_target_row = entity_row[current_entity];
-  skill_target_col = entity_col[current_entity];
-  switch (entity_direction[current_entity]) {
-  case Up: --skill_target_row; break;
-  case Down: ++skill_target_row; break;
-  case Left: --skill_target_col; break;
-  case Right: ++skill_target_col; break;
-  default:
-    return 0;
-  }
-
-  if (skill_target_row > 9 || skill_target_col > 11) return 0;
-
-  for(skill_target_entity = 0; skill_target_entity < num_entities; skill_target_entity++) {
-    if ((entity_hp[skill_target_entity] > 0) &&
-        (entity_row[skill_target_entity] == skill_target_row) &&
-        (entity_col[skill_target_entity] == skill_target_col)) return 1;
-  }
-
-  return 0;
-}
-
 unsigned char enemy_lock_on_melee_target() {
   temp = entity_direction[current_entity];
+  skill_target_row = entity_row[current_entity];
+  skill_target_col = entity_col[current_entity];
+  skill_target_direction = entity_direction[current_entity];
   for(i = 0; i < 4; i++) {
     if (set_melee_skill_target() && skill_target_entity < 4) return 1;
 
     temp++;
     if (temp >= 4) temp = 0;
-    entity_direction[current_entity] = temp;
+    skill_target_direction = entity_direction[current_entity] = temp;
   }
   return 0;
 }
@@ -254,10 +354,11 @@ void entity_input_handler() {
     if (pad1_new & (PAD_UP|PAD_DOWN|PAD_LEFT|PAD_RIGHT)) {
       temp_x = entity_col[current_entity];
       temp_y = entity_row[current_entity];
-      if (pad1_new & PAD_UP) { --temp_y; temp = entity_direction[current_entity] = Up; }
-      if (pad1_new & PAD_DOWN) { ++temp_y; temp = entity_direction[current_entity] = Down; }
-      if (pad1_new & PAD_LEFT) { --temp_x; temp = entity_direction[current_entity] = Left; }
-      if (pad1_new & PAD_RIGHT) { ++temp_x; temp = entity_direction[current_entity] = Right; }
+      if (pad1_new & PAD_UP) { --temp_y; temp = Up; }
+      if (pad1_new & PAD_DOWN) { ++temp_y; temp = Down; }
+      if (pad1_new & PAD_LEFT) { --temp_x; temp = Left; }
+      if (pad1_new & PAD_RIGHT) { ++temp_x; temp = Right; }
+      entity_direction[current_entity] = temp;
 
       if (current_entity_moves > 0 && !entity_collides()) {
         entity_row[current_entity] = temp_y;
@@ -271,6 +372,7 @@ void entity_input_handler() {
       current_entity_state = EntityMenu;
       menu_cursor_row = 0;
       menu_cursor_col = 0;
+      menu_cursor_index = 0;
     } else if (pad1_new & PAD_B) { // Pass
       next_entity();
     }
@@ -333,24 +435,27 @@ void entity_menu_handler() {
   pad_poll(0);
   pad1_new = get_pad_new(0);
   if (pad1_new & PAD_UP) {
-    if (menu_cursor_row > 0) --menu_cursor_row;
+    if (menu_cursor_row > 0) { --menu_cursor_row; --menu_cursor_index; }
   } else if (pad1_new & PAD_DOWN) {
-    if (menu_cursor_row < 2) ++menu_cursor_row;
+    if (menu_cursor_row < 2) { ++menu_cursor_row; ++menu_cursor_index; }
   } else if (pad1_new & PAD_LEFT) {
-    if (menu_cursor_col > 0) --menu_cursor_col;
+    if (menu_cursor_col > 0) { --menu_cursor_col; menu_cursor_index -= 3; }
   } else if (pad1_new & PAD_RIGHT) {
-    if (menu_cursor_col < 2) ++menu_cursor_col;
+    if (menu_cursor_col < 2) { ++menu_cursor_col; menu_cursor_index += 3; }
   } else if (pad1_new & PAD_B) {
     entity_aux = 0;
     current_entity_state = EntityInput;
   } else if (pad1_new & PAD_A) {
-    switch (current_entity_skill = player_skills[current_entity][menu_cursor_col * 3 + menu_cursor_row]) {
+    switch (current_entity_skill = player_skills[current_entity][menu_cursor_index]) {
     case SkNone:
       entity_aux = 0;
       current_entity_state = EntityInput;
       break;
     case SkAttack:
       entity_aux = 0;
+      skill_target_row = entity_row[current_entity];
+      skill_target_col = entity_col[current_entity];
+      skill_target_direction = entity_direction[current_entity];
       if (set_melee_skill_target()) {
         current_entity_state = EntityPlayAction;
       } else {
@@ -363,7 +468,54 @@ void entity_menu_handler() {
     case SkPass:
       next_entity();
       break;
+    default:
+      if (!have_enough_sp()) { break; }
+      skill_target_row = entity_row[current_entity];
+      skill_target_col = entity_col[current_entity];
+      skill_target_direction = entity_direction[current_entity];
+      if (skill_is_targeted()) {
+        current_entity_state = EntityAskTarget;
+        break;
+      } else if (skill_can_hit()) {
+        consume_sp();
+        refresh_hp_sp_hud();
+        entity_aux = 0;
+        current_entity_state = EntityPlayAction;
+      }
+      break;
     }
+  }
+}
+
+void entity_ask_target_handler() {
+  pad_poll(0);
+  pad1_new = get_pad_new(0);
+  if (pad1_new == 0) return;
+
+  if (pad1_new & PAD_UP) {
+    if (skill_target_row > 0) { --skill_target_row; }
+  } else if (pad1_new & PAD_DOWN) {
+    if (skill_target_row < 9) { ++skill_target_row; }
+  } else if (pad1_new & PAD_LEFT) {
+    if (skill_target_col > 0) { --skill_target_col; }
+  } else if (pad1_new & PAD_RIGHT) {
+    if (skill_target_col < 11) { ++skill_target_col; }
+  } else if (pad1_new & PAD_B) {
+    entity_aux = 0;
+    current_entity_state = EntityInput;
+  } else if (pad1_new & PAD_A) {
+    temp_x = skill_target_col;
+    temp_y = skill_target_row;
+    skill_target_entity = find_entity();
+    if (skill_target_entity == 0xff) {
+      entity_aux = 0;
+      current_entity_state = EntityInput;
+      return;
+    }
+    consume_sp();
+    refresh_hp_sp_hud();
+    entity_aux = 0;
+    current_entity_state = EntityPlayAction;
   }
 }
 
@@ -385,41 +537,6 @@ unsigned char melee_to_hit() {
   return (to_hit_bonus > roll_die(20));
 }
 
-const unsigned int xp_per_level[] =
-  {
-   0, // 0
-   0, // 1
-   20, // 2
-   30, // 3
-   50, // 4
-   100, // 5
-   200, // 6
-   400, // 7
-   800, // 8
-   1600, // 9
-   3200, // 10
-   3600, // 11
-   4000, // 12
-   5000, // 13
-   6000, // 14
-   7000, // 15
-   9000, // 16
-   11000, // 17
-   13000, // 18
-   15000, // 19
-   17000, // 20
-   20000, // 21
-   23000, // 22
-   26000, // 23
-   29000, // 24
-   32000, // 25
-   32000, // 26
-   32000, // 27
-   32000, // 28
-   32000, // 29
-   32000 // 30
-  };
-
 void gain_exp() {
   unsigned int exp, temp_exp, temp_goal;
   if (current_entity >= 4) {
@@ -437,15 +554,19 @@ void gain_exp() {
   // TODO: bonus per monster attack:
   exp += 5;
 
+#ifdef DEBUG
+  exp += 500;
+#endif
+
   for(i = 0; i < 4; i++) {
     if (entity_hp[i] == 0) continue;
     temp = entity_lv[i];
     if (temp >= 30) continue;
-    // current player gets 100% xp, others get 50%
+    // current player gets 150% xp, others get 100%
     if (i == current_entity) {
-      temp_exp = exp;
+      temp_exp = exp + exp / 2;
     } else {
-      temp_exp = exp / 2;
+      temp_exp = exp;
     }
 
     temp_goal = xp_per_level[temp];
@@ -454,6 +575,9 @@ void gain_exp() {
       // TODO: maybe check if they can gain multiple levels
       ++entity_lv[i];
       if (entity_lv[i] > party_level) party_level = entity_lv[i];
+
+
+      // increase HP
 
       // TODO: maybe per class?
       temp = roll_die(8);
@@ -478,6 +602,8 @@ void gain_exp() {
         break;
       }
 
+      // increase SP
+
       // TODO: maybe add wiz
       temp = 2 + subrand8(16 / 2 + temp - 1); // wiz~16
 
@@ -495,8 +621,24 @@ void gain_exp() {
         // TODO: error
         break;
       }
+      if (player_max_sp[i] > 255 - temp) {
+        temp = 255 - player_max_sp[i];
+      }
       player_sp[i] += temp;
       player_max_sp[i] += temp;
+
+      // gain skill
+      temp = entity_lv[i];
+      temp_y = LEVEL_FOR_SKILL;
+      for(temp_x = 0; temp_x < 6; temp_x++, temp_y += LEVEL_FOR_SKILL) {
+        if (temp == temp_y) {
+          temp_bank = change_prg_8000(2);
+          player_skills[i][3 + temp_x] = skills_per_class[player_class[i] - 1][temp_x];
+          set_prg_8000(temp_bank);
+          refresh_skills_hud();
+          break;
+        }
+      }
     } else {
       player_xp[i] += temp_exp;
     }
@@ -509,29 +651,36 @@ void gain_exp() {
   }
 }
 
+void skill_damage(unsigned char damage) {
+  if (entity_hp[skill_target_entity] <= damage) {
+    entity_hp[skill_target_entity] = 0;
+    gain_exp();
+  } else {
+    entity_hp[skill_target_entity] -= damage;
+  }
+}
+
 #define BASIC_SKILL_ANIM_LEN 0x18
 
 void entity_action_handler() {
-  switch(current_entity_skill) {
-  case SkAttack:
-    entity_aux++;
-    if (entity_aux >= BASIC_SKILL_ANIM_LEN) {
+  entity_aux++;
+  if (entity_aux >= BASIC_SKILL_ANIM_LEN) {
+    switch(current_entity_skill) {
+    case SkAttack:
       if (melee_to_hit()) {
-        temp = roll_dice(entity_attack[current_entity].amount, entity_attack[current_entity].sides);
-        if (entity_hp[skill_target_entity] <= temp) {
-          entity_hp[skill_target_entity] = 0;
-          gain_exp();
-        } else {
-          entity_hp[skill_target_entity] -= temp;
-        }
+        skill_damage(roll_dice(entity_attack[current_entity].amount, entity_attack[current_entity].sides));
       }
-      entity_aux = 0;
-      next_entity();
+      break;
+    case SkHeal:
+      // TODO: maybe add chance to fumble
+      entity_hp[skill_target_entity] += roll_dice(6, 4);
+      if (entity_hp[skill_target_entity] > entity_max_hp[skill_target_entity]) {
+        entity_hp[skill_target_entity] = entity_max_hp[skill_target_entity];
+      }
+      break;
     }
-    break;
-  default:
-    error();
-    break;
+    entity_aux = 0;
+    next_entity();
   }
 }
 
@@ -592,7 +741,17 @@ void next_entity() {
   }
 }
 
+unsigned char find_entity() {
+  // finds an entity at coords temp_x, temp_y
+  // return 0xff if not found
+  for(i = 0; i < num_entities; i++) {
+    if (entity_hp[i] > 0 && entity_row[i] == temp_y && entity_col[i] == temp_x) return i;
+  }
+  return 0xff;
+}
+
 void draw_entities() {
+  // TODO: spell effects
   if (current_entity_state == EntityPlayAction) {
     switch(current_entity_skill) {
     case SkAttack:
@@ -604,16 +763,28 @@ void draw_entities() {
     }
   }
 
-  for(i = 0; i < num_entities; ++i) {
-    if (entity_hp[i] == 0) continue;
-    if (i == current_entity && current_entity_state == EntityMovement) {
-      switch(entity_type[i]) {
+  if (current_entity_state == EntityAskTarget) {
+    temp_x = 0x10 * skill_target_col + 0x15;
+    temp_y = 0x10 * skill_target_row + 0x20;
+    if ((get_frame_count() & 0b11000) == 0b11000) {
+      temp_x -= 0x04;
+    }
+    oam_meta_spr(temp_x, temp_y, menu_cursor_sprite);
+  }
+
+  entity_sprite_index = get_frame_count() & 0x0f;
+
+  for(i = 0; i < MAX_ENTITIES; ++i, entity_sprite_index = (entity_sprite_index + 7) & 0x0f) {
+    if (entity_sprite_index >= num_entities) continue;
+    if (entity_hp[entity_sprite_index] == 0) continue;
+    if (entity_sprite_index == current_entity && current_entity_state == EntityMovement) {
+      switch(entity_type[entity_sprite_index]) {
       case Player:
-        switch(entity_direction[i]) {
-        case Up: temp = (PLAYER_STEP_1_UP_SPR << 2) | i; break;
-        case Down: temp = (PLAYER_STEP_1_DOWN_SPR << 2) | i; break;
-        case Left: temp = (PLAYER_STEP_1_LEFT_SPR << 2) | i; break;
-        case Right: temp = (PLAYER_STEP_1_RIGHT_SPR << 2) | i; break;
+        switch(entity_direction[entity_sprite_index]) {
+        case Up: temp = (PLAYER_STEP_1_UP_SPR << 2) | entity_sprite_index; break;
+        case Down: temp = (PLAYER_STEP_1_DOWN_SPR << 2) | entity_sprite_index; break;
+        case Left: temp = (PLAYER_STEP_1_LEFT_SPR << 2) | entity_sprite_index; break;
+        case Right: temp = (PLAYER_STEP_1_RIGHT_SPR << 2) | entity_sprite_index; break;
         }
         if (entity_aux & 0b1000) {
           temp += (1 << 2);
@@ -621,7 +792,7 @@ void draw_entities() {
         oam_meta_spr(entity_x, entity_y, player_sprite[temp]);
         break;
       default: // enemies
-        switch(entity_direction[i]) {
+        switch(entity_direction[entity_sprite_index]) {
         case Up: temp = ENEMY_LEFT_1_SPR; break;
         case Down: temp = ENEMY_RIGHT_1_SPR; break;
         case Left: temp = ENEMY_LEFT_1_SPR; break;
@@ -630,44 +801,48 @@ void draw_entities() {
         if (entity_aux & 0b1000) {
           temp++;
         }
+        temp_bank = change_prg_8000(1);
         oam_meta_spr(entity_x,
                      entity_y,
                      enemy_sprite[
-                                  enemy_sprite_index[entity_type[i]] | temp
+                                  enemy_sprite_index[entity_type[entity_sprite_index]] | temp
                                   ]);
+        set_prg_8000(temp_bank);
       }
     } else {
-      temp_x = entity_col[i] * 0x10 + 0x20;
-      temp_y = entity_row[i] * 0x10 + 0x20 - 1;
-      switch(entity_type[i]) {
+      temp_x = entity_col[entity_sprite_index] * 0x10 + 0x20;
+      temp_y = entity_row[entity_sprite_index] * 0x10 + 0x20 - 1;
+      switch(entity_type[entity_sprite_index]) {
       case Player:
-        switch(entity_direction[i]) {
-        case Up: temp = (PLAYER_UP_SPR << 2) | i; break;
-        case Down: temp = (PLAYER_DOWN_SPR << 2) | i; break;
-        case Left: temp = (PLAYER_LEFT_SPR << 2) | i; break;
-        case Right: temp = (PLAYER_RIGHT_SPR << 2) | i; break;
+        switch(entity_direction[entity_sprite_index]) {
+        case Up: temp = (PLAYER_UP_SPR << 2) | entity_sprite_index; break;
+        case Down: temp = (PLAYER_DOWN_SPR << 2) | entity_sprite_index; break;
+        case Left: temp = (PLAYER_LEFT_SPR << 2) | entity_sprite_index; break;
+        case Right: temp = (PLAYER_RIGHT_SPR << 2) | entity_sprite_index; break;
         }
         oam_meta_spr(temp_x, temp_y, player_sprite[temp]);
 
         break;
       default: // enemies
-        switch(entity_direction[i]) {
+        switch(entity_direction[entity_sprite_index]) {
         case Up: temp = ENEMY_LEFT_2_SPR; break;
         case Down: temp = ENEMY_RIGHT_2_SPR; break;
         case Left: temp = ENEMY_LEFT_1_SPR; break;
         case Right: temp = ENEMY_RIGHT_1_SPR; break;
         }
+        temp_bank = change_prg_8000(1);
         oam_meta_spr(temp_x,
                      temp_y,
                      enemy_sprite[
-                                  enemy_sprite_index[entity_type[i]] | temp
+                                  enemy_sprite_index[entity_type[entity_sprite_index]] | temp
                                   ]);
+        set_prg_8000(temp_bank);
       }
     }
   }
 
   if (current_entity_state == EntityMenu) {
-    temp_x = 0x40 * menu_cursor_col + 0x08;
+    temp_x = 0x48 * menu_cursor_col + 0x08;
     temp_y = 0x08 * menu_cursor_row + 0xc4;
     if ((get_frame_count() & 0b11000) == 0b11000) {
       temp_x -= 0x04;

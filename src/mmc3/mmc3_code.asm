@@ -40,7 +40,7 @@ irq_done:		.res 1
 .segment "STARTUP"
 ;needs to be mapped to the fixed bank
 
-.export _set_prg_8000, _get_prg_8000, _set_prg_a000
+.export _set_prg_8000, _get_prg_8000, _set_prg_a000, _change_prg_8000
 .export _set_chr_mode_0, _set_chr_mode_1, _set_chr_mode_2, _set_chr_mode_3
 .export _set_chr_mode_4, _set_chr_mode_5
 
@@ -63,6 +63,14 @@ _get_prg_8000:
 lda BP_BANK_8000
 ldx #0
 rts
+
+_change_prg_8000:
+ldx BP_BANK_8000
+jsr _set_prg_8000
+txa
+ldx #0
+rts
+
 
 
 ; sets the bank at $a000-bfff

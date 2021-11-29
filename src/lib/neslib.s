@@ -147,10 +147,8 @@ nmi:
 ;switch the music into the prg bank first
 	lda BP_BANK_8000 ;save current prg bank
 	pha
-  .ifdef SOUND_BANK
-	  lda #SOUND_BANK
-	  jsr _set_prg_8000
-  .endif
+	lda #SOUND_BANK
+	jsr _set_prg_8000
   cli
 	jsr FamiToneUpdate
 	pla
@@ -825,11 +823,9 @@ _music_play:
 	tax
 	lda BP_BANK_8000 ;save current prg bank
 	pha
-  .ifdef SOUND_BANK
-	  lda #SOUND_BANK
-	  jsr _set_prg_8000 ;only uses A register
-  .endif
-	txa ;song number
+	lda #SOUND_BANK
+	jsr _set_prg_8000 ;only uses A register
+  txa ;song number
 	jsr FamiToneMusicPlay
 
 	pla
@@ -843,11 +839,9 @@ _music_play:
 _music_stop:
 	lda BP_BANK_8000 ;save current prg bank
 	pha
-  .ifdef SOUND_BANK
-	  lda #SOUND_BANK
-	  jsr _set_prg_8000
-  .endif
-	jsr FamiToneMusicStop
+	lda #SOUND_BANK
+	jsr _set_prg_8000
+  jsr FamiToneMusicStop
 
 	pla
 	sta BP_BANK_8000 ;restore prg bank
@@ -863,11 +857,9 @@ _music_pause:
 	tax
 	lda BP_BANK_8000 ;save current prg bank
 	pha
-  .ifdef SOUND_BANK
-	  lda #SOUND_BANK
-	  jsr _set_prg_8000 ;only uses A register
-  .endif
-	txa ;song number
+	lda #SOUND_BANK
+	jsr _set_prg_8000 ;only uses A register
+  txa ;song number
 	jsr FamiToneMusicPause
 
 	pla
@@ -892,11 +884,9 @@ _sfx_play:
 
 	lda BP_BANK_8000 ;save current prg bank
 	pha
-  .ifdef SOUND_BANK
-	  lda #SOUND_BANK
-	  jsr _set_prg_8000 ;only uses A register
-  .endif
-	jsr popa ;a = sound
+	lda #SOUND_BANK
+	jsr _set_prg_8000 ;only uses A register
+  jsr popa ;a = sound
 	;x = channel offset
 	jsr FamiToneSfxPlay
 
@@ -922,11 +912,9 @@ _sample_play:
 	tax
 	lda BP_BANK_8000 ;save current prg bank
 	pha
-  .ifdef SOUND_BANK
-	  lda #SOUND_BANK
-	  jsr _set_prg_8000 ;only uses A register
-  .endif
-	txa ;sample number
+	lda #SOUND_BANK
+	jsr _set_prg_8000 ;only uses A register
+  txa ;sample number
 	jsr FamiToneSamplePlay
 
 	pla

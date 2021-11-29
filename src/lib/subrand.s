@@ -5,6 +5,8 @@ subrand_bound: .res 1
 .segment "CODE"
 .import _rand8
 
+.segment "BANK1"
+
 .export _subrand8
 .proc _subrand8
   STA subrand_bound
@@ -20,9 +22,8 @@ loop:
   JMP loop
 return:
   LDX #$00
+  RTS
 .endproc
-
-.segment "RODATA"
 
 upper_bound_mask_lt:
 .byte 0

@@ -12,8 +12,6 @@
 #pragma rodata-name ("RODATA")
 
 #pragma bss-name(push, "ZEROPAGE")
-extern unsigned char current_screen;
-#pragma zpsym("current_screen");
 
 unsigned int nt_adr;
 

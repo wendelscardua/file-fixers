@@ -17,7 +17,9 @@ debug: LD65_FLAGS += --dbgfile ${PROJECT}.dbg
 debug: CA65_FLAGS += -g -DDEBUG=1
 debug: ${TARGET}
 
-${TARGET}: src/main.o src/crt0.o src/lib/unrle.o src/lib/subrand.o \
+${TARGET}: MMC3.cfg \
+           src/main.o src/crt0.o \
+           src/lib/unrle.o src/lib/subrand.o src/lib/farcall.o \
            src/nametable_loader.o \
            src/castle.o \
            src/dice.o \
@@ -26,6 +28,7 @@ ${TARGET}: src/main.o src/crt0.o src/lib/unrle.o src/lib/subrand.o \
            src/entities.o  \
            src/enemies.o \
            src/players.o \
+           src/skills.o \
            src/temp.o \
            src/wram.o \
            assets/nametables.o \
@@ -34,7 +37,7 @@ ${TARGET}: src/main.o src/crt0.o src/lib/unrle.o src/lib/subrand.o \
            assets/sprites.o \
            assets/enemy-stats.o \
            assets/dialogs.o
-	ld65 $^ -C MMC3.cfg nes.lib -m map.txt -o ${TARGET} ${LD65_FLAGS}
+	ld65 -C $^ nes.lib -m map.txt -o ${TARGET} ${LD65_FLAGS}
 
 %.o: %.s
 	ca65 $< ${CA65_FLAGS}
@@ -92,12 +95,14 @@ src/entities.s: src/entities.c \
                 src/lib/nesdoug.h \
                 src/lib/neslib.h \
                 src/lib/subrand.h \
+                src/charmap.h \
                 src/dice.h \
                 src/directions.h \
                 src/dungeon.h \
                 src/enemies.h \
                 src/entities.h \
                 src/irq_buffer.h \
+                src/main.h \
                 src/temp.h \
                 src/wram.h \
                 assets/enemy-stats.h \
@@ -120,11 +125,19 @@ src/irq_buffer.s: src/irq_buffer.c
 
 src/players.s: src/players.c \
                src/lib/neslib.h \
+               src/lib/subrand.h \
                src/charmap.h \
                src/dice.h \
                src/skills.h \
                src/temp.h \
                src/wram.h
+	cc65 -Oirs $< --add-source ${CA65_FLAGS}
+
+src/skills.s: src/skills.c \
+              src/skills.h \
+              src/lib/farcall.h \
+              src/charmap.h \
+              src/players.h
 	cc65 -Oirs $< --add-source ${CA65_FLAGS}
 
 src/temp.s: src/temp.c
