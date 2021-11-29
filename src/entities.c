@@ -723,11 +723,16 @@ void next_entity() {
   if (num_entities == 0) return;
 
   while(1) {
-    ++current_entity;
-    if (current_entity >= num_entities) {
-      current_entity = 0;
-      ++turn_counter;
+    // check if current entity was fast enough to earn a second turn
+    if (entity_turn_counter[current_entity] < NORMAL_SPEED || entity_hp[current_entity] == 0) {
+      // skip to next entity
+      ++current_entity;
+      if (current_entity >= num_entities) {
+        current_entity = 0;
+        ++turn_counter;
+      }
     }
+
     if (entity_hp[current_entity] == 0) continue;
 
     entity_turn_counter[current_entity] += entity_speed[current_entity];
