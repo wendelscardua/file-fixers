@@ -10,6 +10,7 @@
 #include "entities.h"
 #include "irq_buffer.h"
 #include "main.h"
+#include "skills.h"
 #include "temp.h"
 #include "wram.h"
 #include "../assets/enemy-stats.h"
@@ -25,9 +26,6 @@ unsigned char entity_aux;
 unsigned char temp_w, temp_h;
 unsigned char menu_cursor_row, menu_cursor_col, menu_cursor_index;
 unsigned char *room_ptr;
-unsigned char current_entity_skill;
-unsigned char skill_target_row, skill_target_col;
-unsigned char skill_target_entity;
 
 unsigned char entity_sprite_index;
 
@@ -477,6 +475,9 @@ void entity_menu_handler() {
       break;
     case SkPass:
       next_entity();
+      break;
+    default:
+      // special skill
       break;
     }
   }

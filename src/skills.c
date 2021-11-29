@@ -36,3 +36,7 @@ const char skill_name[NumSkills][8] =
    "Thunder ",
    "Teleport"
   };
+
+unsigned char current_entity_skill;
+unsigned char skill_target_row, skill_target_col;
+unsigned char skill_target_entity;
