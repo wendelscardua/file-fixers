@@ -805,6 +805,27 @@ void entity_action_handler() {
         skill_target_index++;
       }
       break;
+    case SkTaunt:
+      temp_x = entity_col[current_entity];
+      temp_y = entity_row[current_entity];
+
+      while(skill_target_index < skill_target_count) {
+        skill_target_row[0] = skill_target_row[skill_target_index];
+        skill_target_col[0] = skill_target_col[skill_target_index];
+        i = skill_target_entity[0] = skill_target_entity[skill_target_index];
+        if (skill_target_row[0] < temp_y) {
+          entity_direction[i] = Down;
+        } else if (skill_target_row[0] > temp_y) {
+          entity_direction[i] = Up;
+        } else if (skill_target_col[0] < temp_x) {
+          entity_direction[i] = Right;
+        } else {
+          entity_direction[i] = Left;
+        }
+        skill_damage(roll_dice(1, 4));
+        skill_target_index++;
+      }
+      break;
     case SkTele:
       entity_row[current_entity] = skill_target_row[0];
       entity_col[current_entity] = skill_target_col[0];
