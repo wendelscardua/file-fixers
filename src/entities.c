@@ -546,6 +546,24 @@ unsigned char melee_to_hit() {
   return (to_hit_bonus > roll_die(20));
 }
 
+unsigned char fire_to_hit() {
+  signed char to_hit_bonus = 10;
+
+  // TODO: AC
+  if (skill_target_entity < 4) {
+    // player AC
+    to_hit_bonus += 7;
+  } else {
+    to_hit_bonus += 10;
+  }
+
+  if (entity_status[skill_target_entity] & STATUS_PROTECT) {
+    to_hit_bonus -= 5;
+  }
+
+  return (to_hit_bonus > roll_die(20));
+}
+
 void gain_exp() {
   unsigned int exp, temp_exp, temp_goal;
   if (current_entity >= 4) {
@@ -684,6 +702,11 @@ void entity_action_handler() {
       entity_status[skill_target_entity] |= STATUS_CONFUSE;
       entity_status_turns[skill_target_entity] = STATUS_LENGTH;
       entity_direction[skill_target_entity] = subrand8(3);
+      break;
+    case SkFire:
+      if (fire_to_hit()) {
+        skill_damage(roll_dice(2, 12));
+      }
       break;
     case SkFreeze:
       entity_status[skill_target_entity] |= STATUS_FREEZE;
