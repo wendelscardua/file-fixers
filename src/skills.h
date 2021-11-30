@@ -52,8 +52,8 @@ extern const char skill_name[NumSkills][8];
 extern unsigned char current_entity_skill;
 extern unsigned char skill_target_row[MAX_SKILL_TARGETS], skill_target_col[MAX_SKILL_TARGETS];
 extern unsigned char skill_target_entity[MAX_SKILL_TARGETS];
-extern unsigned char skill_target_count;
 extern direction skill_target_direction;
+extern unsigned char skill_target_count, skill_target_index;
 
 #pragma wrapped-call (push, farcallax, bank)
 unsigned char have_enough_sp (void);

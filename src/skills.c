@@ -94,8 +94,8 @@ const skill_kind_t skill_kinds[] =
 unsigned char current_entity_skill;
 unsigned char skill_target_row[MAX_SKILL_TARGETS], skill_target_col[MAX_SKILL_TARGETS];
 unsigned char skill_target_entity[MAX_SKILL_TARGETS];
-unsigned char skill_target_count;
 direction skill_target_direction;
+unsigned char skill_target_count, skill_target_index;
 
 unsigned char have_enough_sp() {
   return player_sp[current_entity] >= 5 * skill_level[current_entity_skill];
@@ -149,8 +149,41 @@ unsigned char set_forward_skill_target() {
   }
 }
 
+// indexed clockwise from 'up' direction
+const unsigned char area_delta_row[] =
+  {
+   -1, -1, 0, 1, 1, 1, 0, -1
+  };
+const unsigned char area_delta_col[] =
+  {
+   0, 1, 1, 1, 0, -1, -1, -1
+  };
+
 unsigned char set_area_skill_targets() {
-  return 1;
+  unsigned char center_row, center_col;
+  switch (skill_target_direction) {
+  case Up: temp = 0; break;
+  case Down: temp = 4; break;
+  case Left: temp = 6; break;
+  case Right: temp = 2; break;
+  default:
+    return 0;
+  }
+  center_row = skill_target_row[0];
+  center_col = skill_target_col[0];
+  skill_target_index = skill_target_count = 0;
+  for(i = 0; i < 8; i++, temp++) {
+    if (temp == 8) temp = 0;
+    temp_x = center_col + area_delta_col[temp];
+    temp_y = center_row + area_delta_row[temp];
+    if ((skill_target_entity[skill_target_count] = find_entity()) != 0xff) {
+      skill_target_row[skill_target_count] = temp_y;
+      skill_target_col[skill_target_count] = temp_x;
+      skill_target_count++;
+    }
+  }
+
+  return (skill_target_count > 0);
 }
 
 unsigned char skill_can_hit() {
