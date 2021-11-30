@@ -33,6 +33,8 @@ unsigned char entity_moves[MAX_ENTITIES];
 unsigned int entity_hp[MAX_ENTITIES];
 unsigned int entity_max_hp[MAX_ENTITIES];
 dice_spec_t entity_attack[MAX_ENTITIES];
+unsigned char entity_status[MAX_ENTITIES];
+unsigned char entity_status_turns[MAX_ENTITIES];
 
 // this one doesn't need to be saved, it's here because of space
 // TODO: optimize it away

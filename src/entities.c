@@ -674,6 +674,10 @@ void entity_action_handler() {
         skill_damage(roll_dice(entity_attack[current_entity].amount, entity_attack[current_entity].sides));
       }
       break;
+    case SkHaste:
+      entity_status[skill_target_entity] |= STATUS_HASTE;
+      entity_status_turns[skill_target_entity] = STATUS_LENGTH;
+      break;
     case SkHeal:
       // TODO: maybe add chance to fumble
       entity_hp[skill_target_entity] += roll_dice(6, 4);
@@ -723,19 +727,38 @@ void next_entity() {
   if (num_entities == 0) return;
 
   while(1) {
-    ++current_entity;
-    if (current_entity >= num_entities) {
-      current_entity = 0;
-      ++turn_counter;
+    // check if current entity was fast enough to earn a second turn
+    if (entity_turn_counter[current_entity] < NORMAL_SPEED || entity_hp[current_entity] == 0) {
+      // skip to next entity
+      ++current_entity;
+      if (current_entity >= num_entities) {
+        current_entity = 0;
+        ++turn_counter;
+      }
     }
+
     if (entity_hp[current_entity] == 0) continue;
 
-    entity_turn_counter[current_entity] += entity_speed[current_entity];
+    if (entity_turn_counter[current_entity] < NORMAL_SPEED) {
+      temp = entity_speed[current_entity];
+      if (entity_status[current_entity] & STATUS_HASTE) {
+        temp = temp * 2;
+      }
+      entity_turn_counter[current_entity] += temp;
+    }
+
     if (entity_turn_counter[current_entity] >= NORMAL_SPEED) {
       entity_turn_counter[current_entity] -= NORMAL_SPEED;
       current_entity_moves = entity_moves[current_entity];
       current_entity_state = EntityInput;
       entity_aux = 0;
+
+      // consume status timer
+      if (entity_status_turns[current_entity] > 0) {
+        entity_status_turns[current_entity]--;
+      } else {
+        entity_status[current_entity] = 0;
+      }
 
       entity_x = entity_col[current_entity] * 0x10 + 0x20;
       entity_y = entity_row[current_entity] * 0x10 + 0x20 - 1;

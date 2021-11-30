@@ -546,17 +546,20 @@ void drivers_window_loading_handler () {
     ppu_on_all();
     pal_fade_to(0, 4);
 
+    // reset players
+    for(i = 0; i < 4; i++) {
+      entity_hp[i] = entity_max_hp[i];
+      player_sp[i] = player_max_sp[i];
+      entity_status[i] = 0;
+      entity_status_turns[i] = 0;
+    }
+
     start_dungeon(cursor_index - 1);
     break;
   }
 }
 
 void return_from_dungeon() {
-  // restore players
-  for(i = 0; i < 4; i++) {
-    entity_hp[i] = entity_max_hp[i];
-  }
-
   current_game_state = DriversWindow;
   if (dungeon_completed(cursor_index - 1)) {
     current_cursor_state = Disabled;

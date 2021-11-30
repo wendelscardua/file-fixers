@@ -44,6 +44,8 @@ void spawn_enemy(unsigned char entity_slot) {
   entity_moves[entity_slot] = enemy_moves[i];
   entity_speed[entity_slot] = enemy_speed[i];
   entity_attack[entity_slot] = enemy_attack[i];
+  entity_status[entity_slot] = 0;
+  entity_status_turns[entity_slot] = 0;
   entity_turn_counter[entity_slot] = subrand8(NORMAL_SPEED);
   temp = enemy_base_level[i];
   if (current_sector_index + 1 < temp) {
