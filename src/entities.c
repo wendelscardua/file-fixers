@@ -310,11 +310,15 @@ unsigned char entity_collides() {
 
 unsigned char enemy_lock_on_melee_target() {
   temp = entity_direction[current_entity];
-  skill_target_row = entity_row[current_entity];
-  skill_target_col = entity_col[current_entity];
   skill_target_direction = entity_direction[current_entity];
+  temp_attr = entity_status[current_entity] & STATUS_CONFUSE;
   for(i = 0; i < 4; i++) {
-    if (set_melee_skill_target() && skill_target_entity < 4) return 1;
+    skill_target_row = entity_row[current_entity];
+    skill_target_col = entity_col[current_entity];
+    if (set_melee_skill_target() &&
+        ((skill_target_entity < 4) == (temp_attr == 0))) {
+      return 1;
+    }
 
     temp++;
     if (temp >= 4) temp = 0;
@@ -352,12 +356,13 @@ void entity_input_handler() {
     pad_poll(0);
     pad1_new = get_pad_new(0);
     if (pad1_new & (PAD_UP|PAD_DOWN|PAD_LEFT|PAD_RIGHT)) {
+      if (entity_status[current_entity] & STATUS_CONFUSE) { pad1_new = rand8(); }
       temp_x = entity_col[current_entity];
       temp_y = entity_row[current_entity];
       if (pad1_new & PAD_UP) { --temp_y; temp = Up; }
-      if (pad1_new & PAD_DOWN) { ++temp_y; temp = Down; }
-      if (pad1_new & PAD_LEFT) { --temp_x; temp = Left; }
-      if (pad1_new & PAD_RIGHT) { ++temp_x; temp = Right; }
+      else if (pad1_new & PAD_DOWN) { ++temp_y; temp = Down; }
+      else if (pad1_new & PAD_LEFT) { --temp_x; temp = Left; }
+      else if (pad1_new & PAD_RIGHT) { ++temp_x; temp = Right; }
       entity_direction[current_entity] = temp;
 
       if (current_entity_moves > 0 && !entity_collides()) {
@@ -681,6 +686,11 @@ void entity_action_handler() {
       if (melee_to_hit()) {
         skill_damage(roll_dice(entity_attack[current_entity].amount, entity_attack[current_entity].sides));
       }
+      break;
+    case SkConfuse:
+      entity_status[skill_target_entity] |= STATUS_CONFUSE;
+      entity_status_turns[skill_target_entity] = STATUS_LENGTH;
+      entity_direction[skill_target_entity] = subrand8(3);
       break;
     case SkHaste:
       entity_status[skill_target_entity] |= STATUS_HASTE;
