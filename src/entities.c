@@ -534,7 +534,15 @@ unsigned char melee_to_hit() {
   if (entity_lv[current_entity] <= 2) ++to_hit_bonus;
 
   // TODO: AC
-  to_hit_bonus += 7; // default AC = 7
+  if (skill_target_entity < 4) {
+    // player AC
+    to_hit_bonus += 7;
+    if (entity_status[skill_target_entity] & STATUS_PROTECT) {
+      to_hit_bonus -= 5;
+    }
+  } else {
+    to_hit_bonus += 10;
+  }
 
 
   return (to_hit_bonus > roll_die(20));
@@ -684,6 +692,10 @@ void entity_action_handler() {
       if (entity_hp[skill_target_entity] > entity_max_hp[skill_target_entity]) {
         entity_hp[skill_target_entity] = entity_max_hp[skill_target_entity];
       }
+      break;
+    case SkProtect:
+      entity_status[skill_target_entity] |= STATUS_PROTECT;
+      entity_status_turns[skill_target_entity] = STATUS_LENGTH;
       break;
     case SkSlow:
       entity_status[skill_target_entity] |= STATUS_SLOW;

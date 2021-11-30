@@ -3,10 +3,11 @@
 #define MAX_ENTITIES 16
 #define NORMAL_SPEED 12
 
-#define STATUS_HASTE 0x01
-#define STATUS_SLOW  0x02
+#define STATUS_HASTE    0x01
+#define STATUS_SLOW     0x02
+#define STATUS_PROTECT  0x04
 
-#define STATUS_LENGTH (4 + roll_die(4))
+#define STATUS_LENGTH (2 + roll_die(4))
 
 typedef enum {
               Eicar,
