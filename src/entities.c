@@ -685,6 +685,10 @@ void entity_action_handler() {
       entity_status_turns[skill_target_entity] = STATUS_LENGTH;
       entity_direction[skill_target_entity] = subrand8(3);
       break;
+    case SkFreeze:
+      entity_status[skill_target_entity] |= STATUS_FREEZE;
+      entity_status_turns[skill_target_entity] = STATUS_LENGTH;
+      break;
     case SkJoust:
       temp_x = entity_col[current_entity];
       temp_y = entity_row[current_entity];
