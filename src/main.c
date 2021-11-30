@@ -269,11 +269,19 @@ void title_handler() {
   for(i = 0; i < 16; i++) {
     pad_poll(0);
     rand16();
-    if (get_pad_new(0) & (PAD_START | PAD_A)) {
+    pad1_new = get_pad_new(0);
+    if (pad1_new & (PAD_START | PAD_A)) {
       sfx_play(SFX_START, 0);
       start_game();
       break;
     }
+#ifdef DEBUG
+    if (pad1_new & (PAD_SELECT)) {
+      sfx_play(SFX_START, 0);
+      go_to_game_over();
+      break;
+    }
+#endif
   }
 }
 

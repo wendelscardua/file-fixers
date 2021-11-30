@@ -43,6 +43,7 @@ unsigned char current_entity_moves;
 entity_state_enum current_entity_state;
 unsigned char entity_x, entity_y;
 
+// indexed by current level
 const unsigned int xp_per_level[] =
   {
    0, // 1
@@ -684,6 +685,9 @@ void gain_exp() {
           break;
         }
       }
+
+      // gain moves
+      entity_moves[i] = moves_per_class_and_level[player_class[i] - 1][entity_lv[i] - 1];
     } else {
       player_xp[i] += temp_exp;
     }
@@ -860,8 +864,9 @@ void next_entity() {
 
     if (entity_hp[current_entity] == 0) continue;
 
+    temp_attr = entity_status[current_entity];
+
     if (entity_turn_counter[current_entity] < NORMAL_SPEED) {
-      temp_attr = entity_status[current_entity];
       temp = entity_speed[current_entity];
 
       if (temp_attr & STATUS_HASTE) {
