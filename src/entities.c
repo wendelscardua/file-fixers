@@ -793,6 +793,18 @@ void entity_action_handler() {
       entity_status[skill_target_entity[0]] |= STATUS_SLOW;
       entity_status_turns[skill_target_entity[0]] = STATUS_LENGTH;
       break;
+    case SkSpin:
+      while(skill_target_index < skill_target_count) {
+        skill_target_row[0] = skill_target_row[skill_target_index];
+        skill_target_col[0] = skill_target_col[skill_target_index];
+        skill_target_entity[0] = skill_target_entity[skill_target_index];
+
+        if (melee_to_hit()) {
+          skill_damage(roll_dice(4 * entity_attack[current_entity].amount, entity_attack[current_entity].sides));
+        }
+        skill_target_index++;
+      }
+      break;
     case SkTele:
       entity_row[current_entity] = skill_target_row[0];
       entity_col[current_entity] = skill_target_col[0];

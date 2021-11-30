@@ -27,7 +27,7 @@ typedef enum {
               SkShield,
               SkSlash,
               SkSlow,
-              SkSpin, // TODO (attack around user)
+              SkSpin,
               SkTaunt, // TODO (make near enemies target self)
               SkThrow,
               SkThunder, // TODO (damage all enemies)
