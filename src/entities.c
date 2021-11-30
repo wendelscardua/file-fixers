@@ -314,10 +314,10 @@ unsigned char enemy_lock_on_melee_target() {
   temp_attr = entity_status[current_entity] & STATUS_CONFUSE;
   for(direction_counter = 0; direction_counter < 4; direction_counter++) {
     skill_target_direction = entity_direction[current_entity];
-    skill_target_row = entity_row[current_entity];
-    skill_target_col = entity_col[current_entity];
+    skill_target_row[0] = entity_row[current_entity];
+    skill_target_col[0] = entity_col[current_entity];
     if (set_melee_skill_target() &&
-        ((skill_target_entity < 4) == (temp_attr == 0))) {
+        ((skill_target_entity[0] < 4) == (temp_attr == 0))) {
       return 1;
     }
     if (entity_direction[current_entity] == 3) entity_direction[current_entity] = 0;
@@ -452,8 +452,8 @@ void entity_menu_handler() {
       break;
     case SkAttack:
       entity_aux = 0;
-      skill_target_row = entity_row[current_entity];
-      skill_target_col = entity_col[current_entity];
+      skill_target_row[0] = entity_row[current_entity];
+      skill_target_col[0] = entity_col[current_entity];
       skill_target_direction = entity_direction[current_entity];
       if (set_melee_skill_target()) {
         current_entity_state = EntityPlayAction;
@@ -469,8 +469,8 @@ void entity_menu_handler() {
       break;
     default:
       if (!have_enough_sp()) { break; }
-      skill_target_row = entity_row[current_entity];
-      skill_target_col = entity_col[current_entity];
+      skill_target_row[0] = entity_row[current_entity];
+      skill_target_col[0] = entity_col[current_entity];
       skill_target_direction = entity_direction[current_entity];
       if (skill_is_targeted()) {
         current_entity_state = EntityAskTarget;
@@ -492,24 +492,24 @@ void entity_ask_target_handler() {
   if (pad1_new == 0) return;
 
   if (pad1_new & PAD_UP) {
-    if (skill_target_row > 0) { --skill_target_row; }
+    if (skill_target_row[0] > 0) { --skill_target_row[0]; }
   } else if (pad1_new & PAD_DOWN) {
-    if (skill_target_row < 9) { ++skill_target_row; }
+    if (skill_target_row[0] < 9) { ++skill_target_row[0]; }
   } else if (pad1_new & PAD_LEFT) {
-    if (skill_target_col > 0) { --skill_target_col; }
+    if (skill_target_col[0] > 0) { --skill_target_col[0]; }
   } else if (pad1_new & PAD_RIGHT) {
-    if (skill_target_col < 11) { ++skill_target_col; }
+    if (skill_target_col[0] < 11) { ++skill_target_col[0]; }
   } else if (pad1_new & PAD_B) {
     entity_aux = 0;
     current_entity_state = EntityInput;
   } else if (pad1_new & PAD_A) {
-    temp_x = skill_target_col;
-    temp_y = skill_target_row;
+    temp_x = skill_target_col[0];
+    temp_y = skill_target_row[0];
     if (collides_with_map()
-        || (skill_target_col == sector_down_column && skill_target_row == sector_down_row)
-        || (skill_target_col == sector_up_column && skill_target_row == sector_up_row)) return;
-    skill_target_entity = find_entity();
-    if ((skill_target_entity == 0xff) == (current_entity_skill != SkTele)) {
+        || (skill_target_col[0] == sector_down_column && skill_target_row[0] == sector_down_row)
+        || (skill_target_col[0] == sector_up_column && skill_target_row[0] == sector_up_row)) return;
+    skill_target_entity[0] = find_entity();
+    if ((skill_target_entity[0] == 0xff) == (current_entity_skill != SkTele)) {
       entity_aux = 0;
       current_entity_state = EntityInput;
       return;
@@ -533,14 +533,14 @@ unsigned char melee_to_hit() {
   if (entity_lv[current_entity] <= 2) ++to_hit_bonus;
 
   // TODO: AC
-  if (skill_target_entity < 4) {
+  if (skill_target_entity[0] < 4) {
     // player AC
     to_hit_bonus += 7;
   } else {
     to_hit_bonus += 10;
   }
 
-  if (entity_status[skill_target_entity] & STATUS_PROTECT) {
+  if (entity_status[skill_target_entity[0]] & STATUS_PROTECT) {
     to_hit_bonus -= 5;
   }
 
@@ -555,14 +555,14 @@ unsigned char ray_to_hit() {
   to_hit_bonus += 2; // dex
 
   // TODO: AC
-  if (skill_target_entity < 4) {
+  if (skill_target_entity[0] < 4) {
     // player AC
     to_hit_bonus += 7;
   } else {
     to_hit_bonus += 10;
   }
 
-  if (entity_status[skill_target_entity] & STATUS_PROTECT) {
+  if (entity_status[skill_target_entity[0]] & STATUS_PROTECT) {
     to_hit_bonus -= 5;
   }
 
@@ -573,14 +573,14 @@ unsigned char fire_to_hit() {
   signed char to_hit_bonus = 10;
 
   // TODO: AC
-  if (skill_target_entity < 4) {
+  if (skill_target_entity[0] < 4) {
     // player AC
     to_hit_bonus += 7;
   } else {
     to_hit_bonus += 10;
   }
 
-  if (entity_status[skill_target_entity] & STATUS_PROTECT) {
+  if (entity_status[skill_target_entity[0]] & STATUS_PROTECT) {
     to_hit_bonus -= 5;
   }
 
@@ -589,14 +589,14 @@ unsigned char fire_to_hit() {
 
 void gain_exp() {
   unsigned int exp, temp_exp, temp_goal;
-  if (current_entity >= 4 || skill_target_entity < 4) return;
+  if (current_entity >= 4 || skill_target_entity[0] < 4) return;
 
-  exp = entity_lv[skill_target_entity];
+  exp = entity_lv[skill_target_entity[0]];
   // ML * ML + 1
   exp = exp * exp + 1;
-  if (entity_speed[skill_target_entity] >= 13) exp += 3;
-  if (entity_speed[skill_target_entity] >= 19) exp += 2;
-  if (entity_lv[skill_target_entity] >= 9) exp += 50;
+  if (entity_speed[skill_target_entity[0]] >= 13) exp += 3;
+  if (entity_speed[skill_target_entity[0]] >= 19) exp += 2;
+  if (entity_lv[skill_target_entity[0]] >= 9) exp += 50;
   // TODO: bonus per monster attack:
   exp += 5;
 
@@ -695,9 +695,9 @@ void gain_exp() {
 }
 
 void skill_damage(unsigned char damage) {
-  if (entity_hp[skill_target_entity] <= damage) {
-    entity_hp[skill_target_entity] = 0;
-    if (skill_target_entity < 4) num_players--;
+  if (entity_hp[skill_target_entity[0]] <= damage) {
+    entity_hp[skill_target_entity[0]] = 0;
+    if (skill_target_entity[0] < 4) num_players--;
     else {
       num_enemies--;
       if (num_enemies == 0 && sector_locked) {
@@ -706,7 +706,7 @@ void skill_damage(unsigned char damage) {
     }
     gain_exp();
   } else {
-    entity_hp[skill_target_entity] -= damage;
+    entity_hp[skill_target_entity[0]] -= damage;
   }
 }
 
@@ -735,9 +735,9 @@ void entity_action_handler() {
 
       break;
     case SkConfuse:
-      entity_status[skill_target_entity] |= STATUS_CONFUSE;
-      entity_status_turns[skill_target_entity] = STATUS_LENGTH;
-      entity_direction[skill_target_entity] = subrand8(3);
+      entity_status[skill_target_entity[0]] |= STATUS_CONFUSE;
+      entity_status_turns[skill_target_entity[0]] = STATUS_LENGTH;
+      entity_direction[skill_target_entity[0]] = subrand8(3);
       break;
     case SkFire:
       if (fire_to_hit()) {
@@ -745,8 +745,8 @@ void entity_action_handler() {
       }
       break;
     case SkFreeze:
-      entity_status[skill_target_entity] |= STATUS_FREEZE;
-      entity_status_turns[skill_target_entity] = STATUS_LENGTH;
+      entity_status[skill_target_entity[0]] |= STATUS_FREEZE;
+      entity_status_turns[skill_target_entity[0]] = STATUS_LENGTH;
       skill_damage(roll_dice(1, 4));
       break;
     case SkJoust:
@@ -754,8 +754,8 @@ void entity_action_handler() {
       temp_y = entity_row[current_entity];
       NUDGE(entity_direction[current_entity]);
       if (find_entity() != 0xff) {
-        entity_col[skill_target_entity] = entity_col[current_entity];
-        entity_row[skill_target_entity] = entity_row[current_entity];
+        entity_col[skill_target_entity[0]] = entity_col[current_entity];
+        entity_row[skill_target_entity[0]] = entity_row[current_entity];
         entity_col[current_entity] = temp_x;
         entity_row[current_entity] = temp_y;
         if (melee_to_hit()) {
@@ -769,20 +769,20 @@ void entity_action_handler() {
       }
       break;
     case SkHaste:
-      entity_status[skill_target_entity] |= STATUS_HASTE;
-      entity_status_turns[skill_target_entity] = STATUS_LENGTH;
+      entity_status[skill_target_entity[0]] |= STATUS_HASTE;
+      entity_status_turns[skill_target_entity[0]] = STATUS_LENGTH;
       break;
     case SkHeal:
       // TODO: maybe add chance to fumble
-      entity_hp[skill_target_entity] += roll_dice(6, 4);
-      if (entity_hp[skill_target_entity] > entity_max_hp[skill_target_entity]) {
-        entity_hp[skill_target_entity] = entity_max_hp[skill_target_entity];
+      entity_hp[skill_target_entity[0]] += roll_dice(6, 4);
+      if (entity_hp[skill_target_entity[0]] > entity_max_hp[skill_target_entity[0]]) {
+        entity_hp[skill_target_entity[0]] = entity_max_hp[skill_target_entity[0]];
       }
       break;
     case SkProtect:
     case SkShield:
-      entity_status[skill_target_entity] |= STATUS_PROTECT;
-      entity_status_turns[skill_target_entity] = STATUS_LENGTH;
+      entity_status[skill_target_entity[0]] |= STATUS_PROTECT;
+      entity_status_turns[skill_target_entity[0]] = STATUS_LENGTH;
       break;
     case SkSlash:
       if (melee_to_hit()) {
@@ -790,26 +790,38 @@ void entity_action_handler() {
       }
       break;
     case SkSlow:
-      entity_status[skill_target_entity] |= STATUS_SLOW;
-      entity_status_turns[skill_target_entity] = STATUS_LENGTH;
+      entity_status[skill_target_entity[0]] |= STATUS_SLOW;
+      entity_status_turns[skill_target_entity[0]] = STATUS_LENGTH;
+      break;
+    case SkSpin:
+      while(skill_target_index < skill_target_count) {
+        skill_target_row[0] = skill_target_row[skill_target_index];
+        skill_target_col[0] = skill_target_col[skill_target_index];
+        skill_target_entity[0] = skill_target_entity[skill_target_index];
+
+        if (melee_to_hit()) {
+          skill_damage(roll_dice(4 * entity_attack[current_entity].amount, entity_attack[current_entity].sides));
+        }
+        skill_target_index++;
+      }
       break;
     case SkTele:
-      entity_row[current_entity] = skill_target_row;
-      entity_col[current_entity] = skill_target_col;
+      entity_row[current_entity] = skill_target_row[0];
+      entity_col[current_entity] = skill_target_col[0];
       break;
     case SkThrow:
-      temp_x = skill_target_col;
-      temp_y = skill_target_row;
+      temp_x = skill_target_col[0];
+      temp_y = skill_target_row[0];
       NUDGE(entity_direction[current_entity]);
       if (entity_collides()) {
-        entity_row[skill_target_entity] = skill_target_row;
-        entity_col[skill_target_entity] = skill_target_col;
+        entity_row[skill_target_entity[0]] = skill_target_row[0];
+        entity_col[skill_target_entity[0]] = skill_target_col[0];
         if (melee_to_hit()) {
           skill_damage(roll_dice(entity_attack[current_entity].amount, entity_attack[current_entity].sides));
         }
       } else {
-        entity_row[skill_target_entity] = skill_target_row = temp_y;
-        entity_col[skill_target_entity] = skill_target_col = temp_x;
+        entity_row[skill_target_entity[0]] = skill_target_row[0] = temp_y;
+        entity_col[skill_target_entity[0]] = skill_target_col[0] = temp_x;
         entity_aux = 0;
         return;
       }
@@ -922,16 +934,16 @@ void draw_entities() {
     switch(current_entity_skill) {
     case SkAttack:
       temp = entity_direction[current_entity];
-      temp_x = skill_target_col * 0x10 + 0x20;
-      temp_y = skill_target_row * 0x10 + 0x20 - 1;
+      temp_x = skill_target_col[0] * 0x10 + 0x20;
+      temp_y = skill_target_row[0] * 0x10 + 0x20 - 1;
       oam_meta_spr(temp_x, temp_y, melee_sprite[temp]);
       break;
     }
   }
 
   if (current_entity_state == EntityAskTarget) {
-    temp_x = 0x10 * skill_target_col + 0x15;
-    temp_y = 0x10 * skill_target_row + 0x20;
+    temp_x = 0x10 * skill_target_col[0] + 0x15;
+    temp_y = 0x10 * skill_target_row[0] + 0x20;
     if ((get_frame_count() & 0b11000) == 0b11000) {
       temp_x -= 0x04;
     }

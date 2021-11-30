@@ -5,6 +5,7 @@
 #include "directions.h"
 #include "players.h"
 
+#define MAX_SKILL_TARGETS 8
 #define LEVEL_FOR_SKILL 3
 
 typedef enum {
@@ -26,7 +27,7 @@ typedef enum {
               SkShield,
               SkSlash,
               SkSlow,
-              SkSpin, // TODO (attack around user)
+              SkSpin,
               SkTaunt, // TODO (make near enemies target self)
               SkThrow,
               SkThunder, // TODO (damage all enemies)
@@ -49,9 +50,10 @@ extern const skill_type skills_per_class[NumClasses - 1][6];
 extern const char skill_name[NumSkills][8];
 
 extern unsigned char current_entity_skill;
-extern unsigned char skill_target_row, skill_target_col;
-extern unsigned char skill_target_entity;
+extern unsigned char skill_target_row[MAX_SKILL_TARGETS], skill_target_col[MAX_SKILL_TARGETS];
+extern unsigned char skill_target_entity[MAX_SKILL_TARGETS];
 extern direction skill_target_direction;
+extern unsigned char skill_target_count, skill_target_index;
 
 #pragma wrapped-call (push, farcallax, bank)
 unsigned char have_enough_sp (void);
