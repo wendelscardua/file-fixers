@@ -360,9 +360,9 @@ void entity_input_handler() {
       temp_x = entity_col[current_entity];
       temp_y = entity_row[current_entity];
       if (pad1_new & PAD_UP) { --temp_y; temp = Up; }
-      if (pad1_new & PAD_DOWN) { ++temp_y; temp = Down; }
-      if (pad1_new & PAD_LEFT) { --temp_x; temp = Left; }
-      if (pad1_new & PAD_RIGHT) { ++temp_x; temp = Right; }
+      else if (pad1_new & PAD_DOWN) { ++temp_y; temp = Down; }
+      else if (pad1_new & PAD_LEFT) { --temp_x; temp = Left; }
+      else if (pad1_new & PAD_RIGHT) { ++temp_x; temp = Right; }
       entity_direction[current_entity] = temp;
 
       if (current_entity_moves > 0 && !entity_collides()) {
