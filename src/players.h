@@ -9,6 +9,7 @@ typedef enum {
 } player_class_type;
 
 extern const char class_names[4][7];
+extern const unsigned char moves_per_class_and_level[3][30];
 
 void initialize_party(void);
 #endif
