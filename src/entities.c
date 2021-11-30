@@ -329,8 +329,8 @@ unsigned char enemy_lock_on_melee_target() {
 void enemy_random_walk() {
   temp_x = entity_col[current_entity];
   temp_y = entity_row[current_entity];
-  temp = entity_direction[current_entity] = subrand8(3);
-  NUDGE(temp);
+  if (entity_aux > 0 || subrand8(2) == 0) entity_direction[current_entity] = subrand8(3);
+  NUDGE(entity_direction[current_entity]);
 
   if (!entity_collides()) {
     entity_row[current_entity] = temp_y;
