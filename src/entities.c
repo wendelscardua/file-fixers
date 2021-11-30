@@ -331,12 +331,7 @@ void enemy_random_walk() {
   temp_x = entity_col[current_entity];
   temp_y = entity_row[current_entity];
   temp = entity_direction[current_entity] = subrand8(3);
-  switch(temp) {
-  case Up: --temp_y; break;
-  case Down: ++temp_y; break;
-  case Left: --temp_x; break;
-  case Right: ++temp_x; break;
-  }
+  NUDGE(temp);
 
   if (!entity_collides()) {
     entity_row[current_entity] = temp_y;
@@ -719,6 +714,23 @@ void entity_action_handler() {
     case SkTele:
       entity_row[current_entity] = skill_target_row;
       entity_col[current_entity] = skill_target_col;
+      break;
+    case SkThrow:
+      temp_x = skill_target_col;
+      temp_y = skill_target_row;
+      NUDGE(entity_direction[current_entity]);
+      if (entity_collides()) {
+        entity_row[skill_target_entity] = skill_target_row;
+        entity_col[skill_target_entity] = skill_target_col;
+        if (melee_to_hit()) {
+          skill_damage(roll_dice(entity_attack[current_entity].amount, entity_attack[current_entity].sides));
+        }
+      } else {
+        entity_row[skill_target_entity] = skill_target_row = temp_y;
+        entity_col[skill_target_entity] = skill_target_col = temp_x;
+        entity_aux = 0;
+        return;
+      }
       break;
     }
     entity_aux = 0;

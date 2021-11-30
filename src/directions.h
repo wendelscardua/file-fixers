@@ -8,4 +8,13 @@ typedef enum {
               Right
 } direction;
 
+#define NUDGE(direction)                                \
+  switch((direction)) {                                 \
+  case Up: --temp_y; break;                             \
+  case Down: ++temp_y; break;                           \
+  case Left: --temp_x; break;                           \
+  case Right: ++temp_x; break;                          \
+  }
+
+
 #endif
