@@ -172,7 +172,7 @@ unsigned char set_area_skill_targets() {
   center_row = skill_target_row[0];
   center_col = skill_target_col[0];
   skill_target_index = skill_target_count = 0;
-  for(i = 0; i < 8; i++, temp++) {
+  for(temp_char = 0; temp_char < 8; temp_char++, temp++) {
     if (temp == 8) temp = 0;
     temp_x = center_col + area_delta_col[temp];
     temp_y = center_row + area_delta_row[temp];
