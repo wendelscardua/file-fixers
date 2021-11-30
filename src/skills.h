@@ -23,7 +23,7 @@ typedef enum {
               SkHeal,
               SkProtect,
               SkRaise, // TODO (revive)
-              SkShield, // TODO (add self AC)
+              SkShield,
               SkSlash,
               SkSlow,
               SkSpin, // TODO (attack around user)
