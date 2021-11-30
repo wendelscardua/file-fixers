@@ -14,9 +14,9 @@ typedef enum {
               SkItem,
               SkPass,
               // learnable skills
-              SkBolt, // TODO (all enemies in front?)
+              SkBolt,
               SkConfuse,
-              SkFire, // TODO (first enemy in front?)
+              SkFire,
               SkFreeze,
               SkJoust,
               SkHaste,
@@ -57,6 +57,7 @@ extern direction skill_target_direction;
 unsigned char have_enough_sp (void);
 unsigned char skill_is_targeted (void);
 unsigned char set_melee_skill_target (void);
+unsigned char set_forward_skill_target (void);
 unsigned char skill_can_hit (void);
 #pragma wrapped-call (pop)
 

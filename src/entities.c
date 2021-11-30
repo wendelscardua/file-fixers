@@ -535,24 +535,60 @@ unsigned char melee_to_hit() {
   if (skill_target_entity < 4) {
     // player AC
     to_hit_bonus += 7;
-    if (entity_status[skill_target_entity] & STATUS_PROTECT) {
-      to_hit_bonus -= 5;
-    }
   } else {
     to_hit_bonus += 10;
   }
 
+  if (entity_status[skill_target_entity] & STATUS_PROTECT) {
+    to_hit_bonus -= 5;
+  }
+
+  return (to_hit_bonus > roll_die(20));
+}
+
+unsigned char ray_to_hit() {
+  signed char to_hit_bonus = 0;
+
+  // TODO: skill / dex bonus
+  to_hit_bonus += 2; // skilled
+  to_hit_bonus += 2; // dex
+
+  // TODO: AC
+  if (skill_target_entity < 4) {
+    // player AC
+    to_hit_bonus += 7;
+  } else {
+    to_hit_bonus += 10;
+  }
+
+  if (entity_status[skill_target_entity] & STATUS_PROTECT) {
+    to_hit_bonus -= 5;
+  }
+
+  return (to_hit_bonus + roll_die(20) > 4);
+}
+
+unsigned char fire_to_hit() {
+  signed char to_hit_bonus = 10;
+
+  // TODO: AC
+  if (skill_target_entity < 4) {
+    // player AC
+    to_hit_bonus += 7;
+  } else {
+    to_hit_bonus += 10;
+  }
+
+  if (entity_status[skill_target_entity] & STATUS_PROTECT) {
+    to_hit_bonus -= 5;
+  }
 
   return (to_hit_bonus > roll_die(20));
 }
 
 void gain_exp() {
   unsigned int exp, temp_exp, temp_goal;
-  if (current_entity >= 4) {
-    num_players--;
-    return;
-  }
-  if (skill_target_entity < 4) return;
+  if (current_entity >= 4 || skill_target_entity < 4) return;
 
   exp = entity_lv[skill_target_entity];
   // ML * ML + 1
@@ -652,17 +688,18 @@ void gain_exp() {
       player_xp[i] += temp_exp;
     }
   }
-
-  num_enemies--;
-
-  if (num_enemies == 0 && sector_locked) {
-    unlock_sector();
-  }
 }
 
 void skill_damage(unsigned char damage) {
   if (entity_hp[skill_target_entity] <= damage) {
     entity_hp[skill_target_entity] = 0;
+    if (skill_target_entity < 4) num_players--;
+    else {
+      num_enemies--;
+      if (num_enemies == 0 && sector_locked) {
+        unlock_sector();
+      }
+    }
     gain_exp();
   } else {
     entity_hp[skill_target_entity] -= damage;
@@ -680,10 +717,28 @@ void entity_action_handler() {
         skill_damage(roll_dice(entity_attack[current_entity].amount, entity_attack[current_entity].sides));
       }
       break;
+    case SkBolt:
+      if (ray_to_hit()) {
+        skill_damage(roll_dice(entity_lv[current_entity] / 2 + 1, 6));
+      }
+
+      // keep going
+      // TODO wall reflection?
+      if (set_forward_skill_target()) {
+        entity_aux = 0;
+        return;
+      }
+
+      break;
     case SkConfuse:
       entity_status[skill_target_entity] |= STATUS_CONFUSE;
       entity_status_turns[skill_target_entity] = STATUS_LENGTH;
       entity_direction[skill_target_entity] = subrand8(3);
+      break;
+    case SkFire:
+      if (fire_to_hit()) {
+        skill_damage(roll_dice(2, 12));
+      }
       break;
     case SkFreeze:
       entity_status[skill_target_entity] |= STATUS_FREEZE;
