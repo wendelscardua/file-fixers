@@ -6,6 +6,7 @@
 #define STATUS_HASTE    0x01
 #define STATUS_SLOW     0x02
 #define STATUS_PROTECT  0x04
+#define STATUS_CONFUSE  0x08
 
 #define STATUS_LENGTH (2 + roll_die(4))
 

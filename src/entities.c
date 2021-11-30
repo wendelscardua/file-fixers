@@ -313,8 +313,12 @@ unsigned char enemy_lock_on_melee_target() {
   skill_target_row = entity_row[current_entity];
   skill_target_col = entity_col[current_entity];
   skill_target_direction = entity_direction[current_entity];
+  temp_attr = entity_status[current_entity] & STATUS_CONFUSE;
   for(i = 0; i < 4; i++) {
-    if (set_melee_skill_target() && skill_target_entity < 4) return 1;
+    if (set_melee_skill_target() &&
+        ((skill_target_entity < 4) == (temp_attr == 0))) {
+      return 1;
+    }
 
     temp++;
     if (temp >= 4) temp = 0;
@@ -681,6 +685,11 @@ void entity_action_handler() {
       if (melee_to_hit()) {
         skill_damage(roll_dice(entity_attack[current_entity].amount, entity_attack[current_entity].sides));
       }
+      break;
+    case SkConfuse:
+      entity_status[skill_target_entity] |= STATUS_CONFUSE;
+      entity_status_turns[skill_target_entity] = STATUS_LENGTH;
+      entity_direction[skill_target_entity] = subrand8(3);
       break;
     case SkHaste:
       entity_status[skill_target_entity] |= STATUS_HASTE;
