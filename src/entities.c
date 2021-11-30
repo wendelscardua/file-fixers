@@ -688,6 +688,7 @@ void entity_action_handler() {
     case SkFreeze:
       entity_status[skill_target_entity] |= STATUS_FREEZE;
       entity_status_turns[skill_target_entity] = STATUS_LENGTH;
+      skill_damage(roll_dice(1, 4));
       break;
     case SkJoust:
       temp_x = entity_col[current_entity];
@@ -820,7 +821,11 @@ void next_entity() {
 
     if (entity_turn_counter[current_entity] >= NORMAL_SPEED) {
       entity_turn_counter[current_entity] -= NORMAL_SPEED;
-      current_entity_moves = entity_moves[current_entity];
+      if (temp_attr & STATUS_FREEZE) {
+        current_entity_moves = 0;
+      } else {
+        current_entity_moves = entity_moves[current_entity];
+      }
       current_entity_state = EntityInput;
       entity_aux = 0;
 
