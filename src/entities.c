@@ -685,6 +685,10 @@ void entity_action_handler() {
         entity_hp[skill_target_entity] = entity_max_hp[skill_target_entity];
       }
       break;
+    case SkSlow:
+      entity_status[skill_target_entity] |= STATUS_SLOW;
+      entity_status_turns[skill_target_entity] = STATUS_LENGTH;
+      break;
     case SkTele:
       entity_row[current_entity] = skill_target_row;
       entity_col[current_entity] = skill_target_col;
@@ -740,10 +744,16 @@ void next_entity() {
     if (entity_hp[current_entity] == 0) continue;
 
     if (entity_turn_counter[current_entity] < NORMAL_SPEED) {
+      temp_attr = entity_status[current_entity];
       temp = entity_speed[current_entity];
-      if (entity_status[current_entity] & STATUS_HASTE) {
+
+      if (temp_attr & STATUS_HASTE) {
         temp = temp * 2;
       }
+      if (temp_attr & STATUS_SLOW) {
+        temp = temp / 2;
+      }
+
       entity_turn_counter[current_entity] += temp;
     }
 
