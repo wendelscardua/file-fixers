@@ -310,11 +310,11 @@ unsigned char entity_collides() {
 
 unsigned char enemy_lock_on_melee_target() {
   temp = entity_direction[current_entity];
-  skill_target_row = entity_row[current_entity];
-  skill_target_col = entity_col[current_entity];
   skill_target_direction = entity_direction[current_entity];
   temp_attr = entity_status[current_entity] & STATUS_CONFUSE;
   for(i = 0; i < 4; i++) {
+    skill_target_row = entity_row[current_entity];
+    skill_target_col = entity_col[current_entity];
     if (set_melee_skill_target() &&
         ((skill_target_entity < 4) == (temp_attr == 0))) {
       return 1;
