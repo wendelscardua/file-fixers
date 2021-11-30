@@ -864,8 +864,9 @@ void next_entity() {
 
     if (entity_hp[current_entity] == 0) continue;
 
+    temp_attr = entity_status[current_entity];
+
     if (entity_turn_counter[current_entity] < NORMAL_SPEED) {
-      temp_attr = entity_status[current_entity];
       temp = entity_speed[current_entity];
 
       if (temp_attr & STATUS_HASTE) {
