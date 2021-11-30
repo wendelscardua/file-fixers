@@ -685,6 +685,25 @@ void entity_action_handler() {
       entity_status_turns[skill_target_entity] = STATUS_LENGTH;
       entity_direction[skill_target_entity] = subrand8(3);
       break;
+    case SkJoust:
+      temp_x = entity_col[current_entity];
+      temp_y = entity_row[current_entity];
+      NUDGE(entity_direction[current_entity]);
+      if (find_entity() != 0xff) {
+        entity_col[skill_target_entity] = entity_col[current_entity];
+        entity_row[skill_target_entity] = entity_row[current_entity];
+        entity_col[current_entity] = temp_x;
+        entity_row[current_entity] = temp_y;
+        if (melee_to_hit()) {
+          skill_damage(roll_dice(2 * entity_attack[current_entity].amount, entity_attack[current_entity].sides));
+        }
+      } else {
+        entity_col[current_entity] = temp_x;
+        entity_row[current_entity] = temp_y;
+        entity_aux = 0;
+        return;
+      }
+      break;
     case SkHaste:
       entity_status[skill_target_entity] |= STATUS_HASTE;
       entity_status_turns[skill_target_entity] = STATUS_LENGTH;

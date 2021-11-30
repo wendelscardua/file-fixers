@@ -131,7 +131,21 @@ unsigned char set_self_target() {
 }
 
 unsigned char set_forward_skill_target() {
-  return 0;
+  while(1) {
+    switch (skill_target_direction) {
+    case Up: --skill_target_row; break;
+    case Down: ++skill_target_row; break;
+    case Left: --skill_target_col; break;
+    case Right: ++skill_target_col; break;
+    default:
+      return 0;
+    }
+    if (skill_target_row > 9 || skill_target_col > 11) return 0;
+    temp_x = skill_target_col;
+    temp_y = skill_target_row;
+    if ((skill_target_entity = find_entity()) != 0xff) return 1;
+    if (collides_with_map()) return 0;
+  }
 }
 
 unsigned char skill_can_hit() {
@@ -139,7 +153,7 @@ unsigned char skill_can_hit() {
   case SkkNone: return 0;
   case SkkSelf: return set_self_target();
   case SkkMelee: return set_melee_skill_target();
-  case SkkForward: return 0; // TODO
+  case SkkForward: return set_forward_skill_target();
   case SkkTargeted: return 1;
   case SkkArea: return 0; // TODO
   case SkkEnemies: return 1;
