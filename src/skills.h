@@ -18,7 +18,7 @@ typedef enum {
               SkConfuse,
               SkFire, // TODO (first enemy in front?)
               SkFreeze, // TODO (reduce/zero moves?)
-              SkJoust, // TODO (move forward and hit first enemy?)
+              SkJoust,
               SkHaste,
               SkHeal,
               SkProtect,
