@@ -15,20 +15,20 @@ typedef enum {
               SkPass,
               // learnable skills
               SkBolt, // TODO (all enemies in front?)
-              SkConfuse, // TODO (confuse target?)
+              SkConfuse,
               SkFire, // TODO (first enemy in front?)
               SkFreeze, // TODO (reduce/zero moves?)
               SkJoust, // TODO (move forward and hit first enemy?)
-              SkHaste, // TODO (increase speed - how long?)
+              SkHaste,
               SkHeal,
               SkProtect,
               SkRaise, // TODO (revive)
               SkShield, // TODO (add self AC)
-              SkSlash, // TODO (strong attack)
+              SkSlash,
               SkSlow,
               SkSpin, // TODO (attack around user)
               SkTaunt, // TODO (make near enemies target self)
-              SkThrow, // TODO (damage and push enemy)
+              SkThrow,
               SkThunder, // TODO (damage all enemies)
               SkTele,
               NumSkills
