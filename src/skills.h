@@ -14,9 +14,9 @@ typedef enum {
               SkItem,
               SkPass,
               // learnable skills
-              SkBolt, // TODO (all enemies in front?)
+              SkBolt,
               SkConfuse,
-              SkFire, // TODO (first enemy in front?)
+              SkFire,
               SkFreeze,
               SkJoust,
               SkHaste,

@@ -12,7 +12,7 @@
 const skill_type skills_per_class[NumClasses - 1][6] =
   {
    { SkSlash, SkTaunt, SkShield, SkThrow, SkJoust, SkSpin },
-   { SkFire, SkBolt, SkFreeze, SkConfuse, SkTele, SkThunder },
+   { SkFire, SkFreeze, SkBolt, SkConfuse, SkTele, SkThunder },
    { SkHeal, SkHaste, SkProtect, SkSlow, SkTele, SkRaise }
   };
 
@@ -47,7 +47,7 @@ const unsigned char skill_level[] =
    0, // SkAttack,
    0, // SkItem,
    0, // SkPass,
-   1, // SkBolt,
+   3, // SkBolt,
    3, // SkConfuse,
    1, // SkFire,
    2, // SkFreeze,
