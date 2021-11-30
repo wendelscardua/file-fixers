@@ -92,8 +92,9 @@ const skill_kind_t skill_kinds[] =
   };
 
 unsigned char current_entity_skill;
-unsigned char skill_target_row, skill_target_col;
-unsigned char skill_target_entity;
+unsigned char skill_target_row[MAX_SKILL_TARGETS], skill_target_col[MAX_SKILL_TARGETS];
+unsigned char skill_target_entity[MAX_SKILL_TARGETS];
+unsigned char skill_target_count;
 direction skill_target_direction;
 
 unsigned char have_enough_sp() {
@@ -110,42 +111,46 @@ unsigned char skill_is_targeted() {
 
 unsigned char set_melee_skill_target() {
   switch (skill_target_direction) {
-  case Up: --skill_target_row; break;
-  case Down: ++skill_target_row; break;
-  case Left: --skill_target_col; break;
-  case Right: ++skill_target_col; break;
+  case Up: --skill_target_row[0]; break;
+  case Down: ++skill_target_row[0]; break;
+  case Left: --skill_target_col[0]; break;
+  case Right: ++skill_target_col[0]; break;
   default:
     return 0;
   }
 
-  if (skill_target_row > 9 || skill_target_col > 11) return 0;
+  if (skill_target_row[0] > 9 || skill_target_col[0] > 11) return 0;
 
-  temp_x = skill_target_col;
-  temp_y = skill_target_row;
-  return ((skill_target_entity = find_entity()) != 0xff);
+  temp_x = skill_target_col[0];
+  temp_y = skill_target_row[0];
+  return ((skill_target_entity[0] = find_entity()) != 0xff);
 }
 
 unsigned char set_self_target() {
-  skill_target_entity = current_entity;
+  skill_target_entity[0] = current_entity;
   return 1;
 }
 
 unsigned char set_forward_skill_target() {
   while(1) {
     switch (skill_target_direction) {
-    case Up: --skill_target_row; break;
-    case Down: ++skill_target_row; break;
-    case Left: --skill_target_col; break;
-    case Right: ++skill_target_col; break;
+    case Up: --skill_target_row[0]; break;
+    case Down: ++skill_target_row[0]; break;
+    case Left: --skill_target_col[0]; break;
+    case Right: ++skill_target_col[0]; break;
     default:
       return 0;
     }
-    if (skill_target_row > 9 || skill_target_col > 11) return 0;
-    temp_x = skill_target_col;
-    temp_y = skill_target_row;
-    if ((skill_target_entity = find_entity()) != 0xff) return 1;
+    if (skill_target_row[0] > 9 || skill_target_col[0] > 11) return 0;
+    temp_x = skill_target_col[0];
+    temp_y = skill_target_row[0];
+    if ((skill_target_entity[0] = find_entity()) != 0xff) return 1;
     if (collides_with_map()) return 0;
   }
+}
+
+unsigned char set_area_skill_targets() {
+  return 1;
 }
 
 unsigned char skill_can_hit() {
@@ -155,7 +160,7 @@ unsigned char skill_can_hit() {
   case SkkMelee: return set_melee_skill_target();
   case SkkForward: return set_forward_skill_target();
   case SkkTargeted: return 1;
-  case SkkArea: return 0; // TODO
+  case SkkArea: return set_area_skill_targets();
   case SkkEnemies: return 1;
   case SkkRaisable: return 0; // TODO
   default: return 0;
