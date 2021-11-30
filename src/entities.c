@@ -699,6 +699,7 @@ void entity_action_handler() {
       }
       break;
     case SkProtect:
+    case SkShield:
       entity_status[skill_target_entity] |= STATUS_PROTECT;
       entity_status_turns[skill_target_entity] = STATUS_LENGTH;
       break;

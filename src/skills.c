@@ -125,6 +125,11 @@ unsigned char set_melee_skill_target() {
   return ((skill_target_entity = find_entity()) != 0xff);
 }
 
+unsigned char set_self_target() {
+  skill_target_entity = current_entity;
+  return 1;
+}
+
 unsigned char set_forward_skill_target() {
   return 0;
 }
@@ -132,7 +137,7 @@ unsigned char set_forward_skill_target() {
 unsigned char skill_can_hit() {
   switch(skill_kinds[current_entity_skill]) {
   case SkkNone: return 0;
-  case SkkSelf: return 1;
+  case SkkSelf: return set_self_target();
   case SkkMelee: return set_melee_skill_target();
   case SkkForward: return 0; // TODO
   case SkkTargeted: return 1;
