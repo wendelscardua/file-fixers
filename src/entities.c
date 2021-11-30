@@ -535,13 +535,13 @@ unsigned char melee_to_hit() {
   if (skill_target_entity < 4) {
     // player AC
     to_hit_bonus += 7;
-    if (entity_status[skill_target_entity] & STATUS_PROTECT) {
-      to_hit_bonus -= 5;
-    }
   } else {
     to_hit_bonus += 10;
   }
 
+  if (entity_status[skill_target_entity] & STATUS_PROTECT) {
+    to_hit_bonus -= 5;
+  }
 
   return (to_hit_bonus > roll_die(20));
 }
