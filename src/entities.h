@@ -4,6 +4,7 @@
 #define NORMAL_SPEED 12
 
 #define STATUS_HASTE 0x01
+#define STATUS_SLOW  0x02
 
 #define STATUS_LENGTH (4 + roll_die(4))
 
