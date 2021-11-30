@@ -356,6 +356,7 @@ void entity_input_handler() {
     pad_poll(0);
     pad1_new = get_pad_new(0);
     if (pad1_new & (PAD_UP|PAD_DOWN|PAD_LEFT|PAD_RIGHT)) {
+      if (entity_status[current_entity] & STATUS_CONFUSE) { pad1_new = rand8(); }
       temp_x = entity_col[current_entity];
       temp_y = entity_row[current_entity];
       if (pad1_new & PAD_UP) { --temp_y; temp = Up; }
