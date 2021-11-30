@@ -546,6 +546,28 @@ unsigned char melee_to_hit() {
   return (to_hit_bonus > roll_die(20));
 }
 
+unsigned char ray_to_hit() {
+  signed char to_hit_bonus = 0;
+
+  // TODO: skill / dex bonus
+  to_hit_bonus += 2; // skilled
+  to_hit_bonus += 2; // dex
+
+  // TODO: AC
+  if (skill_target_entity < 4) {
+    // player AC
+    to_hit_bonus += 7;
+  } else {
+    to_hit_bonus += 10;
+  }
+
+  if (entity_status[skill_target_entity] & STATUS_PROTECT) {
+    to_hit_bonus -= 5;
+  }
+
+  return (to_hit_bonus + roll_die(20) > 4);
+}
+
 unsigned char fire_to_hit() {
   signed char to_hit_bonus = 10;
 
@@ -697,6 +719,19 @@ void entity_action_handler() {
       if (melee_to_hit()) {
         skill_damage(roll_dice(entity_attack[current_entity].amount, entity_attack[current_entity].sides));
       }
+      break;
+    case SkBolt:
+      if (ray_to_hit()) {
+        skill_damage(roll_dice(entity_lv[current_entity] / 2 + 1, 6));
+      }
+
+      // keep going
+      // TODO wall reflection?
+      if (set_forward_skill_target()) {
+        entity_aux = 0;
+        return;
+      }
+
       break;
     case SkConfuse:
       entity_status[skill_target_entity] |= STATUS_CONFUSE;
