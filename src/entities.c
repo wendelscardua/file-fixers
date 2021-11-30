@@ -697,6 +697,11 @@ void entity_action_handler() {
       entity_status[skill_target_entity] |= STATUS_PROTECT;
       entity_status_turns[skill_target_entity] = STATUS_LENGTH;
       break;
+    case SkSlash:
+      if (melee_to_hit()) {
+        skill_damage(roll_dice(2 * entity_attack[current_entity].amount, entity_attack[current_entity].sides));
+      }
+      break;
     case SkSlow:
       entity_status[skill_target_entity] |= STATUS_SLOW;
       entity_status_turns[skill_target_entity] = STATUS_LENGTH;
