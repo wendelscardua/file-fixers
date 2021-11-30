@@ -329,8 +329,8 @@ unsigned char enemy_lock_on_melee_target() {
 void enemy_random_walk() {
   temp_x = entity_col[current_entity];
   temp_y = entity_row[current_entity];
-  temp = entity_direction[current_entity] = subrand8(3);
-  NUDGE(temp);
+  if (entity_aux > 0 || subrand8(2) == 0) entity_direction[current_entity] = subrand8(3);
+  NUDGE(entity_direction[current_entity]);
 
   if (!entity_collides()) {
     entity_row[current_entity] = temp_y;
@@ -802,6 +802,27 @@ void entity_action_handler() {
         if (melee_to_hit()) {
           skill_damage(roll_dice(4 * entity_attack[current_entity].amount, entity_attack[current_entity].sides));
         }
+        skill_target_index++;
+      }
+      break;
+    case SkTaunt:
+      temp_x = entity_col[current_entity];
+      temp_y = entity_row[current_entity];
+
+      while(skill_target_index < skill_target_count) {
+        skill_target_row[0] = skill_target_row[skill_target_index];
+        skill_target_col[0] = skill_target_col[skill_target_index];
+        i = skill_target_entity[0] = skill_target_entity[skill_target_index];
+        if (skill_target_row[0] < temp_y) {
+          entity_direction[i] = Down;
+        } else if (skill_target_row[0] > temp_y) {
+          entity_direction[i] = Up;
+        } else if (skill_target_col[0] < temp_x) {
+          entity_direction[i] = Right;
+        } else {
+          entity_direction[i] = Left;
+        }
+        skill_damage(roll_dice(1, 4));
         skill_target_index++;
       }
       break;
