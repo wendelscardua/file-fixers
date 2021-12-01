@@ -455,6 +455,8 @@ void entity_movement_handler() {
       if (player_items[entity_type[item_index] - Potion] < 99) {
         player_items[entity_type[item_index] - Potion]++;
         refresh_items_hud();
+        ppu_wait_nmi();
+        clear_vram_buffer();
       }
       entity_hp[item_index] = 0;
       item_index = 0xff;
