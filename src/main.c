@@ -1074,6 +1074,12 @@ void start_game (void) {
     }
   }
 
+  set_chr_mode_2(BG_MAIN_0);
+  set_chr_mode_3(BG_MAIN_1);
+  set_chr_mode_4(BG_MAIN_2);
+  set_chr_mode_5(BG_MAIN_3);
+  set_chr_mode_0(SPRITE_0);
+  set_chr_mode_1(SPRITE_1);
   ppu_on_all();
 
   pal_fade_to(0, 4);
