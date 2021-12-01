@@ -24,7 +24,7 @@
 unsigned char num_entities, num_enemies, num_players;
 unsigned char entity_aux;
 unsigned char temp_w, temp_h;
-unsigned char menu_cursor_row, menu_cursor_col, menu_cursor_index;
+unsigned char menu_cursor_row, menu_cursor_col, menu_cursor_index, menu_page;
 unsigned char *room_ptr;
 
 unsigned char current_entity;
@@ -415,6 +415,7 @@ void entity_input_handler() {
       }
     } else if (pad1_new & PAD_A) {
       current_entity_state = EntityMenu;
+      menu_page = current_entity;
       menu_cursor_row = 0;
       menu_cursor_col = 0;
       menu_cursor_index = 0;
@@ -481,7 +482,7 @@ void entity_menu_handler() {
   double_buffer[double_buffer_index++] = MENU_SCANLINE - 1;
   double_buffer[double_buffer_index++] = 0xf6;
   double_buffer[double_buffer_index++] = 8;
-  temp_int = 0x28 * current_entity;
+  temp_int = 0x28 * menu_page;
   double_buffer[double_buffer_index++] = temp_int;
   double_buffer[double_buffer_index++] = 0;
   double_buffer[double_buffer_index++] = ((temp_int & 0xF8) << 2);
@@ -498,45 +499,59 @@ void entity_menu_handler() {
     if (menu_cursor_col < 2) { ++menu_cursor_col; menu_cursor_index += 3; }
   } else if (pad1_new & PAD_B) {
     entity_aux = 0;
-    current_entity_state = EntityInput;
-  } else if (pad1_new & PAD_A) {
-    switch (current_entity_skill = player_skills[current_entity][menu_cursor_index]) {
-    case SkNone:
-      entity_aux = 0;
+    if (menu_page < 4) {
       current_entity_state = EntityInput;
-      break;
-    case SkAttack:
-      entity_aux = 0;
-      skill_target_row[0] = entity_row[current_entity];
-      skill_target_col[0] = entity_col[current_entity];
-      skill_target_direction = entity_direction[current_entity];
-      if (set_melee_skill_target()) {
-        current_entity_state = EntityPlayAction;
-      } else {
-        next_entity();
-      }
-      break;
-    case SkItem:
-      // TODO: item
-      break;
-    case SkPass:
-      next_entity();
-      break;
-    default:
-      if (!have_enough_sp()) { break; }
-      skill_target_row[0] = entity_row[current_entity];
-      skill_target_col[0] = entity_col[current_entity];
-      skill_target_direction = entity_direction[current_entity];
-      if (skill_is_targeted()) {
-        current_entity_state = EntityAskTarget;
-        break;
-      } else if (skill_can_hit()) {
-        consume_sp();
-        refresh_hp_sp_hud();
+    } else {
+      menu_page = current_entity;
+      menu_cursor_row = 1;
+      menu_cursor_col = 0;
+    }
+  } else if (pad1_new & PAD_A) {
+    if (menu_page < 4) {
+      switch (current_entity_skill = player_skills[current_entity][menu_cursor_index]) {
+      case SkNone:
         entity_aux = 0;
-        current_entity_state = EntityPlayAction;
+        current_entity_state = EntityInput;
+        break;
+      case SkAttack:
+        entity_aux = 0;
+        skill_target_row[0] = entity_row[current_entity];
+        skill_target_col[0] = entity_col[current_entity];
+        skill_target_direction = entity_direction[current_entity];
+        if (set_melee_skill_target()) {
+          current_entity_state = EntityPlayAction;
+        } else {
+          next_entity();
+        }
+        break;
+      case SkItem:
+        entity_aux = 0;
+        menu_page = 4;
+        menu_cursor_row = 0;
+        menu_cursor_col = 0;
+        break;
+      case SkPass:
+        next_entity();
+        break;
+      default:
+        if (!have_enough_sp()) { break; }
+        skill_target_row[0] = entity_row[current_entity];
+        skill_target_col[0] = entity_col[current_entity];
+        skill_target_direction = entity_direction[current_entity];
+        if (skill_is_targeted()) {
+          current_entity_state = EntityAskTarget;
+          break;
+        } else if (skill_can_hit()) {
+          consume_sp();
+          refresh_hp_sp_hud();
+          entity_aux = 0;
+          current_entity_state = EntityPlayAction;
+        }
+        break;
       }
-      break;
+    }
+    else {
+      // TODO use item
     }
   }
 }
