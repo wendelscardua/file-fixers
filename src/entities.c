@@ -589,7 +589,6 @@ unsigned char fire_to_hit() {
 
 void gain_exp() {
   unsigned int exp, temp_exp, temp_goal;
-  if (IS_ENEMY(current_entity) || IS_PLAYER(skill_target_entity[0])) return;
 
   exp = entity_lv[skill_target_entity[0]];
   // ML * ML + 1
@@ -698,13 +697,13 @@ void skill_damage(unsigned char damage) {
   if (entity_hp[skill_target_entity[0]] <= damage) {
     entity_hp[skill_target_entity[0]] = 0;
     if (IS_PLAYER(skill_target_entity[0])) num_players--;
-    else {
+    else if (IS_ENEMY(skill_target_entity[0])) {
       num_enemies--;
       if (num_enemies == 0 && sector_locked) {
         unlock_sector();
       }
+      if (IS_PLAYER(current_entity)) gain_exp();
     }
-    gain_exp();
   } else {
     entity_hp[skill_target_entity[0]] -= damage;
   }
