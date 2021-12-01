@@ -12,7 +12,8 @@
 #define STATUS_LENGTH (2 + roll_die(4))
 
 #define IS_PLAYER(entity_index) ((entity_index < 4))
-#define IS_ENEMY(entity_index) ((entity_index >= 4))
+#define IS_ENEMY(entity_index) ((entity_index >= 4) && entity_type[entity_index] < Player)
+#define IS_ITEM(entity_index) ((entity_index >= 4) && entity_type[entity_index] > Player)
 
 typedef enum {
               Eicar,
@@ -20,7 +21,11 @@ typedef enum {
               Buggy,
               Stega,
               Nefet,
-              Player
+              Player,
+              Potion,
+              Ether,
+              Elixir,
+              NumEntityTypes
 } entity_type_enum;
 
 typedef enum {

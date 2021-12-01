@@ -14,7 +14,7 @@
 .export _intelle_sprite
 .segment "BANK1"
 .export _enemy_sprite
-
+.export _item_sprite
 
 .segment "RODATA"
 _default_cursor_sprite:
@@ -281,3 +281,16 @@ _enemy_sprite:
     .word .ident (.concat("enemy_right_alt_", .string(enemy_index), "_p", .string(palette)))
   .endrepeat
 .endrepeat
+
+potion_sprite:
+.byte   4,  7,$a0,1
+.byte $80
+ether_sprite:
+.byte   4,  7,$a0,2
+.byte $80
+elixir_sprite:
+.byte   4,  7,$a0,3
+.byte $80
+
+_item_sprite:
+.word potion_sprite, ether_sprite, elixir_sprite

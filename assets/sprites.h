@@ -6,6 +6,7 @@ extern const unsigned char menu_cursor_sprite[];
 extern const unsigned char * melee_sprite[4];
 extern const unsigned char * enemy_sprite[48];
 extern const unsigned char * player_sprite[12];
+extern const unsigned char * item_sprite[1];
 extern const unsigned char amda_sprite[];
 extern const unsigned char intelle_sprite[];
 
