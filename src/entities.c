@@ -108,6 +108,24 @@ void refresh_skills_hud() {
   }
 }
 
+void refresh_items_hud() {
+  temp_y = 0;
+
+  for(temp = 0; temp < NumEntityTypes - Potion; temp++) {
+    temp_attr = player_items[temp];
+
+    temp_char = 0;
+    while (temp_attr >= 10) {
+      temp_attr -= 10;
+      ++temp_char;
+    }
+    one_vram_buffer(0x10 + temp_char, NTADR_C(11, 20 + temp_y));
+    one_vram_buffer(0x10 + temp_attr, NTADR_C(12, 20 + temp_y));
+
+    temp_y++;
+  }
+}
+
 void refresh_moves_hud() {
   temp = current_entity_moves;
   temp_x = 0;
@@ -201,6 +219,7 @@ void refresh_xp_hud() {
 void refresh_hud() {
   refresh_moves_hud();
   refresh_hp_sp_hud();
+  refresh_items_hud();
 
   temp = entity_lv[current_entity];
   one_vram_buffer(0x10 + (temp / 10), NTADR_A(12, 25));
@@ -434,7 +453,7 @@ void entity_movement_handler() {
     if (item_index != 0xff) {
       if (player_items[entity_type[item_index] - Potion] < 99) {
         player_items[entity_type[item_index] - Potion]++;
-        //refresh_items_hud();
+        refresh_items_hud();
       }
       entity_hp[item_index] = 0;
       item_index = 0xff;
