@@ -786,7 +786,7 @@ void entity_action_handler() {
       break;
     case SkRaise:
       for(i = 0; i < 4; i++) {
-        if (entity_hp[i] == 0 && roll_die(20) < 4) {
+        if (entity_hp[i] == 0 && roll_die(20) < 5) {
           temp_x = entity_col[i];
           temp_y = entity_row[i];
           while(entity_collides()) {
@@ -794,6 +794,9 @@ void entity_action_handler() {
             temp_y = subrand8(9);
           }
           entity_hp[i] == entity_max_hp[i] / 4;
+          entity_col[i] = temp_x;
+          entity_row[i] = temp_y;
+          num_players++;
         }
       }
       break;
