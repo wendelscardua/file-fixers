@@ -32,3 +32,6 @@ _keyboard_nametable: .incbin "nametables/keyboard.rle"
 
 .export _blue_screen_nametable
 _blue_screen_nametable: .incbin "nametables/blue-screen.rle"
+
+.export _shutdown_nametable
+_shutdown_nametable: .incbin "nametables/shutdown.rle"
