@@ -4,60 +4,821 @@
 
 
 soundtrack_music_data:
-	.byte 1
+	.byte 3
 	.word @instruments
 	.word @samples-3
-	.word @song0ch0,@song0ch1,@song0ch2,@song0ch3,@song0ch4,307,256 ; Insert song here
+	.word @song0ch0,@song0ch1,@song0ch2,@song0ch3,@song0ch4,307,256 ; Inevitable Doom - celestialghost8
+	.word @song1ch0,@song1ch1,@song1ch2,@song1ch3,@song1ch4,307,256 ; cheery - Phillip Miller
+	.word @song2ch0,@song2ch1,@song2ch2,@song2ch3,@song2ch4,307,256 ; upbeat -  Phillip Miller
 
 @instruments:
-	.word @env1,@env0,@env0,@env2
+	.word @env2,@env0,@env0,@env21
+	.word @env3,@env13,@env0,@env1
+	.word @env3,@env15,@env0,@env20
+	.word @env4,@env0,@env0,@env1
+	.word @env5,@env17,@env0,@env1
+	.word @env6,@env0,@env0,@env1
+	.word @env7,@env0,@env0,@env1
+	.word @env8,@env0,@env0,@env1
+	.word @env9,@env0,@env0,@env1
+	.word @env10,@env0,@env18,@env1
+	.word @env11,@env16,@env0,@env1
+	.word @env1,@env0,@env0,@env19
+	.word @env1,@env0,@env0,@env1
+	.word @env12,@env14,@env0,@env1
 
 @samples:
 @env0:
 	.byte $c0,$00,$00
 @env1:
-	.byte $c5,$c8,$ca,$c7,$c4,$c2,$c2,$c0,$00,$07
+	.byte $c3,$00,$00
 @env2:
+	.byte $c2,$c3,$c5,$c7,$cb,$cd,$cb,$c7,$c5,$c3,$c2,$00,$0a
+@env3:
+	.byte $cc,$00,$00
+@env4:
+	.byte $ce,$cc,$c9,$c0,$c0,$c0,$00,$05
+@env5:
+	.byte $cf,$cf,$ce,$cd,$ca,$c6,$c0,$c0,$c0,$00,$08
+@env6:
+	.byte $ce,$ce,$cd,$ca,$c6,$c0,$c0,$c0,$00,$07
+@env7:
+	.byte $ce,$cc,$c9,$c5,$c1,$c0,$00,$05
+@env8:
+	.byte $cf,$02,$ce,$ce,$cd,$cc,$ca,$c7,$c3,$c0,$00,$09
+@env9:
+	.byte $ce,$ce,$cd,$cc,$ca,$c7,$c3,$c0,$00,$07
+@env10:
+	.byte $ce,$16,$c0,$00,$02
+@env11:
+	.byte $c2,$c3,$c5,$c7,$cb,$cd,$00,$05
+@env12:
+	.byte $c2,$c3,$c4,$c5,$c7,$c3,$0a,$c2,$c3,$03,$c2,$04,$c1,$04,$c0,$00
+	.byte $0e
+@env13:
+	.byte $c0,$b4,$c0,$b4,$c0,$00,$04
+@env14:
+	.byte $c0,$c2,$c3,$c5,$c1,$c5,$02,$c6,$03,$c7,$04,$c8,$00,$0b
+@env15:
+	.byte $c0,$c7,$c0,$00,$02
+@env16:
+	.byte $b4,$c0,$00,$01
+@env17:
+	.byte $c1,$c0,$c1,$00,$02
+@env18:
+	.byte $cf,$00,$00
+@env19:
+	.byte $c1,$c2,$00,$01
+@env20:
 	.byte $c2,$00,$00
+@env21:
+	.byte $c0,$c1,$c2,$c3,$00,$03
 
 
-; Insert song here
+; Inevitable Doom - celestialghost8
 @song0ch0:
-	.byte $fb,$06
+	.byte $fb,$09
 @song0ch0loop:
 @ref0:
-	.byte $80,$1c,$85,$20,$85,$23,$85,$20,$85,$1c,$dd
+	.byte $96,$04,$00,$04,$00,$83,$04,$00,$04,$00,$8b,$04,$00,$04,$00,$83
+	.byte $04,$00,$04,$00,$83,$07,$00,$83
+@ref1:
+	.byte $04,$00,$04,$00,$83,$04,$00,$04,$00,$8b,$04,$00,$04,$00,$83,$04
+	.byte $00,$04,$00,$83,$07,$00,$07,$81
+@ref2:
+	.byte $04,$00,$04,$00,$83,$04,$00,$04,$00,$8b,$04,$00,$04,$00,$83,$04
+	.byte $00,$04,$00,$83,$07,$00,$83
+	.byte $ff,$18
+	.word @ref1
+	.byte $ff,$17
+	.word @ref2
+	.byte $ff,$18
+	.word @ref1
+	.byte $ff,$17
+	.word @ref2
+	.byte $ff,$18
+	.word @ref1
+	.byte $ff,$17
+	.word @ref2
+	.byte $ff,$18
+	.word @ref1
+	.byte $ff,$17
+	.word @ref2
+	.byte $ff,$18
+	.word @ref1
+	.byte $ff,$17
+	.word @ref2
+	.byte $ff,$18
+	.word @ref1
+	.byte $ff,$17
+	.word @ref2
+	.byte $ff,$18
+	.word @ref1
 	.byte $fd
 	.word @song0ch0loop
 
-; Insert song here
+; Inevitable Doom - celestialghost8
 @song0ch1:
 @song0ch1loop:
-@ref1:
-	.byte $f9,$85
+@ref16:
+	.byte $96,$10,$00,$10,$00,$83,$10,$00,$10,$00,$8b,$10,$00,$10,$00,$83
+	.byte $10,$00,$10,$00,$83,$13,$00,$83
+@ref17:
+	.byte $10,$00,$10,$00,$83,$10,$00,$10,$00,$8b,$10,$00,$10,$00,$83,$10
+	.byte $00,$10,$00,$83,$13,$00,$13,$81
+@ref18:
+	.byte $10,$00,$10,$00,$83,$10,$00,$10,$00,$8b,$10,$00,$10,$00,$83,$10
+	.byte $00,$10,$00,$83,$13,$00,$83
+	.byte $ff,$18
+	.word @ref17
+@ref20:
+	.byte $63,$13,$95,$12,$85,$10,$9b,$00
+@ref21:
+	.byte $10,$81,$12,$81,$13,$85,$12,$85,$13,$81,$12,$81,$10,$9d
+@ref22:
+	.byte $17,$95,$15,$85,$13,$95,$10,$81,$12,$81
+@ref23:
+	.byte $13,$8d,$12,$87,$00,$12,$13,$10,$9d
+	.byte $ff,$17
+	.word @ref18
+	.byte $ff,$18
+	.word @ref17
+@ref26:
+	.byte $13,$12,$13,$85,$12,$13,$12,$8d,$10,$0e,$10,$99
+@ref27:
+	.byte $10,$12,$13,$15,$13,$81,$12,$13,$15,$13,$15,$81,$13,$15,$17,$18
+	.byte $17,$16,$17,$99
+@ref28:
+	.byte $1c,$1a,$1c,$85,$17,$18,$17,$8d,$15,$13,$17,$99
+@ref29:
+	.byte $15,$13,$15,$85,$13,$85,$12,$81,$13,$12,$10,$81,$0e,$81,$10,$99
+@ref30:
+	.byte $1c,$00,$1c,$85,$1c,$00,$1c,$8d,$1c,$00,$1c,$85,$1c,$00,$1c,$85
+	.byte $1a,$00,$1a,$1a
+@ref31:
+	.byte $1c,$00,$1c,$85,$1c,$00,$1c,$8d,$1c,$00,$1c,$85,$1c,$00,$1c,$85
+	.byte $17,$18,$12,$13
 	.byte $fd
 	.word @song0ch1loop
 
-; Insert song here
+; Inevitable Doom - celestialghost8
 @song0ch2:
 @song0ch2loop:
-@ref2:
-	.byte $f9,$85
+@ref32:
+	.byte $98,$38,$00,$38,$00,$83,$38,$00,$38,$00,$8b,$38,$00,$38,$00,$83
+	.byte $38,$00,$38,$00,$8b
+@ref33:
+	.byte $38,$00,$38,$00,$83,$38,$00,$38,$00,$8b,$38,$00,$38,$00,$83,$38
+	.byte $00,$38,$00,$8b
+	.byte $ff,$14
+	.word @ref33
+	.byte $ff,$14
+	.word @ref33
+	.byte $ff,$14
+	.word @ref33
+	.byte $ff,$14
+	.word @ref33
+	.byte $ff,$14
+	.word @ref33
+	.byte $ff,$14
+	.word @ref33
+	.byte $ff,$14
+	.word @ref33
+	.byte $ff,$14
+	.word @ref33
+	.byte $ff,$14
+	.word @ref33
+	.byte $ff,$14
+	.word @ref33
+	.byte $ff,$14
+	.word @ref33
+	.byte $ff,$14
+	.word @ref33
+	.byte $ff,$14
+	.word @ref33
+	.byte $ff,$14
+	.word @ref33
 	.byte $fd
 	.word @song0ch2loop
 
-; Insert song here
+; Inevitable Doom - celestialghost8
 @song0ch3:
 @song0ch3loop:
-@ref3:
-	.byte $f9,$85
+@ref48:
+	.byte $97,$9a,$03,$85,$00,$95,$03,$81,$03,$81
+@ref49:
+	.byte $00,$95,$03,$85,$00,$95,$03,$81,$03,$81
+@ref50:
+	.byte $97,$03,$85,$00,$95,$03,$81,$03,$81
+	.byte $ff,$0a
+	.word @ref49
+	.byte $ff,$09
+	.word @ref50
+	.byte $ff,$0a
+	.word @ref49
+	.byte $ff,$09
+	.word @ref50
+	.byte $ff,$0a
+	.word @ref49
+	.byte $ff,$09
+	.word @ref50
+	.byte $ff,$0a
+	.word @ref49
+	.byte $ff,$09
+	.word @ref50
+	.byte $ff,$0a
+	.word @ref49
+	.byte $ff,$09
+	.word @ref50
+	.byte $ff,$0a
+	.word @ref49
+	.byte $ff,$09
+	.word @ref50
+	.byte $ff,$0a
+	.word @ref49
 	.byte $fd
 	.word @song0ch3loop
 
-; Insert song here
+; Inevitable Doom - celestialghost8
 @song0ch4:
 @song0ch4loop:
-@ref4:
-	.byte $f9,$85
+@ref64:
+	.byte $bf
+@ref65:
+	.byte $bf
+@ref66:
+	.byte $bf
+@ref67:
+	.byte $bf
+@ref68:
+	.byte $bf
+@ref69:
+	.byte $bf
+@ref70:
+	.byte $bf
+@ref71:
+	.byte $bf
+@ref72:
+	.byte $bf
+@ref73:
+	.byte $bf
+@ref74:
+	.byte $bf
+@ref75:
+	.byte $bf
+@ref76:
+	.byte $bf
+@ref77:
+	.byte $bf
+@ref78:
+	.byte $bf
+@ref79:
+	.byte $bf
 	.byte $fd
 	.word @song0ch4loop
+
+
+; cheery - Phillip Miller
+@song1ch0:
+	.byte $fb,$06
+@song1ch0loop:
+@ref80:
+	.byte $00,$ad
+@ref81:
+	.byte $af
+@ref82:
+	.byte $00,$ad
+@ref83:
+	.byte $af
+@ref84:
+	.byte $7f,$82,$12,$83,$7d,$12,$83,$7b,$12,$83,$79,$12,$83,$7f,$12,$83
+	.byte $7d,$12,$83,$7b,$12,$83,$79,$12,$83
+@ref85:
+	.byte $7f,$12,$83,$7d,$12,$83,$7b,$12,$83,$79,$12,$83,$7f,$12,$83,$7d
+	.byte $12,$83,$7b,$12,$83,$79,$12,$83
+	.byte $ff,$10
+	.word @ref85
+	.byte $ff,$10
+	.word @ref85
+	.byte $ff,$10
+	.word @ref85
+	.byte $ff,$10
+	.word @ref85
+	.byte $ff,$10
+	.word @ref85
+@ref91:
+	.byte $7f,$12,$83,$7d,$12,$83,$7b,$12,$83,$79,$12,$83,$7f,$12,$81,$00
+	.byte $91
+	.byte $ff,$10
+	.word @ref85
+	.byte $ff,$10
+	.word @ref85
+	.byte $ff,$10
+	.word @ref85
+	.byte $ff,$0c
+	.word @ref91
+	.byte $ff,$10
+	.word @ref85
+	.byte $ff,$10
+	.word @ref85
+	.byte $ff,$10
+	.word @ref85
+	.byte $ff,$0c
+	.word @ref91
+	.byte $fd
+	.word @song1ch0loop
+
+; cheery - Phillip Miller
+@song1ch1:
+@song1ch1loop:
+@ref100:
+	.byte $84,$1e,$81,$00,$81,$22,$85,$25,$85,$1e,$81,$00,$81,$25,$85,$22
+	.byte $81,$20,$81
+@ref101:
+	.byte $1e,$81,$00,$81,$22,$85,$25,$85,$1e,$81,$00,$81,$27,$81,$25,$81
+	.byte $22,$81,$20,$81
+@ref102:
+	.byte $1e,$81,$00,$81,$22,$85,$25,$85,$1e,$81,$00,$81,$25,$85,$22,$81
+	.byte $20,$81
+@ref103:
+	.byte $1e,$81,$00,$81,$22,$85,$25,$85,$1e,$81,$00,$81,$16,$81,$19,$81
+	.byte $1b,$81,$1d,$81
+	.byte $ff,$12
+	.word @ref102
+	.byte $ff,$14
+	.word @ref101
+	.byte $ff,$12
+	.word @ref102
+	.byte $ff,$14
+	.word @ref101
+	.byte $ff,$12
+	.word @ref102
+	.byte $ff,$14
+	.word @ref101
+	.byte $ff,$12
+	.word @ref102
+@ref111:
+	.byte $1e,$81,$00,$81,$22,$85,$25,$85,$1e,$81,$00,$81,$1a,$81,$1b,$81
+	.byte $1c,$81,$1d,$81
+	.byte $ff,$12
+	.word @ref102
+	.byte $ff,$14
+	.word @ref101
+	.byte $ff,$12
+	.word @ref102
+	.byte $ff,$14
+	.word @ref101
+	.byte $ff,$12
+	.word @ref102
+	.byte $ff,$14
+	.word @ref101
+	.byte $ff,$12
+	.word @ref102
+	.byte $ff,$14
+	.word @ref101
+	.byte $fd
+	.word @song1ch1loop
+
+; cheery - Phillip Miller
+@song1ch2:
+@song1ch2loop:
+@ref120:
+	.byte $00,$ad
+@ref121:
+	.byte $af
+@ref122:
+	.byte $00,$ad
+@ref123:
+	.byte $af
+@ref124:
+	.byte $92,$36,$ad
+@ref125:
+	.byte $af
+@ref126:
+	.byte $36,$ad
+@ref127:
+	.byte $af
+@ref128:
+	.byte $36,$ad
+@ref129:
+	.byte $af
+@ref130:
+	.byte $36,$ad
+@ref131:
+	.byte $af
+@ref132:
+	.byte $36,$ad
+@ref133:
+	.byte $af
+@ref134:
+	.byte $36,$ad
+@ref135:
+	.byte $af
+@ref136:
+	.byte $36,$ad
+@ref137:
+	.byte $af
+@ref138:
+	.byte $36,$ad
+@ref139:
+	.byte $af
+	.byte $fd
+	.word @song1ch2loop
+
+; cheery - Phillip Miller
+@song1ch3:
+@song1ch3loop:
+@ref140:
+	.byte $00,$ad
+@ref141:
+	.byte $af
+@ref142:
+	.byte $00,$ad
+@ref143:
+	.byte $af
+@ref144:
+	.byte $8e,$10,$85,$90,$05,$85,$8c,$09,$81,$09,$81,$90,$10,$85,$05,$81
+	.byte $8c,$09,$81,$90,$05,$85
+	.byte $ff,$10
+	.word @ref144
+	.byte $ff,$10
+	.word @ref144
+	.byte $ff,$10
+	.word @ref144
+	.byte $ff,$10
+	.word @ref144
+	.byte $ff,$10
+	.word @ref144
+	.byte $ff,$10
+	.word @ref144
+@ref151:
+	.byte $8e,$10,$85,$90,$05,$85,$8c,$09,$81,$09,$81,$90,$10,$95
+	.byte $ff,$10
+	.word @ref144
+	.byte $ff,$10
+	.word @ref144
+	.byte $ff,$10
+	.word @ref144
+	.byte $ff,$0a
+	.word @ref151
+	.byte $ff,$10
+	.word @ref144
+	.byte $ff,$10
+	.word @ref144
+	.byte $ff,$10
+	.word @ref144
+	.byte $ff,$0a
+	.word @ref151
+	.byte $fd
+	.word @song1ch3loop
+
+; cheery - Phillip Miller
+@song1ch4:
+@song1ch4loop:
+@ref160:
+	.byte $af
+@ref161:
+	.byte $af
+@ref162:
+	.byte $af
+@ref163:
+	.byte $af
+@ref164:
+	.byte $af
+@ref165:
+	.byte $af
+@ref166:
+	.byte $af
+@ref167:
+	.byte $af
+@ref168:
+	.byte $af
+@ref169:
+	.byte $af
+@ref170:
+	.byte $af
+@ref171:
+	.byte $af
+@ref172:
+	.byte $af
+@ref173:
+	.byte $af
+@ref174:
+	.byte $af
+@ref175:
+	.byte $af
+@ref176:
+	.byte $af
+@ref177:
+	.byte $af
+@ref178:
+	.byte $af
+@ref179:
+	.byte $af
+	.byte $fd
+	.word @song1ch4loop
+
+
+; upbeat -  Phillip Miller
+@song2ch0:
+	.byte $fb,$03
+@song2ch0loop:
+@ref180:
+	.byte $7c,$80,$20,$85,$72,$81,$71,$81,$00,$99,$7c,$1d,$85,$72,$81,$71
+	.byte $81,$00,$95
+@ref181:
+	.byte $83,$7c,$1f,$85,$72,$81,$71,$81,$00,$b9
+@ref182:
+	.byte $7c,$20,$85,$72,$81,$71,$81,$00,$99,$7c,$1d,$85,$72,$81,$71,$81
+	.byte $00,$95
+@ref183:
+	.byte $83,$7c,$20,$85,$72,$81,$71,$81,$00,$b9
+	.byte $ff,$0c
+	.word @ref182
+	.byte $ff,$07
+	.word @ref181
+	.byte $ff,$0c
+	.word @ref182
+	.byte $ff,$07
+	.word @ref183
+	.byte $ff,$0c
+	.word @ref182
+	.byte $ff,$07
+	.word @ref181
+	.byte $ff,$0c
+	.word @ref182
+	.byte $ff,$07
+	.word @ref183
+	.byte $ff,$0c
+	.word @ref182
+	.byte $ff,$07
+	.word @ref181
+	.byte $ff,$0c
+	.word @ref182
+	.byte $ff,$07
+	.word @ref183
+	.byte $ff,$0c
+	.word @ref182
+	.byte $ff,$07
+	.word @ref181
+	.byte $ff,$0c
+	.word @ref182
+	.byte $ff,$07
+	.word @ref183
+	.byte $ff,$0c
+	.word @ref182
+	.byte $ff,$07
+	.word @ref181
+	.byte $ff,$0c
+	.word @ref182
+	.byte $ff,$07
+	.word @ref183
+	.byte $fd
+	.word @song2ch0loop
+
+; upbeat -  Phillip Miller
+@song2ch1:
+@song2ch1loop:
+@ref204:
+	.byte $7c,$80,$23,$85,$72,$81,$71,$81,$00,$99,$7c,$20,$85,$72,$81,$71
+	.byte $81,$00,$95
+@ref205:
+	.byte $83,$7c,$22,$85,$72,$81,$71,$81,$00,$b9
+@ref206:
+	.byte $7c,$23,$85,$72,$81,$71,$81,$00,$99,$7c,$25,$85,$72,$81,$71,$81
+	.byte $00,$95
+	.byte $ff,$07
+	.word @ref205
+@ref208:
+	.byte $7c,$23,$85,$72,$81,$71,$81,$00,$99,$7c,$20,$85,$72,$81,$71,$81
+	.byte $00,$95
+	.byte $ff,$07
+	.word @ref205
+	.byte $ff,$0c
+	.word @ref206
+	.byte $ff,$07
+	.word @ref205
+	.byte $ff,$0c
+	.word @ref208
+	.byte $ff,$07
+	.word @ref205
+	.byte $ff,$0c
+	.word @ref206
+	.byte $ff,$07
+	.word @ref205
+	.byte $ff,$0c
+	.word @ref208
+	.byte $ff,$07
+	.word @ref205
+	.byte $ff,$0c
+	.word @ref206
+	.byte $ff,$07
+	.word @ref205
+	.byte $ff,$0c
+	.word @ref208
+	.byte $ff,$07
+	.word @ref205
+	.byte $ff,$0c
+	.word @ref206
+	.byte $ff,$07
+	.word @ref205
+	.byte $ff,$0c
+	.word @ref208
+	.byte $ff,$07
+	.word @ref205
+	.byte $ff,$0c
+	.word @ref206
+	.byte $ff,$07
+	.word @ref205
+	.byte $fd
+	.word @song2ch1loop
+
+; upbeat -  Phillip Miller
+@song2ch2:
+@song2ch2loop:
+@ref228:
+	.byte $94,$15,$8d,$19,$85,$1c,$85,$1b,$85,$16,$8d,$16,$85,$1b,$85,$19
+	.byte $81
+@ref229:
+	.byte $83,$14,$8d,$18,$85,$1b,$85,$1a,$85,$19,$8d,$1b,$8d
+@ref230:
+	.byte $17,$8d,$19,$85,$1c,$85,$1b,$85,$19,$8d,$1b,$85,$1d,$85,$1e,$81
+@ref231:
+	.byte $83,$10,$8d,$18,$85,$19,$85,$1b,$85,$19,$8d,$17,$8d
+@ref232:
+	.byte $15,$8d,$19,$85,$1c,$85,$1b,$85,$16,$8d,$16,$85,$1b,$85,$19,$81
+	.byte $ff,$0d
+	.word @ref229
+	.byte $ff,$10
+	.word @ref230
+	.byte $ff,$0d
+	.word @ref231
+@ref236:
+	.byte $15,$87,$00,$15,$81,$19,$85,$1c,$85,$1b,$85,$16,$87,$00,$86,$14
+	.byte $81,$94,$16,$85,$1b,$85,$19,$81
+@ref237:
+	.byte $83,$14,$87,$00,$86,$14,$81,$94,$18,$85,$1b,$85,$1a,$85,$19,$89
+	.byte $18,$81,$1b,$89,$86,$0d,$81
+@ref238:
+	.byte $94,$17,$87,$00,$17,$81,$19,$85,$1c,$85,$1b,$85,$19,$87,$00,$19
+	.byte $81,$1b,$85,$1d,$85,$1e,$81
+@ref239:
+	.byte $83,$10,$87,$00,$86,$16,$81,$94,$18,$85,$19,$85,$1b,$85,$19,$89
+	.byte $86,$16,$81,$94,$17,$89,$86,$14,$81
+@ref240:
+	.byte $94,$15,$87,$00,$15,$81,$19,$85,$1c,$85,$1b,$85,$16,$87,$00,$86
+	.byte $14,$81,$94,$16,$85,$1b,$85,$19,$81
+	.byte $ff,$14
+	.word @ref237
+	.byte $ff,$16
+	.word @ref238
+@ref243:
+	.byte $83,$10,$87,$00,$86,$16,$81,$94,$18,$85,$19,$85,$1b,$85,$19,$89
+	.byte $86,$18,$81,$94,$17,$89,$86,$16,$81
+	.byte $ff,$16
+	.word @ref240
+	.byte $ff,$14
+	.word @ref237
+	.byte $ff,$16
+	.word @ref238
+	.byte $ff,$14
+	.word @ref243
+	.byte $ff,$16
+	.word @ref240
+	.byte $ff,$14
+	.word @ref237
+	.byte $ff,$16
+	.word @ref238
+	.byte $ff,$14
+	.word @ref243
+	.byte $fd
+	.word @song2ch2loop
+
+; upbeat -  Phillip Miller
+@song2ch3:
+@song2ch3loop:
+@ref252:
+	.byte $7a,$88,$10,$85,$86,$0d,$85,$8a,$09,$85,$88,$01,$81,$7a,$8a,$09
+	.byte $73,$81,$7a,$86,$0d,$73,$81,$7a,$88,$01,$73,$81,$7a,$10,$85,$86
+	.byte $0d,$85,$8a,$09,$85,$88,$01,$85,$86,$0d,$81
+@ref253:
+	.byte $83,$7a,$88,$10,$85,$86,$0d,$81,$76,$88,$01,$81,$7a,$8a,$09,$85
+	.byte $88,$01,$81,$7a,$8a,$09,$73,$81,$7a,$86,$0d,$81,$76,$88,$01,$72
+	.byte $81,$7a,$10,$85,$86,$0d,$81,$8a,$09,$81,$88,$10,$81,$01,$81,$86
+	.byte $0d,$83,$74,$8a,$09
+@ref254:
+	.byte $7a,$88,$10,$85,$86,$0d,$85,$8a,$09,$85,$88,$01,$81,$7a,$8a,$09
+	.byte $73,$81,$7a,$86,$0d,$73,$81,$75,$0d,$71,$81,$7a,$88,$10,$85,$86
+	.byte $0d,$85,$8a,$09,$85,$88,$01,$81,$7a,$8a,$09,$73,$81,$7a,$86,$0d
+	.byte $73,$81
+@ref255:
+	.byte $76,$88,$01,$81,$7a,$10,$85,$86,$0d,$81,$76,$88,$01,$81,$7a,$8a
+	.byte $09,$85,$88,$01,$81,$7a,$8a,$09,$73,$81,$7a,$86,$0d,$81,$76,$88
+	.byte $01,$72,$81,$7a,$10,$85,$8a,$09,$85,$88,$10,$81,$7a,$8a,$09,$73
+	.byte $81,$7a,$09,$73,$81,$7a,$09,$73,$09
+	.byte $ff,$18
+	.word @ref252
+	.byte $ff,$1e
+	.word @ref253
+	.byte $ff,$1a
+	.word @ref254
+@ref259:
+	.byte $76,$88,$01,$81,$7a,$10,$85,$86,$0d,$81,$76,$88,$01,$81,$7a,$8a
+	.byte $09,$85,$88,$01,$81,$7a,$8a,$09,$73,$81,$7a,$86,$0d,$81,$76,$88
+	.byte $01,$72,$81,$7a,$8a,$09,$85,$88,$10,$85,$7a,$8a,$09,$85,$7a,$09
+	.byte $73,$81,$7a,$09,$73,$09
+@ref260:
+	.byte $75,$88,$10,$71,$8d,$75,$10,$71,$8d,$75,$10,$71,$8d,$75,$10,$71
+	.byte $8d,$75,$10,$71,$89
+@ref261:
+	.byte $83,$75,$10,$71,$8d,$75,$10,$71,$8d,$75,$10,$71,$85,$75,$10,$71
+	.byte $8d,$75,$10,$71,$8d
+@ref262:
+	.byte $75,$10,$71,$8d,$75,$10,$71,$8d,$75,$10,$71,$8d,$75,$10,$71,$8d
+	.byte $75,$10,$71,$89
+	.byte $ff,$0b
+	.word @ref261
+	.byte $ff,$0a
+	.word @ref262
+	.byte $ff,$0b
+	.word @ref261
+@ref266:
+	.byte $75,$10,$72,$8d,$75,$10,$73,$8d,$75,$10,$74,$8d,$76,$10,$74,$8d
+	.byte $77,$10,$75,$89
+@ref267:
+	.byte $83,$78,$10,$76,$8d,$79,$10,$77,$8d,$79,$10,$77,$81,$73,$86,$0d
+	.byte $81,$7a,$88,$10,$81,$75,$8a,$09,$71,$81,$77,$09,$72,$81,$79,$09
+	.byte $73,$81,$7a,$88,$10,$81,$7a,$8a,$09,$73,$81,$7a,$09,$73,$81,$7a
+	.byte $09,$73,$09
+	.byte $ff,$18
+	.word @ref252
+	.byte $ff,$1e
+	.word @ref253
+	.byte $ff,$1a
+	.word @ref254
+	.byte $ff,$1e
+	.word @ref255
+	.byte $ff,$18
+	.word @ref252
+	.byte $ff,$1e
+	.word @ref253
+	.byte $ff,$1a
+	.word @ref254
+	.byte $ff,$1c
+	.word @ref259
+	.byte $fd
+	.word @song2ch3loop
+
+; upbeat -  Phillip Miller
+@song2ch4:
+@song2ch4loop:
+@ref276:
+	.byte $cb
+@ref277:
+	.byte $cb
+@ref278:
+	.byte $cb
+@ref279:
+	.byte $cb
+@ref280:
+	.byte $cb
+@ref281:
+	.byte $cb
+@ref282:
+	.byte $cb
+@ref283:
+	.byte $cb
+@ref284:
+	.byte $cb
+@ref285:
+	.byte $cb
+@ref286:
+	.byte $cb
+@ref287:
+	.byte $cb
+@ref288:
+	.byte $cb
+@ref289:
+	.byte $cb
+@ref290:
+	.byte $cb
+@ref291:
+	.byte $cb
+@ref292:
+	.byte $cb
+@ref293:
+	.byte $cb
+@ref294:
+	.byte $cb
+@ref295:
+	.byte $cb
+@ref296:
+	.byte $cb
+@ref297:
+	.byte $cb
+@ref298:
+	.byte $cb
+@ref299:
+	.byte $cb
+	.byte $fd
+	.word @song2ch4loop
