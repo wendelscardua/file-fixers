@@ -793,7 +793,7 @@ void entity_action_handler() {
             temp_x = subrand8(11);
             temp_y = subrand8(9);
           }
-          entity_hp[i] == entity_max_hp[i] / 4;
+          entity_hp[i] = entity_max_hp[i] / 4;
           entity_col[i] = temp_x;
           entity_row[i] = temp_y;
           num_players++;
