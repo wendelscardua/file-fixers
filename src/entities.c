@@ -920,7 +920,7 @@ void next_entity() {
       }
     }
 
-    if (entity_hp[current_entity] == 0) continue;
+    if (entity_hp[current_entity] == 0 || IS_ITEM(current_entity)) continue;
 
     temp_attr = entity_status[current_entity];
 
