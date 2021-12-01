@@ -28,9 +28,9 @@ typedef enum {
               SkSlash,
               SkSlow,
               SkSpin,
-              SkTaunt, // TODO (make near enemies target self)
+              SkTaunt,
               SkThrow,
-              SkThunder, // TODO (damage all enemies)
+              SkThunder,
               SkTele,
               NumSkills
 } skill_type;

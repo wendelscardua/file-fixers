@@ -847,6 +847,16 @@ void entity_action_handler() {
         return;
       }
       break;
+    case SkThunder:
+      for(i = 4; i < num_entities; i++) {
+        if (entity_hp[i] > 0) {
+          skill_target_entity[0] = i;
+          if (ray_to_hit()) {
+            skill_damage(roll_dice(entity_lv[current_entity] / 4 + 1, 4));
+          }
+        }
+      }
+      break;
     }
     entity_aux = 0;
     next_entity();
