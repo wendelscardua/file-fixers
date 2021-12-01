@@ -168,7 +168,8 @@ assets/nametables.o: assets/nametables.s assets/nametables.h \
                      assets/nametables/castle.rle \
                      assets/nametables/castle-dialog.rle \
                      assets/nametables/keyboard.rle \
-                     assets/nametables/blue-screen.rle
+                     assets/nametables/blue-screen.rle \
+                     assets/nametables/shutdown.rle
 	ca65 $< ${CA65_FLAGS}
 
 assets/sectors.o: assets/sectors.s assets/sectors.h src/charmap.inc \
@@ -193,7 +194,8 @@ assets/sectors.o: assets/sectors.s assets/sectors.h src/charmap.inc \
 assets/palettes.o: assets/palettes.s assets/palettes.h \
                    assets/bg.pal assets/sprites.pal \
                    assets/bg-castle.pal assets/sprites-castle.pal \
-                   assets/bg-dungeon.pal assets/sprites-dungeon.pal
+                   assets/bg-dungeon.pal assets/sprites-dungeon.pal \
+                   assets/shutdown.pal
 	ca65 $< ${CA65_FLAGS}
 
 assets/sprites.o: assets/sprites.s assets/sprites.h

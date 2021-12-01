@@ -265,10 +265,10 @@ void go_to_title (void) {
 
   draw_sprites();
 
-  set_chr_mode_2(BG_MAIN_0);
-  set_chr_mode_3(BG_MAIN_1);
-  set_chr_mode_4(BG_MAIN_2);
-  set_chr_mode_5(BG_MAIN_3);
+  set_chr_mode_2(BG_DUNGEON_0);
+  set_chr_mode_3(BG_DUNGEON_1);
+  set_chr_mode_4(BG_DUNGEON_2);
+  set_chr_mode_5(BG_DUNGEON_3);
   set_chr_mode_0(SPRITE_0);
   set_chr_mode_1(SPRITE_1);
 
@@ -994,7 +994,7 @@ void game_over_handler() {
   if (pad1_new & PAD_START) {
     dungeon_layout_initialized = 0;
     party_initialized = 0;
-    start_game();
+    go_to_title();
   }
 }
 
@@ -1039,6 +1039,46 @@ void go_to_game_over () {
 
 // ::ETC::
 
+void go_to_shutdown () {
+  current_game_state = GameOver;
+
+  if (irq_array[0] != 0xff) {
+    while(!is_irq_done() ){}
+    irq_array[0] = 0xff;
+    double_buffer[0] = 0xff;
+  }
+
+  clear_vram_buffer();
+
+  pal_fade_to(4, 0);
+  ppu_off();
+  vram_adr(NTADR_A(0,0));
+  vram_unrle(shutdown_nametable);
+  music_stop();
+
+  set_scroll_x(0);
+  set_scroll_y(0);
+
+  oam_clear();
+
+  set_chr_mode_2(BG_MAIN_0);
+  set_chr_mode_3(BG_MAIN_1);
+  set_chr_mode_4(BG_MAIN_2);
+  set_chr_mode_5(BG_MAIN_3);
+  set_chr_mode_0(SPRITE_0);
+  set_chr_mode_1(SPRITE_1);
+
+  pal_bg(shutdown_palette);
+  pal_spr(shutdown_palette);
+
+  pal_fade_to(0, 4);
+  ppu_on_all(); //	turn on screen
+
+  // new game plusish
+  yendors = 0;
+  dungeon_layout_initialized = 0;
+}
+
 void start_game (void) {
   if (unseeded) {
     seed_rng();
@@ -1050,6 +1090,8 @@ void start_game (void) {
 
   pal_bg(bg_palette);
   pal_spr(sprites_palette);
+
+  yendors = 0xff;
 
   // draw some things
   vram_adr(NTADR_A(0,0));
@@ -1074,6 +1116,12 @@ void start_game (void) {
     }
   }
 
+  set_chr_mode_2(BG_MAIN_0);
+  set_chr_mode_3(BG_MAIN_1);
+  set_chr_mode_4(BG_MAIN_2);
+  set_chr_mode_5(BG_MAIN_3);
+  set_chr_mode_0(SPRITE_0);
+  set_chr_mode_1(SPRITE_1);
   ppu_on_all();
 
   pal_fade_to(0, 4);
@@ -1142,6 +1190,10 @@ void go_to_castle (void) {
 }
 
 void return_from_castle() {
+  if (yendors == 0xff) {
+    go_to_shutdown();
+    return;
+  }
   current_game_state = MainWindow;
   current_cursor_state = Default;
   oam_clear();

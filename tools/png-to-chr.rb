@@ -9,6 +9,7 @@ gemfile do
   source 'https://rubygems.org'
 
   gem 'chunky_png'
+  gem 'pry'
 end
 
 input, output = ARGV
@@ -23,6 +24,8 @@ color_to_twobits = {}
   (0...png.width).each do |x|
     color = png[x, y]
     chr[y][x] = (color_to_twobits[color] ||= color_to_twobits.size)
+  rescue => e
+    binding.pry
   end
 end
 
