@@ -507,6 +507,7 @@ void entity_menu_handler() {
       menu_page = current_entity;
       menu_cursor_row = 1;
       menu_cursor_col = 0;
+      menu_cursor_index = 1;
     }
   } else if (pad1_new & PAD_A) {
     if (menu_page < 4) {
@@ -531,6 +532,7 @@ void entity_menu_handler() {
         menu_page = 4;
         menu_cursor_row = 0;
         menu_cursor_col = 0;
+        menu_cursor_index = 0;
         break;
       case SkPass:
         next_entity();
