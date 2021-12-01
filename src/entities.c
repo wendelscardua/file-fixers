@@ -693,19 +693,33 @@ void gain_exp() {
   }
 }
 
+void maybe_loot() {
+  // arg1 = entity that maybe will become item
+  unsigned char type;
+
+  for(type = Potion; type < NumEntityTypes; type++) {
+    if (roll_die(20) <= 5) {
+      entity_hp[arg1] = 8;
+      entity_type[arg1] = type;
+    }
+  }
+}
+
 void skill_damage(unsigned char damage) {
-  if (entity_hp[skill_target_entity[0]] <= damage) {
-    entity_hp[skill_target_entity[0]] = 0;
-    if (IS_PLAYER(skill_target_entity[0])) num_players--;
-    else if (IS_ENEMY(skill_target_entity[0])) {
+  arg1 = skill_target_entity[0];
+  if (entity_hp[arg1] <= damage) {
+    entity_hp[arg1] = 0;
+    if (IS_PLAYER(arg1)) num_players--;
+    else if (IS_ENEMY(arg1)) {
       num_enemies--;
       if (num_enemies == 0 && sector_locked) {
         unlock_sector();
       }
+      maybe_loot();
       if (IS_PLAYER(current_entity)) gain_exp();
     }
   } else {
-    entity_hp[skill_target_entity[0]] -= damage;
+    entity_hp[arg1] -= damage;
   }
 }
 
@@ -1046,6 +1060,15 @@ void draw_entities() {
         }
         oam_meta_spr(temp_x, temp_y, player_sprite[temp]);
 
+        break;
+      case Potion:
+      case Ether:
+      case Elixir:
+        temp_bank = change_prg_8000(1);
+        oam_meta_spr(temp_x,
+                     temp_y,
+                     item_sprite[entity_type[entity_sprite_index] - Potion]);
+        set_prg_8000(temp_bank);
         break;
       default: // enemies
         switch(entity_direction[entity_sprite_index]) {
