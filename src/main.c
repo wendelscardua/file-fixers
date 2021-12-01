@@ -994,7 +994,7 @@ void game_over_handler() {
   if (pad1_new & PAD_START) {
     dungeon_layout_initialized = 0;
     party_initialized = 0;
-    start_game();
+    go_to_title();
   }
 }
 
