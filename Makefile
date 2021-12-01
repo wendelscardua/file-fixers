@@ -47,6 +47,7 @@ src/main.s: src/main.c \
             src/lib/neslib.h \
             src/lib/unrle.h \
             src/mmc3/mmc3_code.h \
+            src/music/soundtrack.h \
             src/charmap.h \
             src/castle.h \
             src/dungeon.h \

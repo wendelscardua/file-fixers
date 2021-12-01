@@ -6,6 +6,7 @@
 #include "lib/neslib.h"
 #include "lib/unrle.h"
 #include "mmc3/mmc3_code.h"
+#include "music/soundtrack.h"
 #include "charmap.h"
 #include "castle.h"
 #include "dungeon.h"
