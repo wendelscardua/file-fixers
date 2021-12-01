@@ -30,7 +30,7 @@ const char skill_name[NumSkills][8] =
    "Haste   ",
    "Heal    ",
    "Protect ",
-   "Raise   ",
+   "Revive  ",
    "Shield  ",
    "Slash   ",
    "Slow    ",
@@ -186,6 +186,14 @@ unsigned char set_area_skill_targets() {
   return (skill_target_count > 0);
 }
 
+unsigned char has_raisable_targets() {
+  for(temp = 0; temp < 4; temp++) {
+    if (entity_hp[temp] == 0) return 1;
+  }
+
+  return 0;
+}
+
 unsigned char skill_can_hit() {
   switch(skill_kinds[current_entity_skill]) {
   case SkkNone: return 0;
@@ -195,7 +203,7 @@ unsigned char skill_can_hit() {
   case SkkTargeted: return 1;
   case SkkArea: return set_area_skill_targets();
   case SkkEnemies: return 1;
-  case SkkRaisable: return 0; // TODO
+  case SkkRaisable: return has_raisable_targets();
   default: return 0;
   }
 }
