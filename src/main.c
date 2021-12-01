@@ -258,7 +258,7 @@ void go_to_title (void) {
   // draw some things
   vram_adr(NTADR_A(0,0));
   vram_unrle(title_nametable);
-  music_play(0);
+  music_play(InevitableDoom);
 
   set_scroll_x(0);
   set_scroll_y(0);
@@ -590,6 +590,9 @@ void drivers_window_loading_handler () {
     }
 
     start_dungeon(cursor_index - 1);
+
+    music_play(Upbeat);
+
     break;
   }
 }
@@ -1030,6 +1033,8 @@ void go_to_game_over () {
   ppu_on_all(); //	turn on screen
   multi_vram_buffer_horz(dungeon_name[current_dungeon_index], 8, NTADR_A(23, 9));
   multi_vram_buffer_horz(dungeon_name[current_dungeon_index], 8, NTADR_A(7, 22));
+
+  music_play(InevitableDoom);
 }
 
 // ::ETC::
@@ -1077,6 +1082,8 @@ void start_game (void) {
   reset_cursor();
 
   current_screen = 0;
+
+  music_play(InevitableDoom);
 }
 
 void flip_screen (void) {
@@ -1126,6 +1133,12 @@ void go_to_castle (void) {
 
   ppu_on_all();
   pal_fade_to(0, 4);
+
+  if (yendors == 0xff) {
+    music_play(Cheery);
+  } else {
+    music_play(InevitableDoom);
+  }
 }
 
 void return_from_castle() {

@@ -288,50 +288,50 @@ soundtrack_music_data:
 @ref81:
 	.byte $83,$7c,$1f,$85,$72,$81,$71,$81,$00,$b9
 @ref82:
+	.byte $7c,$20,$85,$72,$81,$71,$81,$00,$bd
+@ref83:
+	.byte $cb
+@ref84:
 	.byte $7c,$20,$85,$72,$81,$71,$81,$00,$99,$7c,$1d,$85,$72,$81,$71,$81
 	.byte $00,$95
-@ref83:
-	.byte $83,$7c,$20,$85,$72,$81,$71,$81,$00,$b9
-	.byte $ff,$0c
-	.word @ref82
 	.byte $ff,$07
 	.word @ref81
-	.byte $ff,$0c
+	.byte $ff,$06
 	.word @ref82
-	.byte $ff,$07
-	.word @ref83
+@ref87:
+	.byte $cb
 	.byte $ff,$0c
-	.word @ref82
-	.byte $ff,$07
-	.word @ref81
-	.byte $ff,$0c
-	.word @ref82
-	.byte $ff,$07
-	.word @ref83
-	.byte $ff,$0c
-	.word @ref82
+	.word @ref84
 	.byte $ff,$07
 	.word @ref81
-	.byte $ff,$0c
+	.byte $ff,$06
 	.word @ref82
-	.byte $ff,$07
-	.word @ref83
+@ref91:
+	.byte $cb
 	.byte $ff,$0c
-	.word @ref82
-	.byte $ff,$07
-	.word @ref81
-	.byte $ff,$0c
-	.word @ref82
-	.byte $ff,$07
-	.word @ref83
-	.byte $ff,$0c
-	.word @ref82
+	.word @ref84
 	.byte $ff,$07
 	.word @ref81
-	.byte $ff,$0c
+	.byte $ff,$06
 	.word @ref82
+@ref95:
+	.byte $cb
+	.byte $ff,$0c
+	.word @ref84
 	.byte $ff,$07
-	.word @ref83
+	.word @ref81
+	.byte $ff,$06
+	.word @ref82
+@ref99:
+	.byte $cb
+	.byte $ff,$0c
+	.word @ref84
+	.byte $ff,$07
+	.word @ref81
+	.byte $ff,$06
+	.word @ref82
+@ref103:
+	.byte $cb
 	.byte $fd
 	.word @song1ch0loop
 
