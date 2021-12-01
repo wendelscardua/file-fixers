@@ -11,6 +11,9 @@
 
 #define STATUS_LENGTH (2 + roll_die(4))
 
+#define IS_PLAYER(entity_index) ((entity_index < 4))
+#define IS_ENEMY(entity_index) ((entity_index >= 4))
+
 typedef enum {
               Eicar,
               Crypt,

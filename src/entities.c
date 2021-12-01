@@ -150,7 +150,7 @@ void refresh_hp_sp_hud() {
   temp_int_y = entity_max_hp[current_entity];
   refresh_gauge(0);
 
-  if (current_entity < 4) {
+  if (IS_PLAYER(current_entity)) {
     temp_int_x = player_sp[current_entity];
     temp_int_y = player_max_sp[current_entity];
   } else {
@@ -317,7 +317,7 @@ unsigned char enemy_lock_on_melee_target() {
     skill_target_row[0] = entity_row[current_entity];
     skill_target_col[0] = entity_col[current_entity];
     if (set_melee_skill_target() &&
-        ((skill_target_entity[0] < 4) == (temp_attr == 0))) {
+        (IS_PLAYER(skill_target_entity[0]) == (temp_attr == 0))) {
       return 1;
     }
     if (entity_direction[current_entity] == 3) entity_direction[current_entity] = 0;
@@ -533,7 +533,7 @@ unsigned char melee_to_hit() {
   if (entity_lv[current_entity] <= 2) ++to_hit_bonus;
 
   // TODO: AC
-  if (skill_target_entity[0] < 4) {
+  if (IS_PLAYER(skill_target_entity[0])) {
     // player AC
     to_hit_bonus += 7;
   } else {
@@ -555,7 +555,7 @@ unsigned char ray_to_hit() {
   to_hit_bonus += 2; // dex
 
   // TODO: AC
-  if (skill_target_entity[0] < 4) {
+  if (IS_PLAYER(skill_target_entity[0])) {
     // player AC
     to_hit_bonus += 7;
   } else {
@@ -573,7 +573,7 @@ unsigned char fire_to_hit() {
   signed char to_hit_bonus = 10;
 
   // TODO: AC
-  if (skill_target_entity[0] < 4) {
+  if (IS_PLAYER(skill_target_entity[0])) {
     // player AC
     to_hit_bonus += 7;
   } else {
@@ -589,7 +589,7 @@ unsigned char fire_to_hit() {
 
 void gain_exp() {
   unsigned int exp, temp_exp, temp_goal;
-  if (current_entity >= 4 || skill_target_entity[0] < 4) return;
+  if (IS_ENEMY(current_entity) || IS_PLAYER(skill_target_entity[0])) return;
 
   exp = entity_lv[skill_target_entity[0]];
   // ML * ML + 1
@@ -697,7 +697,7 @@ void gain_exp() {
 void skill_damage(unsigned char damage) {
   if (entity_hp[skill_target_entity[0]] <= damage) {
     entity_hp[skill_target_entity[0]] = 0;
-    if (skill_target_entity[0] < 4) num_players--;
+    if (IS_PLAYER(skill_target_entity[0])) num_players--;
     else {
       num_enemies--;
       if (num_enemies == 0 && sector_locked) {
@@ -958,7 +958,7 @@ void next_entity() {
       entity_x = entity_col[current_entity] * 0x10 + 0x20;
       entity_y = entity_row[current_entity] * 0x10 + 0x20 - 1;
 
-      if (current_entity < 4) regen();
+      if (IS_PLAYER(current_entity)) regen();
 
       refresh_hud();
       break;
