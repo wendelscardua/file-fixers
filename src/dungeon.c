@@ -25,10 +25,14 @@ unsigned char * current_sector;
 unsigned char * current_sector_room_data;
 unsigned char current_dungeon_index, current_sector_index;
 
+
 void generate_layout() {
+  _Static_assert(NUM_SECTOR_TEMPLATES == 8 || NUM_SECTOR_TEMPLATES == 16 || NUM_SECTOR_TEMPLATES == 32 || NUM_SECTOR_TEMPLATES == 64 || NUM_SECTOR_TEMPLATES == 128);
   for(temp_y = 0; temp_y < NUM_DUNGEONS; temp_y++) {
     for(temp_x = 0; temp_x < NUM_SECTORS; temp_x++) {
-      dungeon_layout[temp_y][temp_x] = rand8() % NUM_SECTOR_TEMPLATES;
+      do {
+        dungeon_layout[temp_y][temp_x] = temp = rand8() & (NUM_SECTOR_TEMPLATES-1);
+      } while(temp_x > 0 && temp == dungeon_layout[temp_y][temp_x - 1]);
     }
   }
 }
