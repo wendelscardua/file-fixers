@@ -784,6 +784,22 @@ void entity_action_handler() {
       entity_status[skill_target_entity[0]] |= STATUS_PROTECT;
       entity_status_turns[skill_target_entity[0]] = STATUS_LENGTH;
       break;
+    case SkRaise:
+      for(skill_target_index = 0; skill_target_index < 4; skill_target_index++) {
+        if (entity_hp[skill_target_index] == 0 && roll_die(20) < 8 - num_players) {
+          temp_x = entity_col[skill_target_index];
+          temp_y = entity_row[skill_target_index];
+          while(entity_collides()) {
+            temp_x = subrand8(11);
+            temp_y = subrand8(9);
+          }
+          entity_hp[skill_target_index] = entity_max_hp[skill_target_index] / 4;
+          entity_col[skill_target_index] = temp_x;
+          entity_row[skill_target_index] = temp_y;
+          num_players++;
+        }
+      }
+      break;
     case SkSlash:
       if (melee_to_hit()) {
         skill_damage(roll_dice(2 * entity_attack[current_entity].amount, entity_attack[current_entity].sides));

@@ -160,6 +160,8 @@ void main (void) {
 
     double_buffer_index = 0;
 
+    rand16();
+
     switch (current_game_state) {
     case Title:
       title_handler();
@@ -291,7 +293,6 @@ void draw_title_sprites() {
 // ::MAIN WINDOW::
 
 void main_window_handler() {
-  rand16();
   pad_poll(0);
   pad1_new = get_pad_new(0);
 
@@ -435,7 +436,6 @@ void main_window_loading_handler () {
 // ::DRIVERS WINDOW::
 
 void drivers_window_handler() {
-  rand16();
   pad_poll(0);
   pad1_new = get_pad_new(0);
 
@@ -598,7 +598,6 @@ void return_from_dungeon() {
 // ::CONFIG::
 
 void config_window_handler() {
-  rand16();
   pad_poll(0);
   pad1_new = get_pad_new(0);
 
