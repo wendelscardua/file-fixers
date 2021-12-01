@@ -555,7 +555,31 @@ void entity_menu_handler() {
       }
     }
     else {
-      // TODO use item
+      if (player_items[menu_cursor_index] > 0) {
+        player_items[menu_cursor_index]--;
+        refresh_items_hud();
+        ppu_wait_nmi();
+        clear_vram_buffer();
+        switch(Potion + menu_cursor_index) {
+        case Potion:
+          entity_hp[current_entity] += roll_dice(6, 4);
+          break;
+        case Ether:
+          player_sp[current_entity] += roll_dice(2, 6);
+          break;
+        case Elixir:
+          entity_hp[current_entity] += roll_dice(6, 8);
+          player_sp[current_entity] += roll_dice(4, 6);
+          break;
+        }
+        if (entity_hp[current_entity] > entity_max_hp[current_entity]) {
+          entity_hp[current_entity] = entity_max_hp[current_entity];
+        }
+        if (player_sp[current_entity] > player_max_sp[current_entity]) {
+          player_sp[current_entity] = player_max_sp[current_entity];
+        }
+        next_entity();
+      }
     }
   }
 }
