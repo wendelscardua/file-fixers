@@ -55,6 +55,8 @@ extern unsigned char skill_target_entity[MAX_SKILL_TARGETS];
 extern direction skill_target_direction;
 extern unsigned char skill_target_count, skill_target_index;
 
+#pragma code-name (push, "BANK2")
+
 #pragma wrapped-call (push, farcallax, bank)
 unsigned char have_enough_sp (void);
 unsigned char skill_is_targeted (void);
@@ -66,5 +68,7 @@ unsigned char skill_can_hit (void);
 #pragma wrapped-call (push, farcall, bank)
 void consume_sp (void);
 #pragma wrapped-call (pop)
+
+#pragma code-name (pop)
 
 #endif

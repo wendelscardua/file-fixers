@@ -5,7 +5,9 @@
 
 // Generates pseudorandom value <= upper_bound
 #pragma wrapped-call (push, farcallax, bank)
+#pragma code-name (push, "BANK1")
 unsigned char __fastcall__ subrand8(unsigned char upper_bound);
+#pragma code-name (pop)
 #pragma wrapped-call (pop)
 
 #endif
