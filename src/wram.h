@@ -18,6 +18,7 @@ extern unsigned int player_xp[];
 extern unsigned int player_sp[];
 extern unsigned int player_max_sp[4];
 extern skill_type player_skills[4][9];
+extern unsigned char player_items[9];
 extern unsigned char party_level;
 
 extern entity_type_enum entity_type[];

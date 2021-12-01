@@ -1,8 +1,10 @@
 #include "lib/nesdoug.h"
 #include "lib/neslib.h"
+#include "mmc3/mmc3_code.h"
 #include "charmap.h"
 #include "castle.h"
 #include "irq_buffer.h"
+#include "main.h"
 #include "temp.h"
 #include "wram.h"
 #include "../assets/dialogs.h"
@@ -39,8 +41,8 @@ unsigned char dialog_column;
 char * dialog_queue[5];
 unsigned char dialog_queue_index;
 
-#pragma code-name ("CODE")
-#pragma rodata-name ("RODATA")
+#pragma rodata-name ("BANK1")
+#pragma code-name ("BANK1")
 
 void init_castle_cutscene() {
   player_y = START_Y;
@@ -83,8 +85,6 @@ void init_castle_cutscene() {
   dialog_row = FIRST_DIALOG_ROW;
   dialog_column = FIRST_DIALOG_COLUMN;
 }
-
-void return_from_castle(void);
 
 const char blank[] = "                      ";
 
@@ -186,7 +186,11 @@ void castle_handler() {
   }
 }
 
+#pragma rodata-name ("RODATA")
+#pragma code-name ("CODE")
+
 void draw_castle_sprites() {
+  temp_bank = change_prg_8000(0);
   oam_meta_spr(0x70, 0x3e, amda_sprite);
   oam_meta_spr(0x80, 0x3e, intelle_sprite);
   oam_meta_spr(0x68, 0x88, player_sprite[(PLAYER_UP_SPR << 2) | 1]);
@@ -223,4 +227,5 @@ void draw_castle_sprites() {
     }
     break;
   }
+  set_prg_8000(temp_bank);
 }

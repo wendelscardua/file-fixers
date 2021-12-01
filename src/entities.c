@@ -24,7 +24,7 @@
 unsigned char num_entities, num_enemies, num_players;
 unsigned char entity_aux;
 unsigned char temp_w, temp_h;
-unsigned char menu_cursor_row, menu_cursor_col, menu_cursor_index;
+unsigned char menu_cursor_row, menu_cursor_col, menu_cursor_index, menu_page;
 unsigned char *room_ptr;
 
 unsigned char current_entity;
@@ -32,6 +32,8 @@ unsigned char current_entity;
 unsigned char entity_sprite_index;
 
 unsigned char turn_counter;
+
+unsigned char entity_collision_index, item_index;
 
 #pragma bss-name(pop)
 
@@ -106,6 +108,24 @@ void refresh_skills_hud() {
   }
 }
 
+void refresh_items_hud() {
+  temp_y = 0;
+
+  for(temp = 0; temp < NumEntityTypes - Potion; temp++) {
+    temp_attr = player_items[temp];
+
+    temp_char = 0;
+    while (temp_attr >= 10) {
+      temp_attr -= 10;
+      ++temp_char;
+    }
+    one_vram_buffer(0x10 + temp_char, NTADR_C(11, 20 + temp_y));
+    one_vram_buffer(0x10 + temp_attr, NTADR_C(12, 20 + temp_y));
+
+    temp_y++;
+  }
+}
+
 void refresh_moves_hud() {
   temp = current_entity_moves;
   temp_x = 0;
@@ -150,7 +170,7 @@ void refresh_hp_sp_hud() {
   temp_int_y = entity_max_hp[current_entity];
   refresh_gauge(0);
 
-  if (current_entity < 4) {
+  if (IS_PLAYER(current_entity)) {
     temp_int_x = player_sp[current_entity];
     temp_int_y = player_max_sp[current_entity];
   } else {
@@ -199,6 +219,7 @@ void refresh_xp_hud() {
 void refresh_hud() {
   refresh_moves_hud();
   refresh_hp_sp_hud();
+  refresh_items_hud();
 
   temp = entity_lv[current_entity];
   one_vram_buffer(0x10 + (temp / 10), NTADR_A(12, 25));
@@ -302,8 +323,33 @@ unsigned char collides_with_map() {
 unsigned char entity_collides() {
   if (collides_with_map()) return 1;
 
-  for(i = 0; i < num_entities; i++) {
-    if (entity_hp[i] > 0 && entity_col[i] == temp_x && entity_row[i] == temp_y) return 1;
+  for(entity_collision_index = 0;
+      entity_collision_index < num_entities;
+      entity_collision_index++) {
+    if (entity_hp[entity_collision_index] > 0 &&
+        entity_col[entity_collision_index] == temp_x &&
+        entity_row[entity_collision_index] == temp_y) return 1;
+  }
+
+  return 0;
+}
+
+unsigned char entity_collides_except_item() {
+  item_index = 0xff;
+  if (collides_with_map()) return 1;
+
+  for(entity_collision_index = 0;
+      entity_collision_index < num_entities;
+      entity_collision_index++) {
+    if (entity_hp[entity_collision_index] > 0 &&
+        entity_col[entity_collision_index] == temp_x &&
+        entity_row[entity_collision_index] == temp_y) {
+      if (IS_ITEM(entity_collision_index)) {
+        item_index = entity_collision_index;
+        return 0;
+      }
+      return 1;
+    }
   }
 
   return 0;
@@ -317,7 +363,7 @@ unsigned char enemy_lock_on_melee_target() {
     skill_target_row[0] = entity_row[current_entity];
     skill_target_col[0] = entity_col[current_entity];
     if (set_melee_skill_target() &&
-        ((skill_target_entity[0] < 4) == (temp_attr == 0))) {
+        (IS_PLAYER(skill_target_entity[0]) == (temp_attr == 0))) {
       return 1;
     }
     if (entity_direction[current_entity] == 3) entity_direction[current_entity] = 0;
@@ -359,7 +405,7 @@ void entity_input_handler() {
       else if (pad1_new & PAD_RIGHT) { ++temp_x; temp = Right; }
       entity_direction[current_entity] = temp;
 
-      if (current_entity_moves > 0 && !entity_collides()) {
+      if (current_entity_moves > 0 && !entity_collides_except_item()) {
         entity_row[current_entity] = temp_y;
         entity_col[current_entity] = temp_x;
         --current_entity_moves;
@@ -369,6 +415,7 @@ void entity_input_handler() {
       }
     } else if (pad1_new & PAD_A) {
       current_entity_state = EntityMenu;
+      menu_page = current_entity;
       menu_cursor_row = 0;
       menu_cursor_col = 0;
       menu_cursor_index = 0;
@@ -404,6 +451,17 @@ void entity_movement_handler() {
 
     if (current_entity >= 4) return;
 
+    if (item_index != 0xff) {
+      if (player_items[entity_type[item_index] - Potion] < 99) {
+        player_items[entity_type[item_index] - Potion]++;
+        refresh_items_hud();
+        ppu_wait_nmi();
+        clear_vram_buffer();
+      }
+      entity_hp[item_index] = 0;
+      item_index = 0xff;
+    }
+
     if (!sector_locked && entity_row[current_entity] == sector_down_row && entity_col[current_entity] == sector_down_column) {
       oam_clear();
       load_dungeon_sector(current_sector_index + 1);
@@ -426,7 +484,7 @@ void entity_menu_handler() {
   double_buffer[double_buffer_index++] = MENU_SCANLINE - 1;
   double_buffer[double_buffer_index++] = 0xf6;
   double_buffer[double_buffer_index++] = 8;
-  temp_int = 0x28 * current_entity;
+  temp_int = 0x28 * menu_page;
   double_buffer[double_buffer_index++] = temp_int;
   double_buffer[double_buffer_index++] = 0;
   double_buffer[double_buffer_index++] = ((temp_int & 0xF8) << 2);
@@ -443,45 +501,85 @@ void entity_menu_handler() {
     if (menu_cursor_col < 2) { ++menu_cursor_col; menu_cursor_index += 3; }
   } else if (pad1_new & PAD_B) {
     entity_aux = 0;
-    current_entity_state = EntityInput;
-  } else if (pad1_new & PAD_A) {
-    switch (current_entity_skill = player_skills[current_entity][menu_cursor_index]) {
-    case SkNone:
-      entity_aux = 0;
+    if (menu_page < 4) {
       current_entity_state = EntityInput;
-      break;
-    case SkAttack:
-      entity_aux = 0;
-      skill_target_row[0] = entity_row[current_entity];
-      skill_target_col[0] = entity_col[current_entity];
-      skill_target_direction = entity_direction[current_entity];
-      if (set_melee_skill_target()) {
-        current_entity_state = EntityPlayAction;
-      } else {
+    } else {
+      menu_page = current_entity;
+      menu_cursor_row = 1;
+      menu_cursor_col = 0;
+      menu_cursor_index = 1;
+    }
+  } else if (pad1_new & PAD_A) {
+    if (menu_page < 4) {
+      switch (current_entity_skill = player_skills[current_entity][menu_cursor_index]) {
+      case SkNone:
+        entity_aux = 0;
+        current_entity_state = EntityInput;
+        break;
+      case SkAttack:
+        entity_aux = 0;
+        skill_target_row[0] = entity_row[current_entity];
+        skill_target_col[0] = entity_col[current_entity];
+        skill_target_direction = entity_direction[current_entity];
+        if (set_melee_skill_target()) {
+          current_entity_state = EntityPlayAction;
+        } else {
+          next_entity();
+        }
+        break;
+      case SkItem:
+        entity_aux = 0;
+        menu_page = 4;
+        menu_cursor_row = 0;
+        menu_cursor_col = 0;
+        menu_cursor_index = 0;
+        break;
+      case SkPass:
+        next_entity();
+        break;
+      default:
+        if (!have_enough_sp()) { break; }
+        skill_target_row[0] = entity_row[current_entity];
+        skill_target_col[0] = entity_col[current_entity];
+        skill_target_direction = entity_direction[current_entity];
+        if (skill_is_targeted()) {
+          current_entity_state = EntityAskTarget;
+          break;
+        } else if (skill_can_hit()) {
+          consume_sp();
+          refresh_hp_sp_hud();
+          entity_aux = 0;
+          current_entity_state = EntityPlayAction;
+        }
+        break;
+      }
+    }
+    else {
+      if (player_items[menu_cursor_index] > 0) {
+        player_items[menu_cursor_index]--;
+        refresh_items_hud();
+        ppu_wait_nmi();
+        clear_vram_buffer();
+        switch(Potion + menu_cursor_index) {
+        case Potion:
+          entity_hp[current_entity] += roll_dice(6, 4);
+          break;
+        case Ether:
+          player_sp[current_entity] += roll_dice(2, 6);
+          break;
+        case Elixir:
+          entity_hp[current_entity] += roll_dice(6, 8);
+          player_sp[current_entity] += roll_dice(4, 6);
+          break;
+        }
+        if (entity_hp[current_entity] > entity_max_hp[current_entity]) {
+          entity_hp[current_entity] = entity_max_hp[current_entity];
+        }
+        if (player_sp[current_entity] > player_max_sp[current_entity]) {
+          player_sp[current_entity] = player_max_sp[current_entity];
+        }
         next_entity();
       }
-      break;
-    case SkItem:
-      // TODO: item
-      break;
-    case SkPass:
-      next_entity();
-      break;
-    default:
-      if (!have_enough_sp()) { break; }
-      skill_target_row[0] = entity_row[current_entity];
-      skill_target_col[0] = entity_col[current_entity];
-      skill_target_direction = entity_direction[current_entity];
-      if (skill_is_targeted()) {
-        current_entity_state = EntityAskTarget;
-        break;
-      } else if (skill_can_hit()) {
-        consume_sp();
-        refresh_hp_sp_hud();
-        entity_aux = 0;
-        current_entity_state = EntityPlayAction;
-      }
-      break;
     }
   }
 }
@@ -533,7 +631,7 @@ unsigned char melee_to_hit() {
   if (entity_lv[current_entity] <= 2) ++to_hit_bonus;
 
   // TODO: AC
-  if (skill_target_entity[0] < 4) {
+  if (IS_PLAYER(skill_target_entity[0])) {
     // player AC
     to_hit_bonus += 7;
   } else {
@@ -555,7 +653,7 @@ unsigned char ray_to_hit() {
   to_hit_bonus += 2; // dex
 
   // TODO: AC
-  if (skill_target_entity[0] < 4) {
+  if (IS_PLAYER(skill_target_entity[0])) {
     // player AC
     to_hit_bonus += 7;
   } else {
@@ -573,7 +671,7 @@ unsigned char fire_to_hit() {
   signed char to_hit_bonus = 10;
 
   // TODO: AC
-  if (skill_target_entity[0] < 4) {
+  if (IS_PLAYER(skill_target_entity[0])) {
     // player AC
     to_hit_bonus += 7;
   } else {
@@ -589,7 +687,6 @@ unsigned char fire_to_hit() {
 
 void gain_exp() {
   unsigned int exp, temp_exp, temp_goal;
-  if (current_entity >= 4 || skill_target_entity[0] < 4) return;
 
   exp = entity_lv[skill_target_entity[0]];
   // ML * ML + 1
@@ -694,19 +791,33 @@ void gain_exp() {
   }
 }
 
+void maybe_loot() {
+  // arg1 = entity that maybe will become item
+  unsigned char type;
+
+  for(type = Potion; type < NumEntityTypes; type++) {
+    if (roll_die(20) <= 5) {
+      entity_hp[arg1] = 8;
+      entity_type[arg1] = type;
+    }
+  }
+}
+
 void skill_damage(unsigned char damage) {
-  if (entity_hp[skill_target_entity[0]] <= damage) {
-    entity_hp[skill_target_entity[0]] = 0;
-    if (skill_target_entity[0] < 4) num_players--;
-    else {
+  arg1 = skill_target_entity[0];
+  if (entity_hp[arg1] <= damage) {
+    entity_hp[arg1] = 0;
+    if (IS_PLAYER(arg1)) num_players--;
+    else if (IS_ENEMY(arg1)) {
       num_enemies--;
       if (num_enemies == 0 && sector_locked) {
         unlock_sector();
       }
+      maybe_loot();
+      if (IS_PLAYER(current_entity)) gain_exp();
     }
-    gain_exp();
   } else {
-    entity_hp[skill_target_entity[0]] -= damage;
+    entity_hp[arg1] -= damage;
   }
 }
 
@@ -921,7 +1032,7 @@ void next_entity() {
       }
     }
 
-    if (entity_hp[current_entity] == 0) continue;
+    if (entity_hp[current_entity] == 0 || IS_ITEM(current_entity)) continue;
 
     temp_attr = entity_status[current_entity];
 
@@ -958,7 +1069,7 @@ void next_entity() {
       entity_x = entity_col[current_entity] * 0x10 + 0x20;
       entity_y = entity_row[current_entity] * 0x10 + 0x20 - 1;
 
-      if (current_entity < 4) regen();
+      if (IS_PLAYER(current_entity)) regen();
 
       refresh_hud();
       break;
@@ -1047,6 +1158,15 @@ void draw_entities() {
         }
         oam_meta_spr(temp_x, temp_y, player_sprite[temp]);
 
+        break;
+      case Potion:
+      case Ether:
+      case Elixir:
+        temp_bank = change_prg_8000(1);
+        oam_meta_spr(temp_x,
+                     temp_y,
+                     item_sprite[entity_type[entity_sprite_index] - Potion]);
+        set_prg_8000(temp_bank);
         break;
       default: // enemies
         switch(entity_direction[entity_sprite_index]) {

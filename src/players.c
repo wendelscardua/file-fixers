@@ -128,15 +128,13 @@ void initialize_party() {
 
   for(i = 0; i < 4; i++) {
     player_xp[i] = 0;
+    for(temp = 0; temp < 9; temp++) {
+      player_skills[i][temp] = SkNone;
+      player_items[temp] = 0;
+    }
     player_skills[i][0] = SkAttack;
     player_skills[i][1] = SkItem;
     player_skills[i][2] = SkPass;
-    player_skills[i][3] = SkNone;
-    player_skills[i][4] = SkNone;
-    player_skills[i][5] = SkNone;
-    player_skills[i][6] = SkNone;
-    player_skills[i][7] = SkNone;
-    player_skills[i][8] = SkNone;
     entity_lv[i] = 1;
     entity_type[i] = Player;
     entity_speed[i] = NORMAL_SPEED;

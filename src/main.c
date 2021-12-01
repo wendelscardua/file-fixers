@@ -1040,6 +1040,8 @@ void go_to_game_over () {
 // ::ETC::
 
 void go_to_shutdown () {
+  unsigned char temp_bank;
+
   current_game_state = GameOver;
 
   if (irq_array[0] != 0xff) {
@@ -1053,6 +1055,7 @@ void go_to_shutdown () {
   pal_fade_to(4, 0);
   ppu_off();
   vram_adr(NTADR_A(0,0));
+  temp_bank = change_prg_8000(0);
   vram_unrle(shutdown_nametable);
   music_stop();
 
@@ -1070,6 +1073,8 @@ void go_to_shutdown () {
 
   pal_bg(shutdown_palette);
   pal_spr(shutdown_palette);
+
+  set_prg_8000(temp_bank);
 
   pal_fade_to(0, 4);
   ppu_on_all(); //	turn on screen
@@ -1188,10 +1193,12 @@ void go_to_castle (void) {
 }
 
 void return_from_castle() {
+  unsigned char temp_bank;
   if (yendors == 0xff) {
     go_to_shutdown();
     return;
   }
+
   current_game_state = MainWindow;
   current_cursor_state = Default;
   oam_clear();
@@ -1203,10 +1210,12 @@ void return_from_castle() {
   set_chr_mode_5(BG_MAIN_3);
   set_chr_mode_0(SPRITE_0);
   set_chr_mode_1(SPRITE_1);
+  temp_bank = change_prg_8000(0);
   pal_bg(bg_palette);
   pal_spr(sprites_palette);
   vram_adr(NTADR_A(0,0));
   vram_unrle(main_window_nametable);
+  set_prg_8000(temp_bank);
   set_scroll_x(0);
   set_scroll_y(0);
   current_screen = 0;
