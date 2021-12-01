@@ -27,7 +27,7 @@ end
 
 File.open(output_file, 'wb') do |f|
   f.puts '.include "../src/charmap.inc"'
-  f.puts '.segment "RODATA"'
+  f.puts '.segment "BANK1"'
 
   dialog_table.each do |dialog_name, dialog_content|
     f.puts ".export _dialog_#{dialog_name}"

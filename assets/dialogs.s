@@ -1,5 +1,5 @@
 .include "../src/charmap.inc"
-.segment "RODATA"
+.segment "BANK1"
 .export _dialog_beginning
 _dialog_beginning: .byte 1, "Welcome, Heroes of the System! I'm Queen Amda...", 2, "... and I'm Queen Intella. Please save our system from crashing.", 1, "Our Kingdom OS relies on four drivers: GPU.DLL, Disk.DLL, IO.DLL and RAM.DLL", 2, "Now the drivers are full of bugs. Dive into each driver, removing them. Cleaning the last sector will yield its crypto key. Return with it and the driver will be finally safe.", 1, "Now go, heroes! You're our last hope!", 0
 .export _dialog_no_dlls
