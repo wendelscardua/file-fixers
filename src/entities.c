@@ -33,6 +33,8 @@ unsigned char entity_sprite_index;
 
 unsigned char turn_counter;
 
+unsigned char entity_collision_index, item_index;
+
 #pragma bss-name(pop)
 
 unsigned char entity_row[MAX_ENTITIES];
@@ -302,8 +304,33 @@ unsigned char collides_with_map() {
 unsigned char entity_collides() {
   if (collides_with_map()) return 1;
 
-  for(i = 0; i < num_entities; i++) {
-    if (entity_hp[i] > 0 && entity_col[i] == temp_x && entity_row[i] == temp_y) return 1;
+  for(entity_collision_index = 0;
+      entity_collision_index < num_entities;
+      entity_collision_index++) {
+    if (entity_hp[entity_collision_index] > 0 &&
+        entity_col[entity_collision_index] == temp_x &&
+        entity_row[entity_collision_index] == temp_y) return 1;
+  }
+
+  return 0;
+}
+
+unsigned char entity_collides_except_item() {
+  item_index = 0xff;
+  if (collides_with_map()) return 1;
+
+  for(entity_collision_index = 0;
+      entity_collision_index < num_entities;
+      entity_collision_index++) {
+    if (entity_hp[entity_collision_index] > 0 &&
+        entity_col[entity_collision_index] == temp_x &&
+        entity_row[entity_collision_index] == temp_y) {
+      if (IS_ITEM(entity_collision_index)) {
+        item_index = entity_collision_index;
+        return 0;
+      }
+      return 1;
+    }
   }
 
   return 0;
@@ -359,7 +386,7 @@ void entity_input_handler() {
       else if (pad1_new & PAD_RIGHT) { ++temp_x; temp = Right; }
       entity_direction[current_entity] = temp;
 
-      if (current_entity_moves > 0 && !entity_collides()) {
+      if (current_entity_moves > 0 && !entity_collides_except_item()) {
         entity_row[current_entity] = temp_y;
         entity_col[current_entity] = temp_x;
         --current_entity_moves;
@@ -403,6 +430,15 @@ void entity_movement_handler() {
     current_entity_state = EntityInput;
 
     if (current_entity >= 4) return;
+
+    if (item_index != 0xff) {
+      if (player_items[entity_type[item_index] - Potion] < 99) {
+        player_items[entity_type[item_index] - Potion]++;
+        //refresh_items_hud();
+      }
+      entity_hp[item_index] = 0;
+      item_index = 0xff;
+    }
 
     if (!sector_locked && entity_row[current_entity] == sector_down_row && entity_col[current_entity] == sector_down_column) {
       oam_clear();
