@@ -785,17 +785,17 @@ void entity_action_handler() {
       entity_status_turns[skill_target_entity[0]] = STATUS_LENGTH;
       break;
     case SkRaise:
-      for(i = 0; i < 4; i++) {
-        if (entity_hp[i] == 0 && roll_die(20) < 5) {
-          temp_x = entity_col[i];
-          temp_y = entity_row[i];
+      for(skill_target_index = 0; skill_target_index < 4; skill_target_index++) {
+        if (entity_hp[skill_target_index] == 0 && roll_die(20) < 5) {
+          temp_x = entity_col[skill_target_index];
+          temp_y = entity_row[skill_target_index];
           while(entity_collides()) {
             temp_x = subrand8(11);
             temp_y = subrand8(9);
           }
-          entity_hp[i] = entity_max_hp[i] / 4;
-          entity_col[i] = temp_x;
-          entity_row[i] = temp_y;
+          entity_hp[skill_target_index] = entity_max_hp[skill_target_index] / 4;
+          entity_col[skill_target_index] = temp_x;
+          entity_row[skill_target_index] = temp_y;
           num_players++;
         }
       }
