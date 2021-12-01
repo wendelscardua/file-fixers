@@ -1091,8 +1091,6 @@ void start_game (void) {
   pal_bg(bg_palette);
   pal_spr(sprites_palette);
 
-  yendors = 0xff;
-
   // draw some things
   vram_adr(NTADR_A(0,0));
   vram_unrle(main_window_nametable);
