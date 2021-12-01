@@ -68,6 +68,7 @@ enum game_state {
                  MainWindow,
                  DriversWindow,
                  ConfigWindow,
+                 AboutWindow,
                  Dungeon,
                  Castle,
                  GameOver
@@ -98,11 +99,15 @@ unsigned char current_screen;
 #pragma rodata-name ("RODATA")
 #pragma code-name ("STARTUP")
 
+void about_window_default_cursor_handler (void);
+void about_window_loading_handler (void);
+void about_window_handler (void);
 void config_window_default_cursor_handler (void);
 void config_window_keyboard_handler (void);
 void config_window_loading_handler (void);
 void config_window_handler (void);
 void draw_cursor (void);
+void draw_about_window_sprites (void);
 void draw_config_window_sprites (void);
 void draw_drivers_window_sprites (void);
 void draw_main_window_sprites (void);
@@ -175,6 +180,9 @@ void main (void) {
     case ConfigWindow:
       config_window_handler();
       break;
+    case AboutWindow:
+      about_window_handler();
+      break;
     case Dungeon:
       dungeon_handler();
       break;
@@ -218,6 +226,9 @@ void draw_sprites (void) {
     break;
   case ConfigWindow:
     draw_config_window_sprites();
+    break;
+  case AboutWindow:
+    draw_about_window_sprites();
     break;
   case Dungeon:
     draw_dungeon_sprites();
@@ -391,8 +402,23 @@ void main_window_loading_handler () {
     }
     break;
   case 3: // About.txt
-    // TODO
-    current_cursor_state = Default;
+    if (cursor_counter == 0) {
+      set_unrle_buffer(unrle_buffer);
+      unrle_to_buffer(about_window_nametable);
+
+      set_nametable_loader_buffer(unrle_buffer);
+      start_nametable_loader(NTADR_ALT_AUTO(0, 0));
+    } else {
+      if (!yield_nametable_loader()) {
+        current_cursor_state = Default;
+        cursor_index = 0;
+        cursor_target_x = FP(0xbc, 0);
+        cursor_target_y = FP(0x24, 0);
+        set_cursor_speed();
+        current_game_state = AboutWindow;
+        flip_screen();
+      }
+    }
     break;
   case 4: // Config.sys
     if (cursor_counter == 0) {
@@ -822,6 +848,65 @@ void refresh_config_classes() {
 void refresh_config_names() {
   for(i = 0; i < 4; i++) {
     multi_vram_buffer_horz((char *) player_name[i], 5, NTADR_AUTO(CONFIG_ORIG_X + 4, CONFIG_ORIG_Y + 2 + 2 * i));
+  }
+}
+
+// ::ABOUT::
+
+void about_window_handler() {
+  pad_poll(0);
+  pad1_new = get_pad_new(0);
+
+  switch(current_cursor_state) {
+  case Default:
+  case Disabled:
+    about_window_default_cursor_handler();
+    break;
+  case Loading:
+    about_window_loading_handler();
+    break;
+  }
+
+  update_cursor();
+}
+
+void draw_about_window_sprites() {
+  draw_cursor();
+}
+
+void about_window_default_cursor_handler() {
+  if (pad1_new) {
+    if (cursor_target_x == cursor_x && cursor_target_y == cursor_y) {
+      if ((pad1_new & PAD_A) &&
+          (current_cursor_state == Default)) {
+        current_cursor_state = Clicking;
+        cursor_counter = CLICK_DELAY;
+      }
+    } else {
+      current_cursor_state = Default;
+      set_cursor_speed();
+    }
+  }
+}
+
+void about_window_loading_handler () {
+  // close button
+  if (cursor_counter == 0) {
+    set_unrle_buffer(unrle_buffer);
+    unrle_to_buffer(main_window_nametable);
+
+    set_nametable_loader_buffer(unrle_buffer);
+    if (current_screen == 0) {
+      start_nametable_loader(NTADR_C(0, 0));
+    } else {
+      start_nametable_loader(NTADR_A(0, 0));
+    }
+  } else {
+    if (!yield_nametable_loader()) {
+      current_cursor_state = Default;
+      current_game_state = MainWindow;
+      flip_screen();
+    }
   }
 }
 
