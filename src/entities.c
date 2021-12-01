@@ -786,7 +786,7 @@ void entity_action_handler() {
       break;
     case SkRaise:
       for(skill_target_index = 0; skill_target_index < 4; skill_target_index++) {
-        if (entity_hp[skill_target_index] == 0 && roll_die(20) < 5) {
+        if (entity_hp[skill_target_index] == 0 && roll_die(20) < 8 - num_players) {
           temp_x = entity_col[skill_target_index];
           temp_y = entity_row[skill_target_index];
           while(entity_collides()) {
